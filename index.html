@@ -1,0 +1,315 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IT Training Arcade | Network Support Services</title>
+
+<style>
+:root {
+  --bg: #08111f;
+  --panel: #14243a;
+  --border: #2b4564;
+  --blue: #22c7f4;
+  --text: #edf5ff;
+  --muted: #aabbd0;
+}
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+header {
+  padding: 50px 20px;
+  text-align: center;
+  background: linear-gradient(135deg,#102d4c,#071321);
+  border-bottom: 2px solid var(--blue);
+}
+
+.logo {
+  font-size: 52px;
+  margin-bottom: 12px;
+}
+h1 {
+  font-size: clamp(28px,5vw,46px);
+  color: var(--blue);
+  margin: 8px 0;
+}
+.subtitle {
+  color: var(--muted);
+  font-size: 18px;
+}
+.label {
+  display: inline-block;
+  margin-top: 15px;
+  padding: 9px 16px;
+  border: 1px solid #32678a;
+  border-radius: 30px;
+  color: #9feaff;
+  font-size: 13px;
+}
+
+main {
+  max-width: 1250px;
+  padding: 30px 20px;
+  margin: auto;
+}
+.section-title {
+  color: var(--blue);
+  margin-bottom: 20px;
+}
+
+.toolbar {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+input, select {
+  background: #192c45;
+  color: white;
+  padding: 13px;
+  border: 1px solid #3a5679;
+  border-radius: 8px;
+  font-size: 15px;
+}
+input { flex: 1; min-width: 220px; }
+
+.grid {
+  display: grid;
+  grid-template-columns:
+    repeat(auto-fit,minmax(270px,1fr));
+  gap: 22px;
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  transition: .2s;
+}
+.card:hover {
+  transform: translateY(-4px);
+  border-color: var(--blue);
+  box-shadow: 0 8px 25px #0006;
+}
+.icon { font-size: 42px; }
+.card h2 { color: #81dfff; }
+.card p {
+  color: var(--muted);
+  line-height: 1.6;
+  flex: 1;
+}
+.tag {
+  font-size: 12px;
+  color: #9fe4ff;
+  margin-bottom: 18px;
+}
+
+.launch {
+  display: block;
+  text-decoration: none;
+  text-align: center;
+  color: #05111e;
+  background: var(--blue);
+  padding: 13px;
+  border-radius: 8px;
+  font-weight: bold;
+}
+.launch:hover { background: #87e8ff; }
+
+.disabled {
+  background: #35445b;
+  color: #adb8c8;
+  cursor: not-allowed;
+}
+
+footer {
+  text-align: center;
+  padding: 35px 15px;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+  margin-top: 45px;
+}
+
+@media(max-width:600px) {
+  header { padding: 35px 15px; }
+  .grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">🖥️</div>
+  <h1>IT TRAINING ARCADE</h1>
+  <div class="subtitle">
+    Network Support Services
+  </div>
+  <p>Interactive IT Training & Simulation Labs</p>
+  <span class="label">
+    LEARN • CONFIGURE • TROUBLESHOOT • MASTER
+  </span>
+</header>
+
+<main>
+  <h2 class="section-title">Available Training Labs</h2>
+
+  <div class="toolbar">
+    <input
+      type="search"
+      id="search"
+      placeholder="Search training labs..."
+      aria-label="Search training labs"
+    >
+    <select id="category" aria-label="Filter by category">
+      <option value="all">All Categories</option>
+      <option value="networking">Networking</option>
+      <option value="virtualization">Virtualization</option>
+      <option value="security">Security</option>
+      <option value="hardware">Hardware</option>
+    </select>
+  </div>
+
+  <div class="grid" id="games">
+
+    <!-- ARUBA CX -->
+    <article class="card" data-category="networking">
+      <div class="icon">🔀</div>
+      <h2>Aruba CX Switching Academy</h2>
+      <p>
+        Configure two Aruba CX switches.
+        Practice VLAN creation, trunk ports,
+        IP addressing, STP and network security.
+      </p>
+      <div class="tag">NETWORKING • SWITCHING</div>
+      <a class="launch"
+         href="REPLACE_WITH_ARUBA_FILENAME.html"
+         target="_blank" rel="noopener">
+        Launch Simulator →
+      </a>
+    </article>
+
+    <!-- PROXMOX -->
+    <article class="card" data-category="virtualization">
+      <div class="icon">🗄️</div>
+      <h2>Proxmox Storage Academy</h2>
+      <p>
+        Learn storage management,
+        ISO repositories, virtual machine disks,
+        storage pools and virtualization concepts.
+      </p>
+      <div class="tag">VIRTUALIZATION • STORAGE</div>
+      <a class="launch"
+         href="Proxmox%20Storage%20Academy.html"
+         target="_blank" rel="noopener">
+        Launch Simulator →
+      </a>
+    </article>
+
+    <!-- PFSENSE -->
+    <article class="card" data-category="security">
+      <div class="icon">🛡️</div>
+      <h2>pfSense Firewall Academy</h2>
+      <p>
+        Configure firewall rules, VLANs,
+        WAN and LAN interfaces, NAT
+        and network traffic policies.
+      </p>
+      <div class="tag">SECURITY • FIREWALL</div>
+      <span class="launch disabled">
+        Coming Soon
+      </span>
+    </article>
+
+    <!-- SUBNETTING -->
+    <article class="card" data-category="networking">
+      <div class="icon">🌐</div>
+      <h2>Subnetting Challenge</h2>
+      <p>
+        Practice network addresses,
+        usable IP ranges, gateways,
+        broadcast addresses and subnet masks.
+      </p>
+      <div class="tag">NETWORKING • IP ADDRESSING</div>
+      <span class="launch disabled">
+        Coming Soon
+      </span>
+    </article>
+
+    <!-- PC BUILDER -->
+    <article class="card" data-category="hardware">
+      <div class="icon">🖥️</div>
+      <h2>PC Builder Simulator</h2>
+      <p>
+        Build virtual computers,
+        choose compatible components,
+        install hardware and troubleshoot issues.
+      </p>
+      <div class="tag">HARDWARE • COMPTIA A+</div>
+      <span class="launch disabled">
+        Coming Soon
+      </span>
+    </article>
+
+    <!-- CYBERSECURITY -->
+    <article class="card" data-category="security">
+      <div class="icon">🔐</div>
+      <h2>Cybersecurity Challenge</h2>
+      <p>
+        Explore cybersecurity fundamentals,
+        threat detection, access controls
+        and network defense concepts.
+      </p>
+      <div class="tag">CYBERSECURITY • SECURITY+</div>
+      <span class="launch disabled">
+        Coming Soon
+      </span>
+    </article>
+
+  </div>
+</main>
+
+<footer>
+  <strong>IT Training Arcade</strong>
+  <p>Network Support Services</p>
+  <p>Learn by Doing • Interactive IT Education</p>
+</footer>
+
+<script>
+const search = document.getElementById("search");
+const category = document.getElementById("category");
+const cards = document.querySelectorAll(".card");
+
+function filterGames() {
+  const query = search.value.toLowerCase().trim();
+  const selected = category.value;
+
+  cards.forEach(card => {
+    const matchesText =
+      card.textContent.toLowerCase().includes(query);
+
+    const matchesCategory =
+      selected === "all" ||
+      card.dataset.category === selected;
+
+    card.style.display =
+      matchesText && matchesCategory ? "flex" : "none";
+  });
+}
+
+search.addEventListener("input", filterGames);
+category.addEventListener("change", filterGames);
+</script>
+
+</body>
+</html>
