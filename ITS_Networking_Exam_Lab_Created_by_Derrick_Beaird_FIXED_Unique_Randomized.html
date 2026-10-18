@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Information Technology Specialist Networking Exam Lab Simulator</title>
+<style>
+:root{
+  --bg:#071019;--panel:#0d1926;--panel2:#13243a;--line:#294760;--text:#eef7ff;--muted:#9fb7c9;
+  --blue:#2aa7ff;--green:#43dc8e;--yellow:#ffd166;--red:#ff6b78;--purple:#a887ff;--orange:#ff9f43
+}
+*{box-sizing:border-box}
+body{margin:0;background:
+radial-gradient(circle at 10% -8%,#163b62 0,transparent 25%),
+radial-gradient(circle at 95% 0,#25194a 0,transparent 24%),
+linear-gradient(#06101a,#09121b);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif;min-height:100vh}
+button,input,select{font:inherit}button{cursor:pointer}
+.app{max-width:1500px;margin:auto;padding:16px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;padding:14px 18px;background:#0b1825e8;border:1px solid var(--line);border-radius:16px;position:sticky;top:8px;z-index:30;box-shadow:0 10px 35px #0006}
+.brand{display:flex;gap:13px;align-items:center}.logo{width:62px;height:62px;border-radius:11px;background:#107c41;color:white;display:grid;place-items:center;font-weight:1000;font-size:16px;text-align:center;line-height:1.05}.brand h1{margin:0;font-size:clamp(20px,3vw,34px)}.brand p{margin:2px 0 0;color:var(--muted);font-size:12px}
+.badges{display:flex;gap:8px;flex-wrap:wrap}.badge{padding:7px 10px;border-radius:999px;border:1px solid #365a78;background:#122a3d;color:#c9ecff;font-size:12px;font-weight:800}
+.shell{display:grid;grid-template-columns:285px 1fr;gap:14px;margin-top:14px}.side,.main{background:#0b1723e8;border:1px solid #243f59;border-radius:16px}.side{padding:12px;align-self:start;position:sticky;top:100px}
+.nav{width:100%;border:0;background:transparent;color:#dceeff;text-align:left;padding:11px;border-radius:9px;font-weight:800;margin:2px 0}.nav:hover,.nav.active{background:#153650}.nav span{display:block;font-size:10px;color:#7fa3bd;font-weight:500;margin-top:2px}
+.main{padding:18px;min-height:820px}.screen{display:none}.screen.active{display:block}
+.hero{padding:22px;border-radius:17px;border:1px solid #315270;background:linear-gradient(135deg,#102c47,#171d37);margin-bottom:14px}.hero h2{font-size:clamp(28px,4vw,44px);margin:0 0 7px}.hero p{line-height:1.55;color:#c0d6e7;max-width:1050px}.heroActions{display:flex;gap:9px;flex-wrap:wrap}
+.primary,.secondary,.danger,.warning,.success{border:0;border-radius:9px;padding:10px 14px;font-weight:900}.primary{background:var(--blue);color:#041727}.secondary{background:#1b344b;color:white;border:1px solid #3b607d}.danger{background:#a53a46;color:white}.warning{background:#a97113;color:white}.success{background:#198d58;color:white}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.card{background:#101f30;border:1px solid #294a65;border-radius:13px;padding:15px}.card h3{margin:0 0 8px}.small{font-size:12px;color:var(--muted)}.muted{color:var(--muted)}.mono{font-family:Consolas,monospace}
+.domainBar{height:8px;border-radius:99px;background:#07101a;overflow:hidden;margin:8px 0}.domainBar span{height:100%;display:block;background:linear-gradient(90deg,var(--blue),var(--green))}
+.examHeader{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.timer{font:900 28px Consolas,monospace;color:var(--yellow)}.examName{font-size:18px;font-weight:900}
+.navgrid{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin:10px 0}.qnav{border:1px solid #36536a;background:#102638;color:white;border-radius:6px;padding:6px 2px;font-size:11px}.qnav.done{background:#176642}.qnav.flag{outline:2px solid var(--yellow)}.qnav.current{border-color:#50cfff;box-shadow:0 0 0 1px #50cfff}
+.questionCard{background:#101f30;border:1px solid #2d4d68;border-radius:14px;padding:20px}.qmeta{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}.tag{padding:4px 7px;border-radius:999px;background:#17364c;color:#c7eaff;font-size:10px;font-weight:900}.selectTag{background:#4e3d13;color:#ffe59b}.pbqTag{background:#422b59;color:#e7caff}
+.question{font-size:21px;font-weight:800;line-height:1.45;margin:10px 0 14px}.answers{display:grid;gap:8px}.answer{border:1px solid #355b78;background:#153149;color:#f0f8ff;border-radius:10px;padding:12px;text-align:left}.answer:hover{filter:brightness(1.13)}.answer.selected{outline:2px solid var(--green);background:#153d31}
+.feedback{padding:11px;border-radius:9px;border:1px dashed #3b607c;background:#0b1824;margin-top:10px;min-height:45px;line-height:1.5}.good{border-color:#2c8059;background:#0f2a21}.bad{border-color:#803a44;background:#2b1519}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.spacer{flex:1}.preset{display:flex;gap:8px;flex-wrap:wrap}
+.console{background:#02070c;color:#b7ffca;border:1px solid #315042;border-radius:10px;padding:12px;font:13px Consolas,monospace;min-height:235px;white-space:pre-wrap}
+.resultBig{font-size:54px;font-weight:1000}.reviewQ{padding:12px;border-radius:10px;border:1px solid #294b65;background:#0e1e2d;margin-bottom:9px}.correctTxt{color:#7effb4}.wrongTxt{color:#ff8d98}
+.studyQ{font-size:18px;font-weight:800;margin:10px 0}.studyCard{margin-bottom:12px}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:8px;border-bottom:1px solid #29475e;text-align:left}th{color:#bfeaff}
+label{display:block;font-size:12px;color:#a9c6d7;font-weight:800;margin-top:9px;margin-bottom:4px}input,select{width:100%;padding:10px 11px;border-radius:8px;border:1px solid #375568;background:#09151e;color:white}
+.topology{display:grid;grid-template-columns:1fr 70px 1fr 70px 1fr;gap:8px;align-items:center}.node{padding:14px 8px;background:#14293a;border:1px solid #31516a;border-radius:10px;text-align:center}.link{height:3px;background:#46657a}
+.creator-footer{position:fixed;bottom:8px;left:50%;transform:translateX(-50%);z-index:9999;padding:6px 12px;border-radius:999px;background:rgba(7,16,25,.88);border:1px solid #365a78;color:#9fb7c9;font-size:11px;font-weight:700;letter-spacing:.5px;backdrop-filter:blur(6px);white-space:nowrap}
+@media(max-width:1050px){.shell{grid-template-columns:1fr}.side{position:static}.grid{grid-template-columns:1fr 1fr}.topology{grid-template-columns:1fr}}
+@media(max-width:700px){.grid,.grid2{grid-template-columns:1fr}.navgrid{grid-template-columns:repeat(8,1fr)}}
+</style>
+</head>
+<body>
+<div class="creator-footer" id="creatorMark"></div>
+<div class="app">
+<div class="topbar">
+<div class="brand"><div class="logo">ITS<br>NET</div><div><h1>Information Technology Specialist - Networking</h1><p>Fundamentals • infrastructure • hardware • protocols/services • troubleshooting</p></div></div>
+<div class="badges"><div class="badge" id="xpBadge">XP 0</div><div class="badge">40-question practice mode</div><div class="badge">50-minute timer</div></div>
+</div>
+
+<div class="shell">
+<aside class="side">
+<button class="nav active" onclick="show('home',this)">🏠 Exam Center<span>Start exam, study, or hands-on labs</span></button>
+<button class="nav" onclick="showStudy(this)">📘 Study Mode<span>Immediate explanations by domain</span></button>
+<button class="nav" onclick="show('pbq',this)">🧪 Networking Skills Lab<span>VLANs, IPv4, DNS/DHCP, tools, troubleshooting</span></button>
+<button class="nav" onclick="setupExam(this)">📝 ITS Networking Exam<span>40 questions • 50 minutes</span></button>
+<button class="nav" onclick="show('objectives',this)">📊 Objective Map<span>Current five Pearson/Certiport domains</span></button>
+</aside>
+
+<main class="main">
+<section id="home" class="screen active">
+<div class="hero"><h2>Networking Technician Challenge</h2><p>This simulator follows the current Information Technology Specialist Networking objective structure. It covers foundational network concepts, LAN/WAN and wireless infrastructure, switches/routers/cabling, OSI/TCP-IP/IPv4/IPv6/ports/DNS/DHCP/NAT, and Windows/Linux troubleshooting tools.</p><div class="heroActions"><button class="primary" onclick="setupExam()">START FULL PRACTICE EXAM</button><button class="success" onclick="document.querySelectorAll('.nav')[2].click()">OPEN NETWORKING SKILLS LAB</button></div></div>
+
+<div class="grid">
+<div class="card"><h3>1. Networking Fundamentals</h3><p class="small">Internet/intranet/extranet, client-server, peer-to-peer, unicast/multicast/broadcast, IoT, virtualization, VPN and Remote Desktop.</p></div>
+<div class="card"><h3>2. Network Infrastructures</h3><p class="small">LANs, DMZs, VLANs, WANs, DSL/cable/satellite/cellular, wireless standards/security/interference, topologies.</p></div>
+<div class="card"><h3>3. Network Hardware</h3><p class="small">Switches, access/trunk ports, Layer 2/3, MAC tables, STP, routers, routes, QoS, cabling, fiber, EMI and crosstalk.</p></div>
+<div class="card"><h3>4. Protocols & Services</h3><p class="small">OSI/TCP-IP models, IPv4/IPv6, ports, DNS records, name resolution, DHCP, NAT/PAT and firewalls.</p></div>
+<div class="card"><h3>5. Troubleshooting</h3><p class="small">Process, professional conduct, cable tools, TDR/OTDR, Windows and Linux diagnostic commands.</p></div>
+<div class="card"><h3>Practice Format</h3><div class="resultBig" style="font-size:30px">40 Q / 50 min</div><p class="small">Original practice questions and interactive networking tasks.</p></div>
+</div>
+</section>
+
+<section id="study" class="screen"><div class="hero"><h2>Networking Study Mode</h2><p>Choose a domain and get immediate explanations after each answer.</p></div><div class="toolbar"><select id="studyDomain" onchange="renderStudy()"></select><button class="secondary" onclick="renderStudy()">NEW QUESTION</button></div><div id="studyArea"></div></section>
+
+<section id="examSetup" class="screen"><div class="hero"><h2>ITS Networking Exam Simulator</h2><p>Full mode provides a 40-question, 50-minute certification-style session. Shorter classroom modes are also included.</p></div>
+<div class="grid">
+<div class="card"><h3>Full Simulation</h3><div class="resultBig" style="font-size:32px">40 Q</div><p class="small">50 minutes. All five objective domains.</p><button class="primary" onclick="startExam(40,3000)">START FULL EXAM</button></div>
+<div class="card"><h3>Class Practice</h3><div class="resultBig" style="font-size:32px">25 Q</div><p class="small">35 minutes. Balanced coverage.</p><button class="primary" onclick="startExam(25,2100)">START 25 QUESTIONS</button></div>
+<div class="card"><h3>Quick Check</h3><div class="resultBig" style="font-size:32px">15 Q</div><p class="small">20 minutes. Fast review.</p><button class="primary" onclick="startExam(15,1200)">START 15 QUESTIONS</button></div>
+</div></section>
+
+<section id="exam" class="screen">
+<div class="examHeader"><div><div class="examName">ITS Networking Practice Exam</div><div class="small">Question <span id="qNum"></span> of <span id="qTotal"></span></div></div><div class="timer" id="timer">50:00</div></div>
+<div class="domainBar"><span id="examProgress"></span></div><div id="qNav" class="navgrid"></div>
+<div class="questionCard"><div class="qmeta"><span class="tag" id="qDomain"></span><span class="tag" id="qType"></span></div><div id="qText" class="question"></div><div id="answers" class="answers"></div>
+<div class="toolbar"><button class="secondary" onclick="prevQ()">← PREVIOUS</button><button class="warning" onclick="toggleFlag()">⚑ FLAG FOR REVIEW</button><div class="spacer"></div><button class="secondary" onclick="nextQ()">NEXT →</button><button class="danger" onclick="submitExam()">SUBMIT EXAM</button></div></div>
+</section>
+
+<section id="results" class="screen"><div id="resultsArea"></div></section>
+
+<section id="pbq" class="screen">
+<div class="hero"><h2>Networking Skills Lab</h2><p>Practice the practical concepts in the objective list: VLAN/trunk roles, IPv4 addressing, DNS/DHCP diagnosis, cable/tool selection, port matching, and Windows/Linux troubleshooting.</p></div>
+<div class="preset">
+<button class="primary" onclick="loadPBQ('vlan')">VLAN / Trunk</button>
+<button class="primary" onclick="loadPBQ('ipv4')">IPv4 / Subnet</button>
+<button class="primary" onclick="loadPBQ('dns')">DNS / DHCP</button>
+<button class="primary" onclick="loadPBQ('ports')">Ports & Services</button>
+<button class="primary" onclick="loadPBQ('cable')">Cabling Tools</button>
+<button class="primary" onclick="loadPBQ('windows')">Windows CLI</button>
+<button class="primary" onclick="loadPBQ('linux')">Linux CLI</button>
+</div><div id="pbqArea" style="margin-top:14px"></div>
+</section>
+
+<section id="objectives" class="screen">
+<div class="hero"><h2>Current ITS Networking Objective Map</h2><p>This simulator covers the five domains in Pearson's current Networking objective document.</p></div>
+<div class="card"><table><tr><th>Domain</th><th>Skills Practiced</th></tr>
+<tr><td>1. Networking Fundamentals</td><td>Network types, transmission types, IoT, cloud/virtualization, VPN and Remote Desktop</td></tr>
+<tr><td>2. Network Infrastructures</td><td>LANs, DMZ/VLAN, WANs, wireless standards/security/interference, star/mesh/ring/bus</td></tr>
+<tr><td>3. Network Hardware</td><td>Switches, trunks/access ports, L2/L3, STP, routing, QoS, physical media, EMI/crosstalk</td></tr>
+<tr><td>4. Protocols and Services</td><td>OSI/TCP-IP, IPv4/IPv6, well-known ports, DNS records/name resolution, DHCP/NAT/firewalls</td></tr>
+<tr><td>5. Troubleshooting</td><td>Troubleshooting process, multimeter/cable tester/toner/TDR/OTDR, Windows and Linux commands</td></tr>
+</table></div>
+</section>
+</main></div></div>
+
+<script>
+let XP=0,examItems=[],responses=[],flags=[],qi=0,timerHandle=null,timeLeft=3000,studyItem=null;
+
+const Q=[
+["1. Networking Fundamentals","Which network is designed primarily for use by employees inside an organization?",["Intranet","Extranet","Internet","PAN only"],[0],"An intranet is a private internal organizational network.","Single answer"],
+["1. Networking Fundamentals","Which network provides controlled access to selected external partners or customers?",["Extranet","Intranet only","Loopback","Broadcast domain"],[0],"An extranet exposes selected resources to authorized external parties.","Single answer"],
+["1. Networking Fundamentals","Which model uses dedicated systems to provide services to requesting user devices?",["Client-server","Peer-to-peer only","Bus topology","Ad hoc only"],[0],"Client-server networks use servers to provide centralized services.","Single answer"],
+["1. Networking Fundamentals","Which traffic type is one sender to one receiver?",["Unicast","Broadcast","Multicast","Anycast only"],[0],"Unicast is one-to-one communication.","Single answer"],
+["1. Networking Fundamentals","Which traffic type targets a selected group of receivers?",["Multicast","Broadcast","Unicast only","Loopback"],[0],"Multicast delivers to members of a group.","Single answer"],
+["1. Networking Fundamentals","Which TWO are virtualization components?",["Hypervisor","Virtual switch","Patch panel","Cable tester"],[0,1],"Hypervisors host VMs and virtual switches connect virtual interfaces.","Select TWO"],
+["1. Networking Fundamentals","Which remote-access technology creates an encrypted tunnel through an untrusted network?",["VPN","Hub","DHCP","NAT only"],[0],"A VPN protects remote traffic across an untrusted network.","Single answer"],
+["1. Networking Fundamentals","Which Microsoft technology commonly allows a user to control a Windows desktop remotely?",["Remote Desktop","DNS","STP","SMTP"],[0],"Remote Desktop provides graphical remote control of Windows systems.","Single answer"],
+
+["2. Network Infrastructures","Which network typically covers a building or campus rather than a large geographic region?",["LAN","WAN","Internet","Satellite network only"],[0],"A LAN covers a relatively limited local area.","Single answer"],
+["2. Network Infrastructures","Which design places public-facing systems in a separated perimeter network?",["DMZ","Flat LAN","Loopback","Peer-to-peer workgroup"],[0],"A DMZ separates public-facing services from internal systems.","Single answer"],
+["2. Network Infrastructures","Which technology logically segments a switched network into separate broadcast domains?",["VLAN","VPN only","DNS","NTP"],[0],"VLANs create separate Layer 2 broadcast domains.","Single answer"],
+["2. Network Infrastructures","Which TWO are WAN access technologies?",["DSL","Satellite","USB keyboard","VLAN trunk"],[0,1],"DSL and satellite can provide WAN connectivity.","Select TWO"],
+["2. Network Infrastructures","Which wireless security technology is obsolete and should not be preferred?",["WEP","WPA2","WPA3","802.1X"],[0],"WEP is obsolete and insecure.","Single answer"],
+["2. Network Infrastructures","Which security approach can authenticate users/devices before granting network access?",["802.1X","WEP only","Broadcasting","NAT"],[0],"802.1X provides port-based access control.","Single answer"],
+["2. Network Infrastructures","Which topology connects endpoints to a central device such as a switch?",["Star","Ring","Bus","Mesh only"],[0],"A star topology connects nodes through a central device.","Single answer"],
+["2. Network Infrastructures","Which topology provides multiple paths between many nodes and can improve resilience?",["Mesh","Bus","Single-star only","Daisy chain"],[0],"Mesh designs can provide redundant paths.","Single answer"],
+["2. Network Infrastructures","A microwave oven causes 2.4 GHz wireless performance to drop. What concept does this demonstrate?",["Wireless interference","Routing convergence","NAT","Subnetting"],[0],"Other RF sources can interfere with wireless networks.","Single answer"],
+
+["3. Network Hardware","What is the primary purpose of a switch MAC address table?",["Associate MAC addresses with switch ports","Map hostnames to IP addresses","Assign DHCP leases","Store static routes only"],[0],"Switches learn which MAC addresses are reachable through which ports.","Single answer"],
+["3. Network Hardware","Which switch port type normally carries traffic for one VLAN to an endpoint?",["Access port","Trunk port","Loopback port","Console-only link"],[0],"Access ports normally serve endpoints in a single VLAN.","Single answer"],
+["3. Network Hardware","Which switch port type carries multiple VLANs between network devices?",["Trunk port","Access port","Disabled port","USB port"],[0],"Trunks carry traffic for multiple VLANs.","Single answer"],
+["3. Network Hardware","Which protocol prevents Layer 2 switching loops?",["Spanning Tree Protocol","DNS","DHCP","SMTP"],[0],"STP blocks redundant paths as needed to prevent Layer 2 loops.","Single answer"],
+["3. Network Hardware","What device forwards traffic between IP networks?",["Router","Hub","Patch panel","Repeater only"],[0],"Routers forward Layer 3 packets between networks.","Single answer"],
+["3. Network Hardware","Which route is used when no more-specific route matches a destination?",["Default route","Loopback route","Host-only VLAN","Broadcast route"],[0],"The default route is the fallback route.","Single answer"],
+["3. Network Hardware","Which routing method is entered manually by an administrator?",["Static routing","Dynamic routing","STP","NAT"],[0],"Static routes are manually configured.","Single answer"],
+["3. Network Hardware","Which feature prioritizes delay-sensitive traffic such as voice during congestion?",["QoS","DNS","ARP","PAT only"],[0],"Quality of Service prioritizes selected traffic classes.","Single answer"],
+["3. Network Hardware","Which TWO are common twisted-pair concerns?",["EMI","Crosstalk","Optical attenuation only","DNS recursion"],[0,1],"Copper cabling can be affected by EMI and crosstalk.","Select TWO"],
+["3. Network Hardware","Which medium is best suited for long-distance high-bandwidth links and is immune to electromagnetic interference?",["Fiber optic","UTP copper","Coax only","Telephone cable"],[0],"Fiber uses light and is immune to EMI.","Single answer"],
+["3. Network Hardware","Which device creates separate collision domains on each port compared with a hub?",["Switch","Hub","Repeater","Passive patch panel"],[0],"Switch ports form separate collision domains.","Single answer"],
+
+["4. Protocols and Services","Which OSI layer is responsible for routing IP packets?",["Layer 3 Network","Layer 2 Data Link","Layer 1 Physical","Layer 7 Application"],[0],"Routing is a Layer 3 function.","Single answer"],
+["4. Protocols and Services","At which OSI layer are MAC addresses primarily used?",["Layer 2 Data Link","Layer 3 Network","Layer 4 Transport","Layer 7 Application"],[0],"MAC addresses are Layer 2 identifiers.","Single answer"],
+["4. Protocols and Services","Which IPv4 address is private?",["192.168.1.50","8.8.8.8","1.1.1.1","203.0.113.10"],[0],"192.168.0.0/16 is private RFC1918 space.","Single answer"],
+["4. Protocols and Services","What is the IPv4 loopback address commonly used for local testing?",["127.0.0.1","169.254.1.1","255.255.255.255","224.0.0.1"],[0],"127.0.0.1 is the standard IPv4 loopback address.","Single answer"],
+["4. Protocols and Services","Which IPv6 prefix represents link-local addresses?",["FE80::/10","2000::/3","FF00::/8 only","::1/128 only"],[0],"IPv6 link-local addresses use FE80::/10.","Single answer"],
+["4. Protocols and Services","Which IPv6 address is the loopback address?",["::1","::","FE80::1","FF02::1"],[0],"::1 is the IPv6 loopback address.","Single answer"],
+["4. Protocols and Services","Which port is used by HTTP by default?",["80","443","22","53"],[0],"HTTP commonly uses TCP port 80.","Single answer"],
+["4. Protocols and Services","Which port is used by HTTPS by default?",["443","80","25","3389"],[0],"HTTPS commonly uses TCP port 443.","Single answer"],
+["4. Protocols and Services","Which port is commonly used by SSH?",["22","21","53","110"],[0],"SSH commonly uses TCP port 22.","Single answer"],
+["4. Protocols and Services","Which port is commonly used by DNS?",["53","67","3389","143"],[0],"DNS commonly uses port 53.","Single answer"],
+["4. Protocols and Services","Which port is commonly used by Remote Desktop Protocol?",["3389","443","22","25"],[0],"RDP commonly uses TCP/UDP 3389.","Single answer"],
+["4. Protocols and Services","Which TWO DNS records map a hostname to an address?",["A","AAAA","MX","PTR"],[0,1],"A maps names to IPv4 addresses; AAAA maps names to IPv6 addresses.","Select TWO"],
+["4. Protocols and Services","Which DNS record identifies a mail server for a domain?",["MX","PTR","A only","SOA only"],[0],"MX records identify mail exchangers.","Single answer"],
+["4. Protocols and Services","Which DNS record is commonly used for reverse lookups?",["PTR","CNAME","MX","AAAA only"],[0],"PTR records map an address back to a hostname.","Single answer"],
+["4. Protocols and Services","Which service automatically assigns IP configuration to clients?",["DHCP","DNS","NAT","FTP"],[0],"DHCP leases IP configuration to clients.","Single answer"],
+["4. Protocols and Services","Which service translates private addresses to public addresses?",["NAT","DNS","DHCP","SSH"],[0],"NAT translates between address spaces.","Single answer"],
+["4. Protocols and Services","Which variation allows many private hosts to share one public IP by using different port numbers?",["PAT","WINS","STP","RDP"],[0],"Port Address Translation distinguishes sessions with transport ports.","Single answer"],
+
+["5. Troubleshooting","What should a technician do first in a structured troubleshooting process?",["Identify the problem and gather information","Replace random hardware","Erase configuration","Document the solution before testing"],[0],"Troubleshooting starts by identifying the problem and gathering evidence.","Single answer"],
+["5. Troubleshooting","Which tool verifies wire map and continuity on a copper network cable?",["Cable tester","OTDR","Packet analyzer only","DNS server"],[0],"Cable testers check copper cabling continuity and wiring.","Single answer"],
+["5. Troubleshooting","Which tool helps trace an unlabeled copper cable through a wiring closet?",["Toner and probe","Multimeter only","OTDR","Router"],[0],"A toner/probe helps locate cable runs.","Single answer"],
+["5. Troubleshooting","Which tool can estimate the distance to a fault on copper cable?",["TDR","OTDR","DNS","Loopback plug only"],[0],"A time-domain reflectometer locates faults in copper cable.","Single answer"],
+["5. Troubleshooting","Which tool is designed to locate faults in fiber-optic cable?",["OTDR","TDR","Multimeter","Tone generator"],[0],"An optical time-domain reflectometer analyzes fiber links.","Single answer"],
+["5. Troubleshooting","Which Windows command displays IP configuration?",["ipconfig","tracert only","hostname only","arp only"],[0],"ipconfig displays Windows IP settings.","Single answer"],
+["5. Troubleshooting","Which Windows command traces the Layer 3 path toward a destination?",["tracert","ipconfig","hostname","arp"],[0],"tracert displays the hop path toward a destination.","Single answer"],
+["5. Troubleshooting","Which Windows command directly queries DNS?",["nslookup","netstat","arp","hostname"],[0],"nslookup queries DNS servers.","Single answer"],
+["5. Troubleshooting","Which Windows command displays active connections and listening ports?",["netstat","hostname","tracert","ipconfig only"],[0],"netstat displays connection and listener information.","Single answer"],
+["5. Troubleshooting","Which Linux command displays interface addressing on modern systems?",["ip addr","format","gpupdate","diskpart"],[0],"ip addr displays Linux interface addressing.","Single answer"],
+["5. Troubleshooting","Which Linux command commonly queries DNS records with detailed output?",["dig","traceroute only","arp only","ip addr only"],[0],"dig is a common DNS query tool on Linux.","Single answer"],
+["5. Troubleshooting","A PC has 169.254.35.20 and cannot reach the gateway. What service should be checked?",["DHCP","DNS only","RDP","NAT only"],[0],"An APIPA address commonly indicates DHCP failure.","Single answer"],
+["5. Troubleshooting","A PC can ping 8.8.8.8 but cannot resolve example.com. What should be checked?",["DNS","Ethernet cable first","Monitor cable","STP"],[0],"Working IP connectivity with failed name lookup points to DNS.","Single answer"],
+["5. Troubleshooting","A PC can reach local subnet hosts but not remote networks. Which setting is most likely wrong?",["Default gateway","Hostname","MAC table only","DNS suffix only"],[0],"The default gateway routes traffic off the local subnet.","Single answer"]
+];
+
+const DOMAINS=[...new Set(Q.map(q=>q[0]))];
+
+const EXTRA_Q=[];
+const BANK=[...Q,...EXTRA_Q];
+
+// Randomize answer positions while preserving the correct answer index(es).
+function shuffleQuestion(q){
+ const choices=q[2].map((answer,index)=>({answer,correct:q[3].includes(index)}));
+ for(let i=choices.length-1;i>0;i--){
+   const j=Math.floor(Math.random()*(i+1));
+   [choices[i],choices[j]]=[choices[j],choices[i]];
+ }
+ return [
+   q[0],
+   q[1],
+   choices.map(x=>x.answer),
+   choices.map((x,i)=>x.correct?i:null).filter(x=>x!==null),
+   q[4],
+   q[5]
+ ];
+}
+
+function show(id,btn){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll(".nav").forEach(n=>n.classList.remove("active"));if(btn)btn.classList.add("active")}
+function setupExam(btn){show("examSetup",btn)}
+function balancedSet(n){
+ const result=[];let remaining=n;
+ DOMAINS.forEach((dom,idx)=>{
+   const count=idx===DOMAINS.length-1?remaining:Math.round(n/DOMAINS.length);
+   remaining-=count;
+   const subset=BANK.filter(q=>q[0]===dom).sort(()=>Math.random()-.5);
+   if(count>subset.length)throw new Error("Not enough unique questions in "+dom);
+   for(let i=0;i<count;i++)result.push(shuffleQuestion(subset[i]));
+ });
+ return result.sort(()=>Math.random()-.5);
+}
+function startExam(n,seconds){examItems=balancedSet(n);responses=Array(n).fill(null).map(()=>[]);flags=Array(n).fill(false);qi=0;timeLeft=seconds;show("exam");document.getElementById("qTotal").textContent=n;clearInterval(timerHandle);timerHandle=setInterval(tick,1000);renderQ();tick(true)}
+function tick(noDec=false){if(!noDec)timeLeft--;let m=Math.floor(timeLeft/60),s=timeLeft%60;document.getElementById("timer").textContent=String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");if(timeLeft<=0)submitExam()}
+function renderQ(){const q=examItems[qi],selected=responses[qi]||[];document.getElementById("qNum").textContent=qi+1;document.getElementById("qDomain").textContent=q[0];document.getElementById("qType").textContent=q[5];document.getElementById("qType").className="tag "+(q[5].includes("TWO")?"selectTag":"");document.getElementById("qText").textContent=q[1];document.getElementById("answers").innerHTML=q[2].map((a,i)=>`<button class="answer ${selected.includes(i)?'selected':''}" onclick="selectAns(${i})">${String.fromCharCode(65+i)}. ${a}</button>`).join("");document.getElementById("examProgress").style.width=((qi+1)/examItems.length*100)+"%";document.getElementById("qNav").innerHTML=examItems.map((_,i)=>`<button class="qnav ${responses[i]?.length?'done':''} ${flags[i]?'flag':''} ${i===qi?'current':''}" onclick="qi=${i};renderQ()">${i+1}</button>`).join("")}
+function selectAns(i){const q=examItems[qi],max=q[3].length;if(max===1)responses[qi]=[i];else{let a=responses[qi]||[];if(a.includes(i))a=a.filter(x=>x!==i);else if(a.length<max)a=[...a,i];responses[qi]=a}renderQ()}
+function nextQ(){if(qi<examItems.length-1)qi++;renderQ()}function prevQ(){if(qi>0)qi--;renderQ()}function toggleFlag(){flags[qi]=!flags[qi];renderQ()}
+function sameSet(a,b){return a.length===b.length&&a.slice().sort().every((x,i)=>x===b.slice().sort()[i])}
+function submitExam(){
+ if(!examItems.length)return;clearInterval(timerHandle);let correct=0;const domains={};
+ examItems.forEach((q,i)=>{if(!domains[q[0]])domains[q[0]]=[0,0];domains[q[0]][1]++;if(sameSet(responses[i]||[],q[3])){correct++;domains[q[0]][0]++}});
+ const pct=Math.round(correct/examItems.length*100);show("results");
+ let html=`<div class="hero"><div class="resultBig">${pct>=85?"STRONG READINESS ✅":pct>=70?"PASSING PRACTICE RANGE — KEEP DRILLING":"REVIEW NEEDED 🛠️"}</div><h2>${correct}/${examItems.length} • ${pct}%</h2><p>This is an original practice percentage, not an official Certiport score report.</p><div class="heroActions"><button class="primary" onclick="setupExam()">NEW EXAM</button><button class="secondary" onclick="showStudy()">STUDY MODE</button></div></div><div class="grid">`;
+ Object.entries(domains).forEach(([d,v])=>{let p=Math.round(v[0]/v[1]*100);html+=`<div class="card"><h3>${d}</h3><div class="resultBig" style="font-size:30px">${p}%</div><div class="domainBar"><span style="width:${p}%"></span></div><div class="small">${v[0]} correct of ${v[1]}</div></div>`});
+ html+="</div><h2 style='margin-top:18px'>Answer Review</h2>";
+ examItems.forEach((q,i)=>{const ok=sameSet(responses[i]||[],q[3]);html+=`<div class="reviewQ"><b>${i+1}. ${q[1]}</b><div class="${ok?'correctTxt':'wrongTxt'}">${ok?'Correct':'Incorrect'}</div><div class="small">Correct answer: ${q[3].map(x=>q[2][x]).join(" + ")}</div><div class="small">${q[4]}</div></div>`});
+ document.getElementById("resultsArea").innerHTML=html;XP+=correct;document.getElementById("xpBadge").textContent="XP "+XP
+}
+function showStudy(btn){show("study",btn);document.getElementById("studyDomain").innerHTML=`<option value="ALL">All Domains</option>`+DOMAINS.map(d=>`<option>${d}</option>`).join("");renderStudy()}
+function renderStudy(){const d=document.getElementById("studyDomain").value||"ALL";let pool=BANK.filter(q=>d==="ALL"||q[0]===d);studyItem=shuffleQuestion(shuffleQuestion(pool[Math.floor(Math.random()*pool.length)]));window.studyChosen=[];document.getElementById("studyArea").innerHTML=`<div class="card studyCard"><span class="tag">${studyItem[0]}</span><span class="tag ${studyItem[5].includes("TWO")?'selectTag':''}">${studyItem[5]}</span><div class="studyQ">${studyItem[1]}</div><div class="answers">${studyItem[2].map((a,i)=>`<button class="answer" onclick="answerStudy(${i},this)">${a}</button>`).join("")}</div><div id="studyFeedback" class="feedback">Answer the question. Study mode explains why.</div></div>`}
+function answerStudy(i,btn){const max=studyItem[3].length;if(max===1){const ok=studyItem[3].includes(i);document.querySelectorAll("#studyArea .answer").forEach(b=>b.classList.remove("selected"));btn.classList.add("selected");document.getElementById("studyFeedback").className="feedback "+(ok?"good":"bad");document.getElementById("studyFeedback").innerHTML=(ok?"✅ Correct. ":"❌ Incorrect. ")+studyItem[4];if(ok){XP+=5;document.getElementById("xpBadge").textContent="XP "+XP}}else{if(window.studyChosen.includes(i))window.studyChosen=window.studyChosen.filter(x=>x!==i);else if(window.studyChosen.length<max)window.studyChosen.push(i);document.querySelectorAll("#studyArea .answer").forEach((b,j)=>b.classList.toggle("selected",window.studyChosen.includes(j)));if(window.studyChosen.length===max){const ok=sameSet(window.studyChosen,studyItem[3]);document.getElementById("studyFeedback").className="feedback "+(ok?"good":"bad");document.getElementById("studyFeedback").innerHTML=(ok?"✅ Correct. ":"❌ Incorrect. ")+studyItem[4]}}}
+
+// PBQs
+function loadPBQ(kind){
+ if(kind==="vlan"){
+  document.getElementById("pbqArea").innerHTML=`<div class="card"><span class="tag pbqTag">SKILLS LAB • VLAN / TRUNK</span><h3>Configure the Switch Roles</h3><p>Port 1 connects to another network device and must carry VLANs 10,20,30. Port 2 connects to a student PC in VLAN 10.</p><div class="grid2"><div><label>Port 1 Mode</label><select id="p1"><option>Access</option><option>Trunk</option></select></div><div><label>Port 2 Mode</label><select id="p2"><option>Trunk</option><option>Access</option></select><label>Port 2 VLAN</label><select id="v2"><option>20</option><option>10</option><option>30</option></select></div></div><button class="success" style="margin-top:10px" onclick="checkVLAN()">VALIDATE</button><div id="pbqFeedback" class="feedback">The multi-VLAN uplink is a trunk; the endpoint is an access port.</div></div>`;
+ } else if(kind==="ipv4"){
+  document.getElementById("pbqArea").innerHTML=`<div class="card"><span class="tag pbqTag">SKILLS LAB • IPv4</span><h3>Complete the Client Configuration</h3><p>The LAN is 192.168.10.0/24 and the router is 192.168.10.1. Configure a valid host address.</p><div class="grid"><div><label>IP Address</label><input id="ip" placeholder="192.168.10.50"></div><div><label>Subnet Mask</label><input id="mask" placeholder="255.255.255.0"></div><div><label>Default Gateway</label><input id="gw" placeholder="192.168.10.1"></div></div><button class="success" style="margin-top:10px" onclick="checkIP()">VALIDATE</button><div id="pbqFeedback" class="feedback">Use a valid host address in the /24 and the router as gateway.</div></div>`;
+ } else if(kind==="dns"){
+  document.getElementById("pbqArea").innerHTML=`<div class="card"><span class="tag pbqTag">SKILLS LAB • DNS / DHCP</span><h3>Diagnose the Client</h3><div class="console">C:\\> ipconfig /all
+IPv4 Address . . . . . : 192.168.1.55
+Subnet Mask  . . . . . : 255.255.255.0
+Default Gateway . . .  : 192.168.1.1
+DHCP Server . . . . .  : 192.168.1.1
+DNS Server  . . . . .  : 192.168.1.250
+
+C:\\> ping 8.8.8.8
+Reply from 8.8.8.8
+
+C:\\> nslookup example.com
+DNS request timed out.</div><div class="answers"><button class="answer" onclick="dnsPick(0)">DNS problem</button><button class="answer" onclick="dnsPick(1)">DHCP failed completely</button><button class="answer" onclick="dnsPick(2)">Default gateway is missing</button><button class="answer" onclick="dnsPick(3)">Cable is disconnected</button></div><div id="pbqFeedback" class="feedback">Use the evidence to isolate the failing service.</div></div>`;
+ } else if(kind==="ports"){
+  document.getElementById("pbqArea").innerHTML=`<div class="card"><span class="tag pbqTag">SKILLS LAB • PORTS & SERVICES</span><h3>Match the Service</h3><div class="grid2"><div><label>HTTPS</label><select id="https"><option>80</option><option>443</option><option>22</option><option>53</option></select><label>SSH</label><select id="ssh"><option>21</option><option>22</option><option>25</option><option>3389</option></select></div><div><label>DNS</label><select id="dns"><option>53</option><option>80</option><option>110</option><option>143</option></select><label>RDP</label><select id="rdp"><option>443</option><option>3389</option><option>22</option><option>53</option></select></div></div><button class="success" style="margin-top:10px" onclick="checkPorts()">VALIDATE</button><div id="pbqFeedback" class="feedback">Match each common service to its standard port.</div></div>`;
+ } else if(kind==="cable"){
+  document.getElementById("pbqArea").innerHTML=`<div class="card"><span class="tag pbqTag">SKILLS LAB • CABLING TOOLS</span><h3>Select the Correct Diagnostic Tool</h3><p>A fiber link fails and the technician needs to determine the distance to the optical fault.</p><div class="answers"><button class="answer" onclick="cablePick(0)">OTDR</button><button class="answer" onclick="cablePick(1)">TDR</button><button class="answer" onclick="cablePick(2)">Toner only</button><button class="answer" onclick="cablePick(3)">Multimeter only</button></div><div id="pbqFeedback" class="feedback">Choose the tool designed for optical fiber fault location.</div></div>`;
+ } else if(kind==="windows"){
+  document.getElementById("pbqArea").innerHTML=`<div class="card"><span class="tag pbqTag">SKILLS LAB • WINDOWS CLI</span><h3>Choose the Next Command</h3><div class="console">C:\\> ping 8.8.8.8
+Reply from 8.8.8.8
+
+Problem:
+Users report that hostnames do not resolve.</div><div class="answers"><button class="answer" onclick="winPick(0)">nslookup example.com</button><button class="answer" onclick="winPick(1)">format C:</button><button class="answer" onclick="winPick(2)">shutdown /s</button><button class="answer" onclick="winPick(3)">hostname only</button></div><div id="pbqFeedback" class="feedback">Use the command that directly tests DNS resolution.</div></div>`;
+ } else {
+  document.getElementById("pbqArea").innerHTML=`<div class="card"><span class="tag pbqTag">SKILLS LAB • LINUX CLI</span><h3>Inspect Interface Addressing</h3><p>Which command should the technician use on a modern Linux system to view interface IP addresses?</p><div class="answers"><button class="answer" onclick="linuxPick(0)">ip addr</button><button class="answer" onclick="linuxPick(1)">format</button><button class="answer" onclick="linuxPick(2)">gpupdate /force</button><button class="answer" onclick="linuxPick(3)">diskpart</button></div><div id="pbqFeedback" class="feedback">Choose the Linux networking command.</div></div>`;
+ }
+}
+function setFB(ok,a,b){const e=document.getElementById("pbqFeedback");e.className="feedback "+(ok?"good":"bad");e.textContent=ok?a:b;if(ok){XP+=10;document.getElementById("xpBadge").textContent="XP "+XP}}
+function checkVLAN(){setFB(document.getElementById("p1").value==="Trunk"&&document.getElementById("p2").value==="Access"&&document.getElementById("v2").value==="10","✅ Correct: Port 1 is the trunk; Port 2 is an access port in VLAN 10.","❌ Re-check trunk versus access roles and VLAN 10.")}
+function checkIP(){const ip=document.getElementById("ip").value.trim();const ok=/^192\.168\.10\.(?:[1-9]|[1-9]\d|1\d\d|2[0-4]\d|25[0-4])$/.test(ip)&&ip!=="192.168.10.1"&&document.getElementById("mask").value.trim()==="255.255.255.0"&&document.getElementById("gw").value.trim()==="192.168.10.1";setFB(ok,"✅ Valid /24 client configuration.","❌ Use a valid 192.168.10.x host, /24 mask, and 192.168.10.1 gateway.")}
+function dnsPick(i){setFB(i===0,"✅ DNS is failing while basic IP connectivity works.","❌ The evidence points to DNS.")}
+function checkPorts(){setFB(document.getElementById("https").value==="443"&&document.getElementById("ssh").value==="22"&&document.getElementById("dns").value==="53"&&document.getElementById("rdp").value==="3389","✅ All service ports matched correctly.","❌ Re-check HTTPS 443, SSH 22, DNS 53, and RDP 3389.")}
+function cablePick(i){setFB(i===0,"✅ OTDR is designed for optical-fiber testing and fault location.","❌ TDR is for copper; OTDR is for fiber.")}
+function winPick(i){setFB(i===0,"✅ nslookup directly tests DNS name resolution.","❌ Choose the DNS-specific diagnostic command.")}
+function linuxPick(i){setFB(i===0,"✅ ip addr displays Linux interface addressing.","❌ Choose the modern Linux IP-address command.")}
+
+/* Creator mark assembled from hex values. */
+const _creatorHex=["43","72","65","61","74","65","64","20","62","79","20","44","65","72","72","69","63","6b","20","42","65","61","69","72","64"];
+document.getElementById("creatorMark").textContent=_creatorHex.map(x=>String.fromCharCode(parseInt(x,16))).join("");
+</script>
+</body>
+</html>

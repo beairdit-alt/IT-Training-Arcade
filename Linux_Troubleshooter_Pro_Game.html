@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linux Troubleshooter Pro</title>
+<style>
+:root{
+  --bg:#07110d;
+  --panel:#0d1b16;
+  --panel2:#10241c;
+  --green:#53ff9a;
+  --cyan:#52e6ff;
+  --yellow:#ffe66d;
+  --red:#ff6b6b;
+  --purple:#c084fc;
+  --text:#dcffe9;
+  --muted:#8ebaa0;
+  --border:#215c42;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:Inter,Segoe UI,Arial,sans-serif;
+  background:
+    linear-gradient(rgba(83,255,154,.035) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(83,255,154,.035) 1px,transparent 1px),
+    radial-gradient(circle at 20% 10%,#123929 0%,#07110d 34%,#030705 100%);
+  background-size:28px 28px,28px 28px,auto;
+  color:var(--text);
+}
+body:before{
+  content:"";
+  position:fixed;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(0deg,rgba(255,255,255,.018),rgba(255,255,255,.018) 1px,transparent 1px,transparent 3px);
+  mix-blend-mode:screen;
+}
+header{
+  padding:20px 24px 14px;
+  border-bottom:1px solid var(--border);
+  background:rgba(3,9,6,.88);
+  position:sticky;top:0;z-index:20;
+  backdrop-filter:blur(10px);
+}
+.brand{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.logo{
+  width:58px;height:58px;border:2px solid var(--green);border-radius:14px;
+  display:grid;place-items:center;font-family:Consolas,monospace;font-weight:900;font-size:28px;
+  color:var(--green);box-shadow:0 0 20px rgba(83,255,154,.25), inset 0 0 20px rgba(83,255,154,.08);
+}
+h1{margin:0;font-size:clamp(24px,4vw,42px);letter-spacing:.5px}
+.subtitle{color:var(--muted);margin-top:4px}
+.stats{margin-left:auto;display:flex;gap:10px;flex-wrap:wrap}
+.stat{
+  border:1px solid var(--border);border-radius:10px;padding:8px 12px;background:#09140f;
+  font-family:Consolas,monospace
+}
+.stat b{color:var(--green)}
+main{
+  max-width:1500px;margin:auto;padding:18px;
+  display:grid;grid-template-columns:320px minmax(0,1fr);gap:18px;
+}
+.sidebar{
+  background:rgba(13,27,22,.92);border:1px solid var(--border);border-radius:16px;
+  padding:16px;height:fit-content;position:sticky;top:105px
+}
+.sidebar h3{margin:0 0 10px;color:var(--cyan)}
+.mission-list{display:flex;flex-direction:column;gap:8px}
+.mission-btn{
+  width:100%;text-align:left;background:#0a1712;border:1px solid #1b4a35;color:var(--text);
+  border-radius:10px;padding:10px 12px;cursor:pointer;transition:.18s
+}
+.mission-btn:hover{border-color:var(--green);transform:translateX(2px)}
+.mission-btn.active{background:#123324;border-color:var(--green);box-shadow:0 0 12px rgba(83,255,154,.1)}
+.mission-btn.done:after{content:" ✓";color:var(--green);font-weight:bold}
+.small{font-size:12px;color:var(--muted)}
+.content{display:flex;flex-direction:column;gap:16px}
+.card{
+  background:rgba(13,27,22,.94);border:1px solid var(--border);border-radius:16px;padding:18px;
+  box-shadow:0 12px 40px rgba(0,0,0,.28)
+}
+.mission-head{display:flex;align-items:flex-start;gap:14px}
+.badge{
+  min-width:72px;text-align:center;padding:7px 10px;border:1px solid var(--cyan);border-radius:999px;
+  color:var(--cyan);font-family:Consolas,monospace;font-weight:bold
+}
+.mission-title{font-size:24px;margin:0 0 6px}
+.scenario{
+  margin-top:14px;padding:14px;border-left:4px solid var(--yellow);background:#171b0e;border-radius:8px
+}
+.objectives{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px;margin-top:14px}
+.objective{padding:9px 10px;background:#0a1712;border:1px solid #183e2d;border-radius:8px;font-size:13px}
+.terminal{
+  background:#020604;border:1px solid #1e6b48;border-radius:14px;overflow:hidden;
+  box-shadow:0 0 30px rgba(83,255,154,.08)
+}
+.termbar{
+  display:flex;gap:7px;align-items:center;padding:9px 12px;background:#0c1712;border-bottom:1px solid #1e4d37;
+  font-family:Consolas,monospace;font-size:13px;color:#a7cdb4
+}
+.dot{width:11px;height:11px;border-radius:50%}.r{background:#ff6b6b}.y{background:#ffe66d}.g{background:#53ff9a}
+#screen{
+  min-height:430px;max-height:520px;overflow:auto;padding:16px;
+  white-space:pre-wrap;font:15px/1.55 Consolas,Monaco,monospace;color:#c8ffe0
+}
+.line.command{color:#fff}
+.prompt{color:var(--green);font-weight:bold}
+.output{color:#b7d8c3}
+.good{color:var(--green)}
+.warn{color:var(--yellow)}
+.bad{color:var(--red)}
+.info{color:var(--cyan)}
+.inputrow{
+  display:flex;gap:8px;align-items:center;padding:12px 14px;border-top:1px solid #173c2b;background:#06100b
+}
+.inputrow span{font:15px Consolas,monospace;color:var(--green)}
+#cmd{
+  flex:1;background:transparent;border:0;outline:0;color:white;font:15px Consolas,monospace;min-width:0
+}
+.btnrow{display:flex;gap:10px;flex-wrap:wrap}
+button.action{
+  border:1px solid var(--green);background:#0e2a1c;color:var(--text);border-radius:9px;
+  padding:10px 14px;cursor:pointer;font-weight:700
+}
+button.action:hover{background:#17452d}
+button.secondary{border-color:var(--cyan);background:#0b2228}
+button.danger{border-color:var(--red);background:#2b1111}
+.hintbox,.knowledge{
+  display:none;margin-top:12px;border-radius:10px;padding:13px;background:#101f18;border:1px solid #28553f
+}
+.hintbox.show,.knowledge.show{display:block}
+.hintbox b{color:var(--yellow)} .knowledge b{color:var(--cyan)}
+.progresswrap{height:10px;background:#09140f;border-radius:10px;overflow:hidden;border:1px solid #17452d}
+#progress{height:100%;width:0;background:linear-gradient(90deg,var(--green),var(--cyan));transition:.3s}
+#feedback{
+  min-height:48px;margin-top:12px;padding:11px 13px;border-radius:10px;background:#08130e;border:1px solid #1d4834
+}
+.cmdref{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px}
+.cmdchip{
+  background:#09140f;border:1px solid #1d4834;border-radius:9px;padding:8px 10px;font:13px Consolas,monospace;color:#c8ffe0
+}
+kbd{background:#0c2a1c;border:1px solid #245f42;padding:2px 5px;border-radius:4px}
+footer{text-align:center;color:#6e9680;padding:28px 16px}
+.modal{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:100;align-items:center;justify-content:center;padding:20px
+}
+.modal.show{display:flex}
+.modalbox{
+  max-width:760px;width:100%;background:#0c1a14;border:1px solid var(--green);border-radius:18px;padding:24px;
+  box-shadow:0 0 60px rgba(83,255,154,.15)
+}
+.modalbox h2{color:var(--green);font-size:32px}
+.rank{font:700 22px Consolas,monospace;color:var(--cyan)}
+@media(max-width:900px){
+  main{grid-template-columns:1fr}.sidebar{position:static}.mission-list{display:grid;grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:560px){.mission-list{grid-template-columns:1fr}.stats{margin-left:0}.mission-head{flex-direction:column}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="logo">$_</div>
+    <div>
+      <h1>LINUX TROUBLESHOOTER PRO</h1>
+      <div class="subtitle">Diagnose it. Prove it. Fix it. Explain it.</div>
+    </div>
+    <div class="stats">
+      <div class="stat">Score <b id="score">0</b></div>
+      <div class="stat">Solved <b id="solved">0</b>/<span id="total">0</span></div>
+      <div class="stat">Streak <b id="streak">0</b></div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <aside class="sidebar">
+    <h3>MISSIONS</h3>
+    <div class="small" style="margin-bottom:10px">Choose a failure ticket. Type real Linux commands into the terminal.</div>
+    <div class="mission-list" id="missionList"></div>
+    <div style="margin-top:16px">
+      <div class="small">Overall progress</div>
+      <div class="progresswrap"><div id="progress"></div></div>
+    </div>
+  </aside>
+
+  <section class="content">
+    <div class="card" id="missionCard">
+      <div class="mission-head">
+        <div class="badge" id="levelBadge">LEVEL 1</div>
+        <div>
+          <h2 class="mission-title" id="missionTitle"></h2>
+          <div class="small" id="missionCategory"></div>
+        </div>
+      </div>
+      <div class="scenario" id="scenario"></div>
+      <div class="objectives" id="objectives"></div>
+    </div>
+
+    <div class="terminal">
+      <div class="termbar">
+        <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+        <span style="margin-left:6px">student@linux-lab:~</span>
+      </div>
+      <div id="screen"></div>
+      <div class="inputrow">
+        <span>student@linux-lab:~$</span>
+        <input id="cmd" autocomplete="off" spellcheck="false" placeholder="type a Linux command...">
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="btnrow">
+        <button class="action" onclick="runCommand()">RUN COMMAND</button>
+        <button class="action secondary" onclick="toggleHint()">HINT</button>
+        <button class="action secondary" onclick="toggleKnowledge()">WHY THIS WORKS</button>
+        <button class="action danger" onclick="resetMission()">RESET MISSION</button>
+      </div>
+      <div id="feedback">Use evidence. Don't guess. Start with the simplest command that isolates the next layer.</div>
+      <div class="hintbox" id="hintbox"></div>
+      <div class="knowledge" id="knowledge"></div>
+    </div>
+
+    <div class="card">
+      <h3 style="color:var(--cyan);margin-top:0">COMMAND ARSENAL</h3>
+      <div class="small" style="margin-bottom:10px">Reference only. The game accepts many equivalent command forms.</div>
+      <div class="cmdref">
+        <div class="cmdchip">ip addr</div><div class="cmdchip">ip route</div><div class="cmdchip">ip neigh</div>
+        <div class="cmdchip">ping -c 4 HOST</div><div class="cmdchip">dig HOST</div><div class="cmdchip">ss -tulpn</div>
+        <div class="cmdchip">systemctl status SERVICE</div><div class="cmdchip">journalctl -u SERVICE</div>
+        <div class="cmdchip">df -h</div><div class="cmdchip">df -i</div><div class="cmdchip">du -h</div>
+        <div class="cmdchip">free -h</div><div class="cmdchip">uptime</div><div class="cmdchip">top</div>
+        <div class="cmdchip">ps aux</div><div class="cmdchip">lsof</div><div class="cmdchip">chmod</div>
+        <div class="cmdchip">chown</div><div class="cmdchip">ssh -vvv</div><div class="cmdchip">tcpdump</div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>Linux Troubleshooter Pro • Classroom Practice Lab • Created for Network Systems Administration / Network Support Services</footer>
+
+<div class="modal" id="completeModal">
+  <div class="modalbox">
+    <h2>MISSION COMPLETE</h2>
+    <p id="completeText"></p>
+    <div class="rank" id="rankText"></div>
+    <div class="btnrow" style="margin-top:18px">
+      <button class="action" onclick="nextMission()">NEXT MISSION</button>
+      <button class="action secondary" onclick="closeModal()">REVIEW TERMINAL</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const missions = [
+{
+ title:"No Internet Access", category:"Networking • IP • Routing • DNS", level:1,
+ scenario:"Ticket #101: A Linux workstation says it is connected to the LAN, but the user reports: “The Internet is down.” Determine exactly where the failure is before recommending a fix.",
+ objectives:["Inspect the IP address","Inspect the default route","Test the gateway","Test an Internet IP","Test DNS"],
+ hint:"Start at Layer 3. Use <code>ip addr</code>, then <code>ip route</code>. Do not start by changing DNS.",
+ knowledge:"A technician should isolate the path: interface/IP → gateway → remote IP → DNS. If 8.8.8.8 works but a hostname fails, the problem is name resolution rather than general connectivity.",
+ steps:[
+  {match:/^ip\s+(a|addr|address)\b/i,out:"2: ens33: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500\\n    inet 192.168.50.24/24 brd 192.168.50.255 scope global dynamic ens33",msg:"Good. The NIC is UP and has a valid IPv4 address.",pts:10},
+  {match:/^ip\s+(r|route)\b/i,out:"192.168.50.0/24 dev ens33 proto kernel scope link src 192.168.50.24",msg:"Important finding: there is NO default route.",pts:20},
+  {match:/^ping\b.*192\.168\.50\.1/i,out:"PING 192.168.50.1 ...\\n64 bytes from 192.168.50.1: icmp_seq=1 ttl=64 time=0.82 ms\\n64 bytes from 192.168.50.1: icmp_seq=2 ttl=64 time=0.77 ms",msg:"The gateway is reachable on the local subnet.",pts:15},
+  {match:/^ping\b.*8\.8\.8\.8/i,out:"ping: connect: Network is unreachable",msg:"That fits the missing default route. Linux does not know where to send off-subnet traffic.",pts:20},
+  {match:/^(dig|nslookup|host|ping)\b.*(google\.com|example\.com)/i,out:";; communications error to 127.0.0.53#53: timed out\\n;; no servers could be reached",msg:"DNS also cannot work until routing is restored.",pts:10}
+ ], solution:"Root cause: missing default route. Restore the correct gateway through NetworkManager or the system's network configuration, then verify IP reachability and DNS."
+},
+{
+ title:"DNS Failure", category:"Networking • DNS", level:2,
+ scenario:"Ticket #102: Users can reach 8.8.8.8 but cannot browse websites by name. Diagnose without assuming the DNS server is down.",
+ objectives:["Verify IP connectivity","Test hostname resolution","Inspect resolver configuration","Query a DNS server directly"],
+ hint:"Compare an IP test with a hostname test. Then inspect <code>/etc/resolv.conf</code> or <code>resolvectl status</code>.",
+ knowledge:"A successful ping to an Internet IP combined with failed hostname resolution strongly narrows the issue to DNS/name resolution.",
+ steps:[
+  {match:/^ping\b.*8\.8\.8\.8/i,out:"64 bytes from 8.8.8.8: icmp_seq=1 ttl=117 time=22.4 ms\\n64 bytes from 8.8.8.8: icmp_seq=2 ttl=117 time=21.9 ms",msg:"Internet IP connectivity works.",pts:15},
+  {match:/^(ping|dig|nslookup|host)\b.*google\.com/i,out:"ping: google.com: Temporary failure in name resolution",msg:"Hostname resolution is failing.",pts:15},
+  {match:/^(cat\s+\/etc\/resolv\.conf|resolvectl\s+status)/i,out:"nameserver 192.168.50.99\\nsearch lab.local",msg:"The configured DNS server is 192.168.50.99.",pts:20},
+  {match:/^dig\s+@8\.8\.8\.8\s+google\.com/i,out:";; ANSWER SECTION:\\ngoogle.com.  300 IN A 142.250.190.14",msg:"Direct queries work through 8.8.8.8. The configured resolver is the problem.",pts:25}
+ ], solution:"Root cause: bad/unreachable configured DNS server. Correct the DNS configuration, then test with dig and a hostname lookup."
+},
+{
+ title:"Web Server Down", category:"Services • Ports • Logs", level:3,
+ scenario:"Ticket #103: A Linux web server answers ping, but the website is unavailable. Determine whether this is networking, firewall, or service failure.",
+ objectives:["Check service state","Check listening ports","Test localhost","Read service logs"],
+ hint:"Ping only proves some IP connectivity. Check <code>systemctl status nginx</code> and whether TCP 80/443 are actually listening.",
+ knowledge:"Service troubleshooting should connect four pieces of evidence: process/service state, listening socket, local application response, and logs.",
+ steps:[
+  {match:/^systemctl\s+status\s+(nginx|apache2|httpd)/i,out:"● nginx.service - A high performance web server\\n   Loaded: loaded (/lib/systemd/system/nginx.service; enabled)\\n   Active: failed (Result: exit-code)\\n   Process: 1088 ExecStartPre=/usr/sbin/nginx -t (code=exited, status=1/FAILURE)",msg:"The service failed before starting.",pts:20},
+  {match:/^ss\b.*(-tulpn|-ltnp|-ltn)/i,out:"State  Recv-Q Send-Q Local Address:Port  Process\\nLISTEN 0      128    0.0.0.0:22         users:((\\\"sshd\\\",pid=721,fd=3))",msg:"Nothing is listening on TCP 80 or 443.",pts:20},
+  {match:/^curl\b.*(localhost|127\.0\.0\.1)/i,out:"curl: (7) Failed to connect to localhost port 80: Connection refused",msg:"The failure is local to the server, not merely an upstream network path.",pts:20},
+  {match:/^journalctl\s+.*(nginx|apache2|httpd)/i,out:"nginx[1088]: nginx: [emerg] unexpected \\\"}\\\" in /etc/nginx/sites-enabled/default:24\\nnginx[1088]: nginx: configuration file /etc/nginx/nginx.conf test failed",msg:"There is the root cause: configuration syntax error.",pts:30}
+ ], solution:"Root cause: nginx configuration syntax error. Correct the configuration, test with nginx -t, restart the service, and verify port 80/443."
+},
+{
+ title:"Disk Full Emergency", category:"Storage • Filesystems", level:4,
+ scenario:"Ticket #104: Applications are failing to write files and package installs are breaking. Users report “the server is acting weird.” Find the storage problem.",
+ objectives:["Check filesystem usage","Check inode usage","Find the large directory","Identify large logs"],
+ hint:"Start with <code>df -h</code>. Also remember a filesystem can fail because of inode exhaustion, so check <code>df -i</code>.",
+ knowledge:"df measures filesystem usage; du measures file/directory usage. They answer different questions. Inodes can also be exhausted even when byte capacity remains.",
+ steps:[
+  {match:/^df\s+-h\b/i,out:"Filesystem      Size  Used Avail Use% Mounted on\\n/dev/sda2        40G   40G   80M 100% /\\n/dev/sda1       512M  96M  416M  19% /boot",msg:"The root filesystem is 100% full.",pts:25},
+  {match:/^df\s+-i\b/i,out:"Filesystem      Inodes IUsed IFree IUse% Mounted on\\n/dev/sda2      2621440 184221 2437219 8% /",msg:"Inodes are fine. This is capacity, not inode exhaustion.",pts:15},
+  {match:/^du\b.*\/(var)?\b/i,out:"4.0K /home\\n1.8G /usr\\n34G /var\\n39G /",msg:"/var is consuming most of the disk.",pts:20},
+  {match:/^du\b.*\/var(\/log)?/i,out:"120M /var/cache\\n31G /var/log\\n34G /var",msg:"/var/log is the major consumer.",pts:20},
+  {match:/^(ls|find)\b.*\/var\/log/i,out:"-rw-r----- 1 root adm 29G syslog.1\\n-rw-r----- 1 root adm 1.1G syslog",msg:"A runaway rotated log is consuming the filesystem.",pts:20}
+ ], solution:"Root cause: oversized logs filled /. Investigate why logging exploded, rotate/compress safely, confirm free space, and verify logrotate configuration."
+},
+{
+ title:"Permission Denied", category:"Permissions • Ownership", level:5,
+ scenario:"Ticket #105: A script exists but a student cannot execute it. The error is 'Permission denied'. Diagnose before using chmod blindly.",
+ objectives:["Inspect permissions","Inspect identity/groups","Apply the minimum required correction"],
+ hint:"Use <code>ls -l</code> first. Determine which user/group permission class applies.",
+ knowledge:"Linux permissions are evaluated by owner, group, and others. r=4, w=2, x=1. Avoid solving every problem with 777.",
+ steps:[
+  {match:/^ls\s+-l\b.*(backup\.sh|script\.sh)?/i,out:"-rw-r----- 1 student1 netadmins 2148 Sep  9 12:10 backup.sh",msg:"The file has no execute bit for anyone.",pts:25},
+  {match:/^(id|groups)\b/i,out:"uid=1001(student1) gid=1001(student1) groups=1001(student1),1102(netadmins)",msg:"The student is a member of netadmins.",pts:15},
+  {match:/^chmod\s+([ugoa+rx0-7]+\s+)?(backup\.sh|script\.sh)/i,out:"",msg:"Correct approach: add only the execute permission actually required.",pts:30},
+  {match:/^\.\/(backup\.sh|script\.sh)/i,out:"Backup verification started...\\nBackup target reachable.\\nVerification complete.",msg:"The script now executes successfully.",pts:20}
+ ], solution:"Root cause: missing execute permission. Add the minimum appropriate execute bit (for example chmod u+x backup.sh or a policy-appropriate group permission), then verify."
+},
+{
+ title:"SSH Connection Refused", category:"Remote Administration • SSH", level:6,
+ scenario:"Ticket #106: A remote administrator gets 'Connection refused' when connecting by SSH. The server itself is reachable.",
+ objectives:["Verify reachability","Test TCP 22","Check sshd","Check the listening socket","Inspect logs"],
+ hint:"'Connection refused' is different from a timeout. Test TCP 22 and inspect <code>sshd</code>.",
+ knowledge:"Connection refused usually means the host was reached but nothing accepted that port, or a firewall actively rejected it. A timeout suggests silent filtering or path failure.",
+ steps:[
+  {match:/^ping\b.*192\.168\.50\.20/i,out:"64 bytes from 192.168.50.20: icmp_seq=1 ttl=64 time=0.45 ms",msg:"The server is reachable.",pts:10},
+  {match:/^nc\s+.*(-vz|-zv).*192\.168\.50\.20\s+22/i,out:"nc: connect to 192.168.50.20 port 22 (tcp) failed: Connection refused",msg:"TCP 22 is refusing connections.",pts:15},
+  {match:/^systemctl\s+status\s+(ssh|sshd)/i,out:"● ssh.service - OpenBSD Secure Shell server\\n   Active: failed (Result: exit-code)",msg:"SSH is not running.",pts:20},
+  {match:/^ss\b.*22/i,out:"",msg:"No process is listening on TCP 22.",pts:15},
+  {match:/^journalctl\s+.*(ssh|sshd)/i,out:"sshd[894]: /etc/ssh/sshd_config line 17: Bad configuration option: PermitRootLoginn",msg:"The daemon fails because of an invalid configuration directive.",pts:30}
+ ], solution:"Root cause: typo in sshd_config. Correct the directive, validate with sshd -t, restart SSH, and verify port 22."
+},
+{
+ title:"Server Is Slow", category:"Performance • CPU • RAM", level:7,
+ scenario:"Ticket #107: A server is responsive but painfully slow. CPU fans are running hard. Find what resource is under pressure.",
+ objectives:["Check load average","Inspect processes","Check memory","Identify top CPU consumer"],
+ hint:"Use <code>uptime</code> and <code>top</code> or sort <code>ps aux</code> by CPU.",
+ knowledge:"High load must be interpreted relative to CPU count. A sustained load of 8 on a 2-core machine is very different from load 8 on a 32-core server.",
+ steps:[
+  {match:/^uptime\b/i,out:"13:02:41 up 12 days, 4:11, 2 users, load average: 9.84, 8.91, 7.52",msg:"Load is very high and has been high for several minutes.",pts:15},
+  {match:/^(top|htop)\b/i,out:"%Cpu(s): 97.1 us, 1.8 sy, 0.1 id\\nPID USER   %CPU %MEM COMMAND\\n2118 render 286.4 12.1 python3\\n721  root     0.3  0.2 sshd",msg:"A python3 process is consuming almost three CPU cores.",pts:25},
+  {match:/^free\s+-h\b/i,out:"Mem: 15Gi total, 8.1Gi used, 5.6Gi free, 6.4Gi available\\nSwap: 2.0Gi total, 0B used",msg:"Memory pressure is not the primary issue.",pts:15},
+  {match:/^ps\s+aux\b.*(--sort=-%cpu|sort)/i,out:"render 2118 286.4 12.1 python3 /opt/jobs/render_loop.py",msg:"You isolated the CPU-hungry process.",pts:25},
+  {match:/^(kill|renice)\b.*2118/i,out:"",msg:"Good. In production, verify ownership/business impact before terminating a process.",pts:20}
+ ], solution:"Root cause: runaway CPU-intensive process. Identify why render_loop.py is looping, stop or renice it appropriately, and correct the application/job."
+},
+{
+ title:"Mount Failure", category:"Storage • fstab • Mounts", level:8,
+ scenario:"Ticket #108: After a storage change, the backup volume is missing. The admin wants to reboot immediately. Prove whether /etc/fstab is valid first.",
+ objectives:["Inspect block devices","Inspect mounts","Read fstab","Test fstab without rebooting"],
+ hint:"Use <code>lsblk</code>, <code>findmnt</code>, then <code>mount -a</code>. Testing fstab before reboot is safer.",
+ knowledge:"mount -a attempts to mount entries in /etc/fstab and is an excellent validation step before rebooting a system after storage configuration changes.",
+ steps:[
+  {match:/^lsblk\b/i,out:"NAME   SIZE FSTYPE UUID                                 MOUNTPOINTS\\nsda     80G\\n├─sda1  1G  ext4   1111-AAAA                            /boot\\n└─sda2 79G  ext4   2222-BBBB                            /\\nsdb    500G\\n└─sdb1 500G ext4   9c8d-REAL-UUID",msg:"The backup disk exists as /dev/sdb1.",pts:15},
+  {match:/^(findmnt|mount)\b/i,out:"TARGET SOURCE    FSTYPE OPTIONS\\n/      /dev/sda2 ext4   rw,relatime\\n/boot  /dev/sda1 ext4   rw,relatime",msg:"The backup filesystem is not mounted.",pts:15},
+  {match:/^cat\s+\/etc\/fstab/i,out:"UUID=2222-BBBB / ext4 defaults 0 1\\nUUID=9c8d-WRONG-UUID /backup ext4 defaults 0 2",msg:"The fstab UUID does not match the actual disk UUID.",pts:25},
+  {match:/^sudo\s+mount\s+-a|^mount\s+-a/i,out:"mount: /backup: can't find UUID=9c8d-WRONG-UUID.",msg:"Excellent: you proved the fstab entry is broken without rebooting.",pts:30}
+ ], solution:"Root cause: incorrect UUID in /etc/fstab. Correct it using the UUID from lsblk/blkid, run mount -a, then verify with findmnt."
+},
+{
+ title:"Mystery NIC Failure", category:"Hardware • Kernel • Drivers", level:9,
+ scenario:"Ticket #109: A newly installed Ethernet adapter does not appear as a usable network interface. Determine whether Linux detects the hardware and driver.",
+ objectives:["Inspect PCI hardware","Inspect interfaces","Inspect kernel messages","Inspect kernel modules"],
+ hint:"Use <code>lspci</code>, <code>ip link</code>, and <code>dmesg</code>. Hardware detection and interface configuration are separate stages.",
+ knowledge:"lspci can show that PCIe hardware exists even when no network interface is available. dmesg and driver/module tools help bridge the gap between hardware detection and OS usability.",
+ steps:[
+  {match:/^lspci\b/i,out:"03:00.0 Ethernet controller: Intel Corporation Ethernet Controller I225-V (rev 03)",msg:"The PCIe device is detected by the system.",pts:20},
+  {match:/^ip\s+link\b/i,out:"1: lo: <LOOPBACK,UP,LOWER_UP>\\n2: ens18: <BROADCAST,MULTICAST,UP,LOWER_UP>",msg:"No interface corresponding to the new NIC appears.",pts:15},
+  {match:/^(dmesg|journalctl\s+-k)/i,out:"igc 0000:03:00.0: probe failed with error -5\\nigc: Intel(R) 2.5G Ethernet Linux Driver",msg:"The kernel sees the device but the driver failed to initialize it.",pts:30},
+  {match:/^(lsmod|modinfo)\b.*(igc)?/i,out:"igc 204800 0\\nptp 36864 1 igc",msg:"The expected driver module is present. Continue with firmware/kernel compatibility and hardware diagnostics.",pts:20}
+ ], solution:"Root cause area: driver/device initialization failure. Check kernel version, firmware, driver compatibility, BIOS/PCIe settings, and hardware health rather than merely assigning an IP."
+},
+{
+ title:"Final Boss: Multi-Layer Outage", category:"Full Troubleshooting Chain", level:10,
+ scenario:"FINAL TICKET: A Linux application server cannot be reached by hostname from clients. The server was recently moved to a different VLAN. Work the problem layer-by-layer and identify every failure you can prove.",
+ objectives:["Inspect IP/VLAN symptoms","Inspect routing","Test gateway","Test DNS","Check service","Check port","Read logs"],
+ hint:"Treat this as a chain. Do not stop after finding the first problem—real outages can contain multiple faults.",
+ knowledge:"Expert troubleshooting is evidence-driven. Each command should answer one specific question and determine the next test.",
+ steps:[
+  {match:/^ip\s+(a|addr|address)/i,out:"2: ens18: <BROADCAST,MULTICAST,UP,LOWER_UP>\\n    inet 192.168.10.50/24 scope global ens18",msg:"The server still has an address from VLAN 10.",pts:10},
+  {match:/^ip\s+(r|route)/i,out:"default via 192.168.10.1 dev ens18\\n192.168.10.0/24 dev ens18 proto kernel",msg:"Its route also points at VLAN 10.",pts:10},
+  {match:/^ping\b.*192\.168\.10\.1/i,out:"From 192.168.10.50 icmp_seq=1 Destination Host Unreachable",msg:"The old gateway is unreachable after the physical VLAN move.",pts:15},
+  {match:/^ip\s+neigh/i,out:"192.168.10.1 dev ens18 INCOMPLETE",msg:"ARP/neighbor resolution for the gateway is failing—a strong Layer 2/VLAN clue.",pts:15},
+  {match:/^(dig|nslookup|host)\b/i,out:"app01.lab.local. 300 IN A 192.168.10.50",msg:"DNS still points to the old server address.",pts:10},
+  {match:/^systemctl\s+status\s+(nginx|apache2|httpd)/i,out:"● nginx.service\\n   Active: active (running)",msg:"The application service itself is running.",pts:10},
+  {match:/^ss\b.*(-tulpn|-ltnp|80|443)/i,out:"LISTEN 0 511 0.0.0.0:443 0.0.0.0:* users:((\\\"nginx\\\",pid=902,fd=6))",msg:"HTTPS is listening. The application stack is healthy locally.",pts:10},
+  {match:/^journalctl\s+.*(nginx|NetworkManager|systemd-networkd)/i,out:"NetworkManager: ens18: DHCPv4 lease expired\\nNetworkManager: activation failed: IP configuration unavailable",msg:"Network configuration failed after the VLAN change.",pts:20}
+ ], solution:"Root causes: server moved to a new VLAN but retained old addressing/routing, and DNS still points at the old address. Correct VLAN/IP/DHCP configuration, verify gateway reachability, update DNS, then confirm HTTPS from a client."
+}
+];
+
+let current=0, score=0, streak=0, completed=new Set(), achieved=new Map(), history=[];
+const $=id=>document.getElementById(id);
+
+function init(){
+  $('total').textContent=missions.length;
+  renderMissionList();
+  loadMission(0);
+  $('cmd').addEventListener('keydown',e=>{
+    if(e.key==='Enter') runCommand();
+    if(e.key==='ArrowUp'){
+      e.preventDefault();
+      if(history.length) $('cmd').value=history[history.length-1];
+    }
+  });
+}
+function renderMissionList(){
+  const box=$('missionList'); box.innerHTML='';
+  missions.forEach((m,i)=>{
+    const b=document.createElement('button');
+    b.className='mission-btn'+(i===current?' active':'')+(completed.has(i)?' done':'');
+    b.innerHTML=`<b>${i+1}. ${m.title}</b><div class="small">${m.category}</div>`;
+    b.onclick=()=>loadMission(i);
+    box.appendChild(b);
+  });
+}
+function loadMission(i){
+  current=i;
+  if(!achieved.has(i)) achieved.set(i,new Set());
+  const m=missions[i];
+  $('levelBadge').textContent='LEVEL '+m.level;
+  $('missionTitle').textContent=m.title;
+  $('missionCategory').textContent=m.category;
+  $('scenario').textContent=m.scenario;
+  $('objectives').innerHTML=m.objectives.map(x=>`<div class="objective">◻ ${x}</div>`).join('');
+  $('hintbox').innerHTML='<b>Hint:</b> '+m.hint;
+  $('knowledge').innerHTML='<b>Knowledge:</b> '+m.knowledge;
+  $('hintbox').classList.remove('show'); $('knowledge').classList.remove('show');
+  $('feedback').innerHTML='Use evidence. Don’t guess. Start with the simplest command that isolates the next layer.';
+  $('screen').innerHTML='';
+  print(`Linux Troubleshooter Pro — ${m.title}`,'info');
+  print(`Ticket loaded. ${m.objectives.length} objectives to investigate.`,'output');
+  print(`Type commands below. Try "help" for game controls.`,'output');
+  renderMissionList(); updateStats();
+  $('cmd').focus();
+}
+function sanitize(s){
+  return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+}
+function print(text,cls='output'){
+  const d=document.createElement('div'); d.className='line '+cls; d.textContent=text;
+  $('screen').appendChild(d); $('screen').scrollTop=$('screen').scrollHeight;
+}
+function printCommand(cmd){
+  const d=document.createElement('div'); d.className='line command';
+  d.innerHTML='<span class="prompt">student@linux-lab:~$</span> '+sanitize(cmd);
+  $('screen').appendChild(d);
+}
+function runCommand(){
+  let cmd=$('cmd').value.trim();
+  if(!cmd) return;
+  history.push(cmd); if(history.length>30) history.shift();
+  $('cmd').value='';
+  printCommand(cmd);
+  if(/^clear$/i.test(cmd)){ $('screen').innerHTML=''; return; }
+  if(/^help$/i.test(cmd)){
+    print('Game controls: clear | help | mission | hint | reset','info');
+    print('Use real troubleshooting commands. Common examples: ip addr, ip route, ping, dig, ss, systemctl, journalctl, df, du, free, top, ps, lsof, chmod, tcpdump.','output');
+    return;
+  }
+  if(/^mission$/i.test(cmd)){ print(missions[current].scenario,'info'); return; }
+  if(/^hint$/i.test(cmd)){ toggleHint(); print('Hint panel opened.','warn'); return; }
+  if(/^reset$/i.test(cmd)){ resetMission(); return; }
+
+  const m=missions[current], set=achieved.get(current);
+  let found=false;
+  for(let idx=0;idx<m.steps.length;idx++){
+    const step=m.steps[idx];
+    if(step.match.test(cmd)){
+      found=true;
+      if(step.out) print(step.out,'output');
+      if(!set.has(idx)){
+        set.add(idx); score+=step.pts; streak++;
+        $('feedback').innerHTML=`<span style="color:var(--green)"><b>+${step.pts} points</b></span> — ${step.msg}`;
+      }else{
+        $('feedback').innerHTML=`You already collected this evidence. ${step.msg}`;
+      }
+      break;
+    }
+  }
+  if(!found){
+    genericCommand(cmd);
+    streak=0;
+  }
+  updateStats();
+  if(set.size===m.steps.length && !completed.has(current)){
+    completed.add(current); score+=50;
+    updateStats(); renderMissionList();
+    setTimeout(()=>showComplete(),350);
+  }
+}
+function genericCommand(cmd){
+  const generic = [
+    [/^whoami$/i,'student'],
+    [/^id$/i,'uid=1000(student) gid=1000(student) groups=1000(student),27(sudo),1102(netadmins)'],
+    [/^hostname(ctl)?$/i,'linux-lab'],
+    [/^uname\b/i,'Linux linux-lab 6.8.0-79-generic x86_64 GNU/Linux'],
+    [/^pwd$/i,'/home/student'],
+    [/^ls(\s|$)/i,'Desktop  Documents  Downloads  lab-notes.txt'],
+    [/^cat\s+\/etc\/os-release/i,'PRETTY_NAME="Ubuntu 24.04.3 LTS"\\nNAME="Ubuntu"\\nVERSION_ID="24.04"'],
+    [/^lscpu/i,'Architecture: x86_64\\nCPU(s): 4\\nModel name: Intel(R) Core(TM) i5 Lab CPU'],
+    [/^free\s+-h/i,'Mem: 15Gi total, 5.8Gi used, 7.2Gi free, 8.4Gi available\\nSwap: 2.0Gi total, 0B used'],
+    [/^ps\s+aux/i,'USER PID %CPU %MEM COMMAND\\nroot 1 0.0 0.1 /sbin/init\\nstudent 2210 0.2 0.3 bash'],
+    [/^systemctl\s+--failed/i,'0 loaded units listed.'],
+    [/^journalctl\s+-p\s+err/i,'-- No high-priority errors for this simulated host outside the active ticket --'],
+    [/^sudo\s+ufw\s+status|^ufw\s+status/i,'Status: active\\n22/tcp ALLOW Anywhere\\n443/tcp ALLOW Anywhere'],
+    [/^sudo\s+nft\s+list\s+ruleset|^nft\s+list\s+ruleset/i,'table inet filter { chain input { type filter hook input priority filter; policy accept; } }'],
+    [/^traceroute|^tracepath|^mtr/i,'1  192.168.50.1  0.8 ms\\n2  10.10.0.1  2.1 ms\\n3  * * *'],
+    [/^tcpdump/i,'tcpdump: listening on ens33, link-type EN10MB (Ethernet)\\n(simulated capture — use ticket-specific tests to isolate the fault)'],
+    [/^man\s+/i,'Manual page opened in the simulated lab. Tip: use COMMAND --help to inspect syntax.']
+  ];
+  for(const [r,out] of generic){
+    if(r.test(cmd)){ print(out,'output'); $('feedback').innerHTML='Useful command, but it does not yet prove the active ticket’s root cause.'; return; }
+  }
+  print(`bash: ${cmd.split(/\s+/)[0]}: command not recognized in this simulation`,'bad');
+  $('feedback').innerHTML='<span style="color:var(--yellow)"><b>No points.</b></span> Try a troubleshooting command that tests one specific layer.';
+}
+function updateStats(){
+  $('score').textContent=score; $('streak').textContent=streak; $('solved').textContent=completed.size;
+  $('progress').style.width=(completed.size/missions.length*100)+'%';
+}
+function toggleHint(){
+  $('hintbox').classList.toggle('show');
+  if($('hintbox').classList.contains('show')){ score=Math.max(0,score-5); updateStats(); }
+}
+function toggleKnowledge(){ $('knowledge').classList.toggle('show'); }
+function resetMission(){
+  achieved.set(current,new Set()); completed.delete(current); streak=0;
+  loadMission(current); renderMissionList(); updateStats();
+}
+function showComplete(){
+  const m=missions[current];
+  $('completeText').innerHTML=`<b>${m.title}</b><br><br>${m.solution}<br><br>Completion bonus: <b>+50 points</b>`;
+  let r= score>=900?'ROOT SHELL LEGEND':score>=650?'LINUX TROUBLESHOOTER':score>=400?'JUNIOR SYSADMIN':'HELP DESK TECH';
+  $('rankText').textContent='Current Rank: '+r;
+  $('completeModal').classList.add('show');
+}
+function closeModal(){ $('completeModal').classList.remove('show'); }
+function nextMission(){
+  closeModal();
+  if(current<missions.length-1) loadMission(current+1);
+  else{
+    $('completeText').innerHTML=`You completed all ${missions.length} missions with a score of <b>${score}</b>.<br><br>You practiced IP addressing, routes, DNS, services, ports, logs, storage, permissions, SSH, performance, mounts, drivers, and multi-layer troubleshooting.`;
+    $('rankText').textContent=score>=900?'Final Rank: ROOT SHELL LEGEND':'Final Rank: LINUX TROUBLESHOOTER';
+    $('completeModal').classList.add('show');
+  }
+}
+init();
+</script>
+</body>
+</html>

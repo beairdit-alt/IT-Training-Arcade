@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Information Technology Specialist Cloud Computing Exam Lab Simulator</title>
+<style>
+:root{
+  --bg:#071019;--panel:#0d1926;--line:#294760;--text:#eef7ff;--muted:#9fb7c9;
+  --blue:#2aa7ff;--green:#43dc8e;--yellow:#ffd166;--red:#ff6b78;--purple:#a887ff;--cyan:#3de1ff
+}
+*{box-sizing:border-box}
+body{margin:0;background:
+radial-gradient(circle at 12% -8%,#144b6b 0,transparent 26%),
+radial-gradient(circle at 95% 0,#25194a 0,transparent 24%),
+linear-gradient(#06101a,#09121b);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif;min-height:100vh}
+button,input,select,textarea{font:inherit}button{cursor:pointer}
+.app{max-width:1500px;margin:auto;padding:16px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;padding:14px 18px;background:#0b1825e8;border:1px solid var(--line);border-radius:16px;position:sticky;top:8px;z-index:30;box-shadow:0 10px 35px #0006}
+.brand{display:flex;gap:13px;align-items:center}.logo{width:66px;height:66px;border-radius:14px;background:linear-gradient(135deg,#1683d8,#33d1ff);color:#03111b;display:grid;place-items:center;font-weight:1000;font-size:14px;text-align:center;line-height:1.05}.brand h1{margin:0;font-size:clamp(20px,3vw,34px)}.brand p{margin:2px 0 0;color:var(--muted);font-size:12px}
+.badges{display:flex;gap:8px;flex-wrap:wrap}.badge{padding:7px 10px;border-radius:999px;border:1px solid #365a78;background:#122a3d;color:#c9ecff;font-size:12px;font-weight:800}
+.shell{display:grid;grid-template-columns:285px 1fr;gap:14px;margin-top:14px}.side,.main{background:#0b1723e8;border:1px solid #243f59;border-radius:16px}.side{padding:12px;align-self:start;position:sticky;top:100px}
+.nav{width:100%;border:0;background:transparent;color:#dceeff;text-align:left;padding:11px;border-radius:9px;font-weight:800;margin:2px 0}.nav:hover,.nav.active{background:#153650}.nav span{display:block;font-size:10px;color:#7fa3bd;font-weight:500;margin-top:2px}
+.main{padding:18px;min-height:820px}.screen{display:none}.screen.active{display:block}
+.hero{padding:22px;border-radius:17px;border:1px solid #315270;background:linear-gradient(135deg,#102c47,#17273d);margin-bottom:14px}.hero h2{font-size:clamp(28px,4vw,44px);margin:0 0 7px}.hero p{line-height:1.55;color:#c0d6e7;max-width:1050px}.heroActions{display:flex;gap:9px;flex-wrap:wrap}
+.primary,.secondary,.danger,.warning,.success{border:0;border-radius:9px;padding:10px 14px;font-weight:900}.primary{background:var(--blue);color:#041727}.secondary{background:#1b344b;color:white;border:1px solid #3b607d}.danger{background:#a53a46;color:white}.warning{background:#a97113;color:white}.success{background:#198d58;color:white}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.card{background:#101f30;border:1px solid #294a65;border-radius:13px;padding:15px}.card h3{margin:0 0 8px}.small{font-size:12px;color:var(--muted)}.mono{font-family:Consolas,monospace}
+.domainBar{height:8px;border-radius:99px;background:#07101a;overflow:hidden;margin:8px 0}.domainBar span{height:100%;display:block;background:linear-gradient(90deg,var(--blue),var(--green))}
+.examHeader{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.timer{font:900 28px Consolas,monospace;color:var(--yellow)}.examName{font-size:18px;font-weight:900}
+.navgrid{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin:10px 0}.qnav{border:1px solid #36536a;background:#102638;color:white;border-radius:6px;padding:6px 2px;font-size:11px}.qnav.done{background:#176642}.qnav.flag{outline:2px solid var(--yellow)}.qnav.current{border-color:#50cfff}
+.questionCard{background:#101f30;border:1px solid #2d4d68;border-radius:14px;padding:20px}.qmeta{display:flex;gap:7px;flex-wrap:wrap}.tag{padding:4px 7px;border-radius:999px;background:#17364c;color:#c7eaff;font-size:10px;font-weight:900}.selectTag{background:#4e3d13;color:#ffe59b}.labTag{background:#422b59;color:#e7caff}
+.question{font-size:21px;font-weight:800;line-height:1.45;margin:12px 0}.answers{display:grid;gap:8px}.answer{border:1px solid #355b78;background:#153149;color:white;border-radius:10px;padding:12px;text-align:left}.answer.selected{outline:2px solid var(--green);background:#153d31}
+.feedback{padding:11px;border-radius:9px;border:1px dashed #3b607c;background:#0b1824;margin-top:10px;min-height:45px}.good{border-color:#2c8059;background:#0f2a21}.bad{border-color:#803a44;background:#2b1519}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.spacer{flex:1}.preset{display:flex;gap:8px;flex-wrap:wrap}
+.console{background:#02070c;color:#b7ffca;border:1px solid #315042;border-radius:10px;padding:12px;font:13px Consolas,monospace;white-space:pre-wrap}
+.resultBig{font-size:52px;font-weight:1000}.reviewQ{padding:12px;border-radius:10px;border:1px solid #294b65;background:#0e1e2d;margin-bottom:9px}.correctTxt{color:#7effb4}.wrongTxt{color:#ff8d98}.studyQ{font-size:18px;font-weight:800;margin:10px 0}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:8px;border-bottom:1px solid #29475e;text-align:left}th{color:#bfeaff}
+label{display:block;font-size:12px;color:#a9c6d7;font-weight:800;margin:9px 0 4px}input,select{width:100%;padding:10px;border-radius:8px;border:1px solid #375568;background:#09151e;color:white}
+.arch{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.archBox{border:1px solid #355b78;background:#10283a;border-radius:10px;padding:12px;text-align:center}.flow{font-size:26px;color:var(--cyan);display:grid;place-items:center}
+.metric{font-size:34px;font-weight:1000}.creator-footer{position:fixed;bottom:8px;left:50%;transform:translateX(-50%);z-index:9999;padding:6px 12px;border-radius:999px;background:rgba(7,16,25,.88);border:1px solid #365a78;color:#9fb7c9;font-size:11px;font-weight:700;letter-spacing:.5px;white-space:nowrap}
+@media(max-width:1050px){.shell{grid-template-columns:1fr}.side{position:static}.grid{grid-template-columns:1fr 1fr}.arch{grid-template-columns:1fr}}
+@media(max-width:700px){.grid,.grid2{grid-template-columns:1fr}.navgrid{grid-template-columns:repeat(8,1fr)}}
+</style>
+</head>
+<body>
+<div class="creator-footer" id="creatorMark"></div>
+<div class="app">
+<div class="topbar">
+<div class="brand"><div class="logo">ITS<br>CLOUD</div><div><h1>Information Technology Specialist - Cloud Computing</h1><p>INF-104 • cloud concepts • architecture • lifecycle • deployment • governance</p></div></div>
+<div class="badges"><div class="badge" id="xpBadge">XP 0</div><div class="badge">Vendor-neutral</div><div class="badge">Azure + AWS terminology</div></div>
+</div>
+
+<div class="shell">
+<aside class="side">
+<button class="nav active" onclick="show('home',this)">🏠 Exam Center<span>Start exam, study, or cloud labs</span></button>
+<button class="nav" onclick="showStudy(this)">📘 Study Mode<span>Immediate explanations by domain</span></button>
+<button class="nav" onclick="show('pbq',this)">☁️ Cloud Skills Lab<span>Architecture, scaling, storage, DR, governance</span></button>
+<button class="nav" onclick="show('setup',this)">📝 Cloud Exam<span>40 questions • 50-minute practice</span></button>
+<button class="nav" onclick="show('objectives',this)">📊 Objective Map<span>Five current INF-104 domains</span></button>
+</aside>
+
+<main class="main">
+<section id="home" class="screen active">
+<div class="hero"><h2>Cloud Solutions Challenge</h2><p>This simulator follows Pearson's current ITS Cloud Computing objectives. Students practice the advantages and costs of cloud, IaaS/PaaS/SaaS, performance/availability/scalability/reliability, public/private/hybrid cloud, architecture diagrams, VMs, containers, APIs, storage, CI/CD, deployment, monitoring, disaster recovery, governance, privacy, identity, least privilege and encryption.</p><div class="heroActions"><button class="primary" onclick="show('setup')">START PRACTICE EXAM</button><button class="success" onclick="show('pbq')">OPEN CLOUD SKILLS LAB</button></div></div>
+
+<div class="grid">
+<div class="card"><h3>1. Cloud Concepts</h3><p class="small">Cloud advantages, IaaS/PaaS/SaaS, cost, ROI, PASR, SLAs, edge computing, availability, reliability, scalability and OTS vs custom solutions.</p></div>
+<div class="card"><h3>2. Developing Cloud Architecture</h3><p class="small">Public/private/hybrid, data flows, shared responsibility, virtualization, serverless, APIs, VM sizing/geography/backups and storage requirements.</p></div>
+<div class="card"><h3>3. Cloud Development Life Cycle</h3><p class="small">Source control, virtual environments, packages, testing, bugs, integration, VMs vs containers, microservices, version control and CI/CD.</p></div>
+<div class="card"><h3>4. Deploy the Application</h3><p class="small">Usage-based pricing, scaling, business continuity, disaster recovery, support, training, logging, monitoring, dashboards and alerts.</p></div>
+<div class="card"><h3>5. Cloud Governance</h3><p class="small">Privacy/regulatory requirements, NIST/ISO awareness, ethics/bias/transparency, IAM/MFA, roles, least privilege, encryption, IDS/IPS and firewalls.</p></div>
+<div class="card"><h3>Exam Preparation</h3><div class="metric">150 hrs</div><p class="small">Pearson recommends roughly 150 hours of instruction or hands-on experience developing and deploying cloud solutions.</p></div>
+</div>
+</section>
+
+<section id="study" class="screen"><div class="hero"><h2>Cloud Study Mode</h2><p>Choose a domain and receive immediate explanations.</p></div><div class="toolbar"><select id="studyDomain" onchange="renderStudy()"></select><button class="secondary" onclick="renderStudy()">NEW QUESTION</button></div><div id="studyArea"></div></section>
+
+<section id="setup" class="screen">
+<div class="hero"><h2>ITS Cloud Computing Exam Simulator</h2><p>Use the full mode for certification-style endurance or shorter modes for classroom review.</p></div>
+<div class="grid">
+<div class="card"><h3>Full Simulation</h3><div class="resultBig" style="font-size:32px">40 Q</div><p class="small">50-minute practice session.</p><button class="primary" onclick="startExam(40,3000)">START FULL EXAM</button></div>
+<div class="card"><h3>Class Practice</h3><div class="resultBig" style="font-size:32px">25 Q</div><p class="small">35-minute balanced review.</p><button class="primary" onclick="startExam(25,2100)">START 25 QUESTIONS</button></div>
+<div class="card"><h3>Quick Check</h3><div class="resultBig" style="font-size:32px">15 Q</div><p class="small">20-minute warm-up.</p><button class="primary" onclick="startExam(15,1200)">START 15 QUESTIONS</button></div>
+</div>
+</section>
+
+<section id="exam" class="screen">
+<div class="examHeader"><div><div class="examName">ITS Cloud Computing Practice Exam</div><div class="small">Question <span id="qNum"></span> of <span id="qTotal"></span></div></div><div class="timer" id="timer">50:00</div></div>
+<div class="domainBar"><span id="examProgress"></span></div><div id="qNav" class="navgrid"></div>
+<div class="questionCard"><div class="qmeta"><span class="tag" id="qDomain"></span><span class="tag" id="qType"></span></div><div id="qText" class="question"></div><div id="answers" class="answers"></div><div class="toolbar"><button class="secondary" onclick="prevQ()">← PREVIOUS</button><button class="warning" onclick="toggleFlag()">⚑ FLAG</button><div class="spacer"></div><button class="secondary" onclick="nextQ()">NEXT →</button><button class="danger" onclick="submitExam()">SUBMIT EXAM</button></div></div>
+</section>
+
+<section id="results" class="screen"><div id="resultsArea"></div></section>
+
+<section id="pbq" class="screen">
+<div class="hero"><h2>Cloud Skills Lab</h2><p>Practice cloud design decisions using safe, vendor-neutral scenarios while recognizing common Azure and AWS terminology.</p></div>
+<div class="preset">
+<button class="primary" onclick="loadPBQ('service')">Service Models</button>
+<button class="primary" onclick="loadPBQ('arch')">Architecture</button>
+<button class="primary" onclick="loadPBQ('vm')">VM Sizing</button>
+<button class="primary" onclick="loadPBQ('container')">VM vs Container</button>
+<button class="primary" onclick="loadPBQ('scaling')">Autoscaling</button>
+<button class="primary" onclick="loadPBQ('dr')">DR / Backup</button>
+<button class="primary" onclick="loadPBQ('governance')">Governance / IAM</button>
+</div><div id="pbqArea" style="margin-top:14px"></div>
+</section>
+
+<section id="objectives" class="screen">
+<div class="hero"><h2>Current INF-104 Objective Map</h2><p>The current Pearson objective sheet contains five major domains.</p></div>
+<div class="card"><table>
+<tr><th>Domain</th><th>Coverage</th></tr>
+<tr><td>1. Cloud Concepts</td><td>IaaS/PaaS/SaaS, cost, ROI, PASR, edge computing, SLAs, reliability, availability, scalability, OTS/custom</td></tr>
+<tr><td>2. Developing Cloud Architecture</td><td>Public/private/hybrid, architectural diagrams, data flows, shared responsibility, serverless, APIs, VMs, storage</td></tr>
+<tr><td>3. Implementing the Cloud Development Life Cycle</td><td>Source control, virtual environments, testing, integration, containers vs VMs, microservices, deployment, CI/CD</td></tr>
+<tr><td>4. Deploy the Application</td><td>Operational cost, scale up/down, BCDR, support/training, monitoring, logs, dashboards and alerts</td></tr>
+<tr><td>5. Understanding Cloud Governance</td><td>Privacy/regulation, NIST/ISO, ethics, bias/transparency, identity/MFA, access policy, least privilege, encryption, IDS/IPS/firewalls</td></tr>
+</table></div>
+</section>
+</main></div></div>
+
+<script>
+let XP=0,examItems=[],responses=[],flags=[],qi=0,timerHandle=null,timeLeft=3000,studyItem=null;
+const Q=[
+["1. Cloud Concepts","Which cloud service model gives the customer control over virtual machines and guest operating systems?",["IaaS","PaaS","SaaS","DaaS only"],[0],"IaaS provides infrastructure resources while the customer commonly manages guest operating systems and workloads.","Single answer"],
+["1. Cloud Concepts","Which service model lets developers deploy applications without managing most underlying servers and OS components?",["PaaS","IaaS","SaaS only","Colocation"],[0],"PaaS abstracts much of the underlying platform administration.","Single answer"],
+["1. Cloud Concepts","Which service model delivers a complete application to end users?",["SaaS","IaaS","Bare metal only","Private WAN"],[0],"SaaS provides complete applications as a managed service.","Single answer"],
+["1. Cloud Concepts","Which TWO are common cloud advantages?",["Elastic scalability","Usage-based consumption","Guaranteed zero downtime","No need for governance"],[0,1],"Elasticity and consumption-based pricing are common cloud advantages.","Select TWO"],
+["1. Cloud Concepts","What does an SLA define?",["Service commitments such as availability or response targets","A VM image format","A firewall rule","A programming language"],[0],"An SLA documents measurable service commitments.","Single answer"],
+["1. Cloud Concepts","Which quality describes a system's ability to increase or decrease resources as demand changes?",["Scalability","Confidentiality","Normalization","Tokenization"],[0],"Scalability allows capacity to adjust to demand.","Single answer"],
+["1. Cloud Concepts","Why might edge computing improve performance?",["It processes data closer to users/devices, reducing latency","It always eliminates networking","It removes all cloud cost","It replaces encryption"],[0],"Edge computing can reduce latency by moving processing closer to the data source or user.","Single answer"],
+["1. Cloud Concepts","What is ROI used to evaluate?",["Whether expected benefits justify the investment","Only CPU clock speed","Only storage encryption","Only VM operating system"],[0],"ROI compares the value gained with the cost of an investment.","Single answer"],
+["1. Cloud Concepts","Which TWO are part of PASR considerations?",["Availability","Scalability","Wallpaper design","Cable color"],[0,1],"PASR stands for performance, availability, scalability and reliability.","Select TWO"],
+["1. Cloud Concepts","Which is an example of an off-the-shelf cloud offering?",["Microsoft 365","A custom microservice written from scratch","A local switch VLAN","A custom kernel"],[0],"Microsoft 365 is an off-the-shelf hosted service offering.","Single answer"],
+
+["2. Developing Cloud Architecture","Which cloud deployment combines private resources with public cloud services?",["Hybrid cloud","Public cloud only","Private cloud only","Edge-only LAN"],[0],"Hybrid cloud integrates private and public environments.","Single answer"],
+["2. Developing Cloud Architecture","Which cloud model dedicates infrastructure primarily to one organization?",["Private cloud","Public cloud","SaaS only","Multicast cloud"],[0],"Private cloud resources are dedicated to one organization.","Single answer"],
+["2. Developing Cloud Architecture","Why include data flows in an architecture diagram?",["To show how components communicate and what protocols are used","To display monitor resolution","To calculate CPU temperature","To replace access control"],[0],"Data-flow diagrams show component interactions and communication paths.","Single answer"],
+["2. Developing Cloud Architecture","Which TWO should be identified in a cloud architecture diagram?",["Compute components","Data/storage components","Keyboard layouts","Printer toner levels"],[0,1],"Cloud diagrams should identify compute, data and networking components.","Select TWO"],
+["2. Developing Cloud Architecture","What does the shared responsibility model describe?",["Which security/operational duties belong to the provider versus the customer","How to share passwords","How to split one VM into two CPUs","How to assign DNS names only"],[0],"Cloud security duties are divided between provider and customer depending on the service model.","Single answer"],
+["2. Developing Cloud Architecture","When is serverless architecture often attractive?",["When code should run on demand without managing servers directly","When every workload requires a dedicated physical server","When no scaling is needed ever","When APIs are prohibited"],[0],"Serverless platforms abstract infrastructure and commonly scale executions on demand.","Single answer"],
+["2. Developing Cloud Architecture","What is an API used for in a cloud application?",["Allow services/applications to communicate programmatically","Replace all storage","Provide physical cabling","Set monitor brightness"],[0],"APIs expose programmatic interfaces between services.","Single answer"],
+["2. Developing Cloud Architecture","Which TWO considerations affect VM geographic placement?",["Latency","Legal/data-residency requirements","Keyboard color","Local printer model"],[0,1],"Region selection can affect latency and regulatory/data-location requirements.","Select TWO"],
+["2. Developing Cloud Architecture","Which data type is best described as rows and columns with a predefined schema?",["Structured data","Unstructured data","Packet capture only","Object code"],[0],"Structured data follows a defined schema such as relational tables.","Single answer"],
+["2. Developing Cloud Architecture","Which data is commonly considered unstructured?",["Images and videos","Relational table rows","Integer columns only","Primary keys"],[0],"Images, videos and free-form documents are typical unstructured data.","Single answer"],
+
+["3. Cloud Development Life Cycle","Why use source-code management such as Git?",["Track versions and collaborate on code changes","Increase RAM automatically","Replace backups entirely","Encrypt every database"],[0],"Source control records changes and supports collaboration/versioning.","Single answer"],
+["3. Cloud Development Life Cycle","Which service is specifically named in the objective sheet as a source-code management example?",["GitHub","DHCP","NTP","BitLocker"],[0],"GitHub is an example of source-code management and workflow hosting.","Single answer"],
+["3. Cloud Development Life Cycle","What is the purpose of testing before deployment?",["Find defects and verify expected behavior","Guarantee no future bugs","Replace version control","Disable monitoring"],[0],"Testing helps identify defects and validate requirements.","Single answer"],
+["3. Cloud Development Life Cycle","Which TWO are appropriate parts of iterative testing?",["Run test cases","Report bugs","Hide failed tests","Skip regression checks"],[0,1],"Testing involves running cases/scenarios and reporting defects for correction.","Select TWO"],
+["3. Cloud Development Life Cycle","How do containers generally differ from virtual machines?",["Containers share the host OS kernel while VMs emulate separate machines with guest OSs","Containers always need more resources than VMs","VMs cannot run applications","Containers require physical servers only"],[0],"Containers share more of the host OS stack and are typically lighter weight than full VMs.","Single answer"],
+["3. Cloud Development Life Cycle","Which technology is specifically referenced as a container example?",["Docker","Hyper-V only","RDP","DNSSEC"],[0],"Docker is named in the objective sheet as a container technology example.","Single answer"],
+["3. Cloud Development Life Cycle","Which technology is specifically referenced as a VM example?",["Hyper-V","Docker only","GitHub Actions","SMTP"],[0],"Hyper-V is referenced as a virtual-machine platform example.","Single answer"],
+["3. Cloud Development Life Cycle","What is a microservices architecture?",["An application split into smaller independently deployable services","A single huge application process only","A physical switching topology","A backup format"],[0],"Microservices decompose applications into smaller services.","Single answer"],
+["3. Cloud Development Life Cycle","What does CI/CD primarily automate?",["Build, test and deployment workflows","Firewall hardware replacement","Employee scheduling","Cable certification"],[0],"CI/CD automates integration, testing and delivery/deployment processes.","Single answer"],
+["3. Cloud Development Life Cycle","Which workflow automation platform is named in the objectives?",["GitHub Actions","Disk Management","Task Manager","Active Directory Users and Computers"],[0],"GitHub Actions is listed as an example workflow/CI-CD platform.","Single answer"],
+
+["4. Deploy the Application","What is usage-based pricing?",["Cost based on resources or services consumed","One fixed hardware purchase only","Free unlimited resources","A software license key"],[0],"Cloud costs often reflect actual consumption.","Single answer"],
+["4. Deploy the Application","Why scale down unused resources?",["Reduce unnecessary operating cost","Increase attack surface","Increase latency","Disable backups"],[0],"Right-sizing and scaling down can reduce cloud spend.","Single answer"],
+["4. Deploy the Application","Which TWO belong in a business-continuity/disaster-recovery plan?",["Potential disaster scenarios","Backup strategy","UI color palette","Keyboard shortcuts"],[0,1],"BCDR planning identifies risks and recovery/backup approaches.","Select TWO"],
+["4. Deploy the Application","Why keep backups in another location or region?",["Increase resilience against site-level failure","Make every restore slower by definition","Disable replication","Remove encryption"],[0],"Geographic redundancy helps survive local disasters.","Single answer"],
+["4. Deploy the Application","What is a cloud monitoring dashboard used for?",["Visualize health, usage and performance metrics","Edit source code only","Replace user training","Assign physical switch ports"],[0],"Dashboards summarize operational metrics and events.","Single answer"],
+["4. Deploy the Application","Why configure alerts?",["Notify operators when conditions or thresholds require attention","Guarantee no outages","Replace logs","Remove need for monitoring"],[0],"Alerts bring relevant conditions to operator attention.","Single answer"],
+["4. Deploy the Application","Which TWO are part of supporting users after deployment?",["Application/hardware support","Training tools","Disable documentation","Remove help channels"],[0,1],"Support and training are part of operating a cloud solution.","Select TWO"],
+
+["5. Cloud Governance","Which regulation is associated with protection of health information in the United States?",["HIPAA","FERPA only","COPPA only","PCI routing"],[0],"HIPAA addresses protected health information.","Single answer"],
+["5. Cloud Governance","Which regulation is strongly associated with privacy rights for people in the European Union?",["GDPR","DHCP","NAT","SLA"],[0],"GDPR is a major EU privacy regulation.","Single answer"],
+["5. Cloud Governance","Which TWO frameworks/standards are specifically referenced in the cloud objectives?",["NIST","ISO","SMTP","FTP"],[0,1],"The objectives call for awareness of NIST and ISO frameworks/standards.","Select TWO"],
+["5. Cloud Governance","Why does data location matter in cloud governance?",["Privacy, regulatory and legal requirements may depend on geography","It changes keyboard layout only","It determines monitor brightness","It eliminates encryption"],[0],"Data residency can affect regulatory compliance.","Single answer"],
+["5. Cloud Governance","Which ethical concern can arise from prebuilt cloud AI/services?",["Bias and lack of transparency","Too many Ethernet ports","Incorrect monitor refresh rate","RAID stripe size"],[0],"The objectives specifically call out bias, transparency and accountability concerns.","Single answer"],
+["5. Cloud Governance","Which control strengthens identity verification beyond a password?",["MFA","Open anonymous access","Shared admin password","Disable logging"],[0],"MFA uses multiple authentication factors.","Single answer"],
+["5. Cloud Governance","What is least privilege?",["Grant only the permissions required for the task","Give all users administrator rights","Share root credentials","Never remove old accounts"],[0],"Least privilege minimizes unnecessary permissions.","Single answer"],
+["5. Cloud Governance","What should happen to access that is no longer needed?",["Remove it and disable unused accounts","Keep it forever","Share it with other users","Convert it to global admin"],[0],"Access hygiene includes prompt removal of unnecessary access.","Single answer"],
+["5. Cloud Governance","Which TWO controls help protect cloud environments from unauthorized network access?",["Firewall","IDS/IPS","Public anonymous admin console","Default credentials"],[0,1],"Firewalls and IDS/IPS are identified protective controls.","Select TWO"],
+["5. Cloud Governance","Why encrypt cloud data?",["Protect confidentiality if data or storage is exposed","Increase CPU speed","Replace IAM","Eliminate backup requirements"],[0],"Encryption protects data confidentiality.","Single answer"]
+];
+const DOMAINS=[...new Set(Q.map(q=>q[0]))];
+const EXTRA_Q=[["4. Deploy the Application", "Which monitoring feature should be configured to notify administrators automatically when a cloud resource exceeds an acceptable threshold?", ["Alert", "Snapshot only", "Load balancer", "Source repository"], [0], "Alerts notify administrators when monitored conditions cross configured thresholds.", "Single answer"]];
+const BANK=[...Q,...EXTRA_Q];
+
+// Randomize answer positions while preserving the correct answer index(es).
+function shuffleQuestion(q){
+ const choices=q[2].map((answer,index)=>({answer,correct:q[3].includes(index)}));
+ for(let i=choices.length-1;i>0;i--){
+   const j=Math.floor(Math.random()*(i+1));
+   [choices[i],choices[j]]=[choices[j],choices[i]];
+ }
+ return [
+   q[0],
+   q[1],
+   choices.map(x=>x.answer),
+   choices.map((x,i)=>x.correct?i:null).filter(x=>x!==null),
+   q[4],
+   q[5]
+ ];
+}
+
+function show(id,btn){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll(".nav").forEach(n=>n.classList.remove("active"));if(btn)btn.classList.add("active")}
+function balancedSet(n){
+ const result=[];let remaining=n;
+ DOMAINS.forEach((dom,idx)=>{
+   const count=idx===DOMAINS.length-1?remaining:Math.round(n/DOMAINS.length);
+   remaining-=count;
+   const subset=BANK.filter(q=>q[0]===dom).sort(()=>Math.random()-.5);
+   if(count>subset.length)throw new Error("Not enough unique questions in "+dom);
+   for(let i=0;i<count;i++)result.push(shuffleQuestion(subset[i]));
+ });
+ return result.sort(()=>Math.random()-.5);
+}
+function toggleGov(i,b){window.gov=window.gov||[];if(window.gov.includes(i))window.gov=window.gov.filter(x=>x!==i);else if(window.gov.length<2)window.gov.push(i);document.querySelectorAll("#pbqArea .answer").forEach((x,j)=>x.classList.toggle("selected",window.gov.includes(j)))}
+function checkGov(){fb(window.gov.length===2&&window.gov.includes(0)&&window.gov.includes(1),"✅ MFA + least privilege matches the governance objectives.","❌ Choose MFA and least-privilege roles.")}
+function fb(ok,a,b){const e=document.getElementById("pbqFeedback");e.className="feedback "+(ok?"good":"bad");e.textContent=ok?a:b;if(ok){XP+=10;document.getElementById("xpBadge").textContent="XP "+XP}}
+const _creatorHex=["43","72","65","61","74","65","64","20","62","79","20","44","65","72","72","69","63","6b","20","42","65","61","69","72","64"];
+document.getElementById("creatorMark").textContent=_creatorHex.map(x=>String.fromCharCode(parseInt(x,16))).join("");
+</script>
+</body>
+</html>

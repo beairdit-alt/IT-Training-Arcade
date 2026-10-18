@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SMART Drive Diagnostic Lab</title>
+<style>
+  :root{
+    --bg:#07051a; --panel:#0d0b25; --panel2:#12103a; --cyan:#23e6ff;
+    --pink:#ff36d1; --purple:#9b5cff; --lime:#6dff9d; --yellow:#ffe45c;
+    --red:#ff5a72; --text:#eef6ff; --muted:#aeb7d3; --border:#2a2b60;
+    --shadow:0 0 24px rgba(35,230,255,.14), inset 0 0 24px rgba(155,92,255,.05);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; color:var(--text); font-family:Inter,Segoe UI,Arial,sans-serif;
+    background:
+      radial-gradient(circle at 50% 8%,rgba(255,54,209,.17),transparent 25%),
+      radial-gradient(circle at 10% 25%,rgba(35,230,255,.10),transparent 20%),
+      linear-gradient(180deg,#09061f 0%,#050516 55%,#02020a 100%);
+    min-height:100vh;
+  }
+  body:before{
+    content:""; position:fixed; inset:55% 0 0; pointer-events:none; opacity:.18;
+    background-image:linear-gradient(rgba(35,230,255,.55) 1px,transparent 1px),linear-gradient(90deg,rgba(35,230,255,.55) 1px,transparent 1px);
+    background-size:42px 28px; transform:perspective(520px) rotateX(58deg) scale(1.6); transform-origin:top;
+  }
+  .wrap{width:min(1180px,94vw);margin:auto;padding:26px 0 70px;position:relative;z-index:1}
+  header{padding:24px;border:1px solid var(--border);border-radius:18px;background:linear-gradient(135deg,rgba(18,16,58,.95),rgba(8,7,28,.95));box-shadow:var(--shadow);overflow:hidden;position:relative}
+  header:after{content:"SMART // DRIVE // DIAGNOSTICS";position:absolute;right:18px;top:12px;color:rgba(35,230,255,.12);font-weight:900;font-size:clamp(28px,5vw,72px);white-space:nowrap;pointer-events:none}
+  h1{margin:0;font-size:clamp(32px,5vw,60px);line-height:.95;letter-spacing:.02em;text-transform:uppercase;text-shadow:0 0 12px rgba(35,230,255,.6)}
+  h1 span{color:var(--pink);text-shadow:0 0 12px rgba(255,54,209,.65)}
+  .sub{max-width:820px;color:var(--muted);font-size:17px;margin:14px 0 0;line-height:1.55}
+  .chips{display:flex;gap:9px;flex-wrap:wrap;margin-top:16px}
+  .chip{border:1px solid #3c3f79;background:#0b0a2b;padding:7px 10px;border-radius:999px;color:#dbe7ff;font-size:13px}
+  .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:18px;margin-top:18px}
+  @media(max-width:900px){.grid{grid-template-columns:1fr}}
+  .card{border:1px solid var(--border);border-radius:16px;background:rgba(12,10,40,.94);box-shadow:var(--shadow);padding:18px}
+  .card h2,.card h3{margin-top:0}.card h2{font-size:22px}.card h3{font-size:17px;color:#dfe9ff}
+  .accent{color:var(--cyan)} .pink{color:var(--pink)} .lime{color:var(--lime)} .warn{color:var(--yellow)} .bad{color:var(--red)}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:18px}
+  @media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}}
+  .stat{background:#090825;border:1px solid #2a2d61;border-radius:13px;padding:12px;text-align:center}.stat b{display:block;font-size:25px;color:var(--cyan)}.stat span{font-size:12px;color:var(--muted)}
+  button,.btn{cursor:pointer;border:none;border-radius:10px;padding:10px 13px;font-weight:800;letter-spacing:.02em;color:#07101c;background:linear-gradient(90deg,var(--cyan),#7df5ff);box-shadow:0 0 14px rgba(35,230,255,.18)}
+  button.secondary{background:#171744;color:#dfe8ff;border:1px solid #3a3c75;box-shadow:none}
+  button.pinkbtn{background:linear-gradient(90deg,var(--pink),#ff8ce5)}
+  button:active{transform:translateY(1px)}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .installTabs button.active,.osbtn.active{outline:2px solid var(--pink);background:#24125b;color:#fff}
+  pre,code,.terminal{font-family:Consolas,"Cascadia Mono",monospace}
+  .codebox{position:relative;background:#050712;border:1px solid #27345c;border-radius:12px;padding:13px;margin:10px 0;color:#bafcff;white-space:pre-wrap;overflow:auto}
+  .copy{position:absolute;right:8px;top:8px;font-size:11px;padding:6px 8px}
+  .note{border-left:4px solid var(--yellow);background:#1c1830;padding:10px 12px;border-radius:8px;color:#e9e4c5;font-size:14px;line-height:1.45}
+  .terminal{background:#020607;border:1px solid #174c55;border-radius:14px;overflow:hidden;box-shadow:0 0 22px rgba(35,230,255,.08)}
+  .termbar{background:#0c1820;border-bottom:1px solid #183942;padding:9px 12px;color:#91d8e5;font-size:12px;display:flex;justify-content:space-between}
+  #termOut{height:390px;overflow:auto;padding:14px;white-space:pre-wrap;line-height:1.38;color:#bdf7cd;font-size:13px}
+  .promptline{display:flex;align-items:center;border-top:1px solid #183942;padding:10px;background:#061014}
+  .prompt{color:var(--pink);font-family:Consolas,monospace;margin-right:8px;font-weight:900}
+  #cmdInput{flex:1;background:transparent;border:none;outline:none;color:#fff;font-family:Consolas,monospace;font-size:14px}
+  select{background:#0b0a2c;color:#fff;border:1px solid #363a78;border-radius:9px;padding:9px}
+  .mission{padding:12px;border-radius:12px;border:1px solid #34376e;background:#0b0a2a;margin:10px 0}
+  .mission.done{border-color:#2a8b59;background:#081e1b}.mission .mhead{display:flex;justify-content:space-between;gap:10px;font-weight:800}.badge{font-size:11px;border:1px solid #4a4d86;border-radius:999px;padding:4px 8px;color:#c8d0ec}.mission.done .badge{border-color:#43ad70;color:#8cffb4}
+  .question{border:1px solid #34376e;background:#0b0a2a;border-radius:14px;padding:14px;margin:12px 0}.answers{display:grid;gap:8px;margin-top:10px}.answer{width:100%;text-align:left;background:#171744;color:#eff3ff;border:1px solid #393d76;box-shadow:none}.answer.correct{background:#103923;border-color:#4ce98e}.answer.wrong{background:#441625;border-color:#ff667f}.feedback{margin-top:9px;color:#cbd3ea;min-height:20px}
+  .meter{height:12px;border-radius:999px;background:#08091e;border:1px solid #2e315f;overflow:hidden}.meter>div{height:100%;width:0;background:linear-gradient(90deg,var(--pink),var(--cyan));transition:.3s}
+  table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:9px;border-bottom:1px solid #2b2d59;text-align:left;vertical-align:top}th{color:var(--cyan);font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+  .statusPill{display:inline-block;border-radius:999px;padding:4px 8px;font-size:11px;font-weight:800}.s-green{background:#123724;color:#8fffb2}.s-yellow{background:#413818;color:#ffe374}.s-red{background:#481526;color:#ff8aa0}.s-blue{background:#122a48;color:#8fd6ff}
+  details{border:1px solid #30336a;border-radius:12px;padding:10px 12px;margin:9px 0;background:#0a0927}summary{cursor:pointer;font-weight:800;color:#eaf4ff}
+  .footer{text-align:center;color:#8188aa;font-size:12px;margin-top:26px}.footer a{color:#9eefff}.bigscore{font-size:42px;color:var(--cyan);font-weight:900;text-shadow:0 0 12px rgba(35,230,255,.5)}
+  .hide{display:none!important}.small{font-size:13px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>SMART <span>Drive Diagnostic</span> Lab</h1>
+  <p class="sub">Learn how to install and use <b>smartctl</b> on Windows and Linux, run SMART health checks and self-tests, interpret drive data, and decide what action a technician should take.</p>
+  <div class="chips"><span class="chip">HDD</span><span class="chip">SATA SSD</span><span class="chip">NVMe</span><span class="chip">Windows</span><span class="chip">Linux</span><span class="chip">Hands-on CLI</span></div>
+  <div class="stats">
+    <div class="stat"><b id="score">0</b><span>POINTS</span></div>
+    <div class="stat"><b id="missionsDone">0/8</b><span>MISSIONS</span></div>
+    <div class="stat"><b id="quizScore">0/0</b><span>QUIZ</span></div>
+    <div class="stat"><b id="rank">ROOKIE</b><span>TECH RANK</span></div>
+  </div>
+</header>
+
+<div class="grid">
+<section class="card">
+  <h2>1. Install <span class="accent">smartmontools</span></h2>
+  <p class="small">The <b>smartmontools</b> package includes <code>smartctl</code> for drive inspection/testing and <code>smartd</code> for monitoring.</p>
+  <div class="row installTabs">
+    <button class="secondary active" data-install="win">Windows</button>
+    <button class="secondary" data-install="deb">Ubuntu / Debian</button>
+    <button class="secondary" data-install="fed">Fedora / RHEL</button>
+    <button class="secondary" data-install="arch">Arch / Manjaro</button>
+  </div>
+
+  <div id="install-win" class="installPanel">
+    <h3 class="bad">If you see this in PowerShell...</h3>
+    <div class="codebox">PS C:\WINDOWS\system32&gt; smartctl --version
+smartctl : The term 'smartctl' is not recognized as the name of a cmdlet, function, script file, or operable program.
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again.</div>
+    <p class="small"><b>Diagnosis:</b> <code>smartctl</code> is not installed yet, or its folder is not in the Windows PATH.</p>
+    <ol>
+      <li>Open <b>PowerShell or Windows Terminal as Administrator</b>.</li>
+      <li>Install smartmontools with WinGet:</li>
+    </ol>
+    <div class="codebox"><button class="copy" onclick="copyText('winget install -e --id smartmontools.smartmontools')">COPY</button>winget install -e --id smartmontools.smartmontools</div>
+    <ol start="3">
+      <li>When installation finishes, <b>close and reopen</b> PowerShell so PATH changes are picked up.</li>
+      <li>Verify the installation:</li>
+    </ol>
+    <div class="codebox"><button class="copy" onclick="copyText('smartctl --version')">COPY</button>smartctl --version</div>
+    <p class="small"><b>If WinGet is unavailable:</b> use the official smartmontools Windows installer, then reopen the terminal. If needed, run <code>smartctl.exe</code> from the smartmontools installation folder or add that folder to PATH.</p>
+  </div>
+  <div id="install-deb" class="installPanel hide">
+    <h3 class="bad">Linux command-not-found example</h3>
+    <div class="codebox">student@lab:~$ smartctl --version
+bash: smartctl: command not found</div>
+    <p class="small"><b>Diagnosis:</b> install the <code>smartmontools</code> package, then verify <code>smartctl</code>.</p>
+    <div class="codebox"><button class="copy" onclick="copyText('sudo apt update && sudo apt install smartmontools')">COPY</button>sudo apt update
+sudo apt install smartmontools
+smartctl --version</div>
+  </div>
+  <div id="install-fed" class="installPanel hide">
+    <h3 class="bad">Linux command-not-found example</h3>
+    <div class="codebox">student@lab:~$ smartctl --version
+bash: smartctl: command not found</div>
+    <div class="codebox"><button class="copy" onclick="copyText('sudo dnf install smartmontools')">COPY</button>sudo dnf install smartmontools
+smartctl --version</div>
+  </div>
+  <div id="install-arch" class="installPanel hide">
+    <h3 class="bad">Linux command-not-found example</h3>
+    <div class="codebox">student@lab:~$ smartctl --version
+bash: smartctl: command not found</div>
+    <div class="codebox"><button class="copy" onclick="copyText('sudo pacman -S smartmontools')">COPY</button>sudo pacman -S smartmontools
+smartctl --version</div>
+  </div>
+  <div class="note">SMART is useful evidence, not a guarantee. A drive can fail even if the overall SMART status says PASSED. Important data still needs backups.</div>
+</section>
+
+<section class="card">
+  <h2>2. Command <span class="pink">Cheat Sheet</span></h2>
+  <table>
+    <tr><th>Command</th><th>Purpose</th></tr>
+    <tr><td><code>winget install -e --id smartmontools.smartmontools</code></td><td>Windows: install smartmontools if <code>smartctl</code> is missing.</td></tr>
+    <tr><td><code>sudo apt install smartmontools</code></td><td>Ubuntu/Debian: install smartmontools if <code>smartctl</code> is missing.</td></tr>
+    <tr><td><code>smartctl --scan</code></td><td>Find drives smartctl can access.</td></tr>
+    <tr><td><code>smartctl -H DEVICE</code></td><td>Show overall SMART health status.</td></tr>
+    <tr><td><code>smartctl -a DEVICE</code></td><td>Show main SMART information and attributes.</td></tr>
+    <tr><td><code>smartctl -x DEVICE</code></td><td>Show extended SMART information.</td></tr>
+    <tr><td><code>smartctl -t short DEVICE</code></td><td>Start a short self-test.</td></tr>
+    <tr><td><code>smartctl -t long DEVICE</code></td><td>Start an extended/long self-test.</td></tr>
+    <tr><td><code>smartctl -l selftest DEVICE</code></td><td>Read the self-test log.</td></tr>
+  </table>
+  <p class="small">Linux examples usually need <code>sudo</code>. On Windows, run the terminal as Administrator. Use the device name returned by <code>smartctl --scan</code>.</p>
+</section>
+</div>
+
+<section class="card" style="margin-top:18px">
+  <div class="row" style="justify-content:space-between">
+    <div><h2 style="margin-bottom:4px">3. <span class="accent">Terminal Simulator</span></h2><div class="small">The simulator starts with smartctl missing. Diagnose the error, install smartmontools, then test the drive.</div></div>
+    <div class="row"><span class="small">OS:</span><button class="secondary osbtn active" data-os="linux">Linux</button><button class="secondary osbtn" data-os="windows">Windows</button>
+      <select id="driveScenario" title="Choose simulated drive"><option value="healthy">Healthy HDD</option><option value="cable">Cable / CRC Problem</option><option value="failing">Failing HDD</option><option value="nvme">NVMe Wear / Errors</option></select></div>
+  </div>
+  <div class="terminal" style="margin-top:14px">
+    <div class="termbar"><span>SMART-LAB CONSOLE</span><span id="osLabel">LINUX • sudo available</span></div>
+    <div id="termOut"></div>
+    <div class="promptline"><span class="prompt" id="prompt">student@lab:~$</span><input id="cmdInput" autocomplete="off" spellcheck="false" placeholder="Try: sudo smartctl --scan" /></div>
+  </div>
+</section>
+
+<div class="grid">
+<section class="card">
+  <h2>4. <span class="pink">Mission Board</span></h2>
+  <div id="missions"></div>
+  <div class="meter"><div id="missionMeter"></div></div>
+  <div class="row" style="margin-top:12px"><button onclick="hint()">MISSION HINT</button><button class="secondary" onclick="resetGame()">RESET GAME</button></div>
+</section>
+
+<section class="card">
+  <h2>5. SMART <span class="accent">Signals</span></h2>
+  <table>
+    <tr><th>Signal</th><th>What it can suggest</th></tr>
+    <tr><td><span class="statusPill s-red">5 Reallocated</span></td><td>Bad sectors already remapped. Increasing counts deserve attention.</td></tr>
+    <tr><td><span class="statusPill s-red">197 Pending</span></td><td>Unstable sectors waiting to be re-read/remapped.</td></tr>
+    <tr><td><span class="statusPill s-red">198 Offline Uncorrectable</span></td><td>Data could not be corrected during offline testing.</td></tr>
+    <tr><td><span class="statusPill s-yellow">199 UDMA CRC</span></td><td>Often points to cable, connection, or interface communication problems.</td></tr>
+    <tr><td><span class="statusPill s-blue">Temperature</span></td><td>Useful context; temperature limits vary by drive model.</td></tr>
+    <tr><td><span class="statusPill s-green">Power-On Hours</span></td><td>Age/usage context, not a failure verdict by itself.</td></tr>
+  </table>
+  <p class="small">Raw SMART attributes are vendor-specific. Look at trends, self-test results, error logs, and manufacturer guidance—not one number alone.</p>
+</section>
+</div>
+
+<section class="card" style="margin-top:18px">
+  <div class="row" style="justify-content:space-between"><div><h2>6. <span class="pink">Diagnostic Challenge</span></h2><div class="small">Choose the best technician response. Questions are randomized when the page loads.</div></div><button class="secondary" onclick="newQuiz()">NEW QUIZ</button></div>
+  <div id="quiz"></div>
+</section>
+
+<section class="card" style="margin-top:18px">
+  <h2>7. Field Notes: <span class="accent">What SMART Can and Cannot Do</span></h2>
+  <details open><summary>Does every drive support SMART?</summary><p>Most modern HDDs and SSDs expose health data, and smartmontools supports common ATA/SATA, SCSI/SAS, and NVMe devices. Access can be limited by some USB bridges, RAID controllers, or vendor implementations.</p></details>
+  <details><summary>What if smartctl cannot see a USB drive?</summary><p>Run <code>smartctl --scan-open</code>. Some USB-to-SATA bridges need a device type option such as <code>-d sat</code>. Do not guess in production—identify the bridge/controller and check smartctl support first.</p></details>
+  <details><summary>Should I run a long test on a failing drive?</summary><p>If a drive is already showing serious read errors or contains important data, prioritize getting a backup or image first. A long self-test adds drive activity and does not repair the disk.</p></details>
+  <details><summary>What changes for NVMe?</summary><p>NVMe health data uses fields such as Critical Warning, Available Spare, Percentage Used, Media/Data Integrity Errors, temperature, and error log entries rather than the classic ATA attribute table.</p></details>
+</section>
+
+<div class="footer">
+  Created by Derrick Beaird • Network Support Services<br>
+  Educational simulator — commands are not executed on your real computer.<br>
+  Reference: <a href="https://www.smartmontools.org/" target="_blank" rel="noopener">smartmontools project</a> • <a href="https://github.com/smartmontools/smartmontools" target="_blank" rel="noopener">official upstream repository</a>
+</div>
+</div>
+
+<script>
+let score=0, quizCorrect=0, quizAnswered=0, os='linux';
+let installed={linux:false,windows:false};
+const completed=new Set();
+const missions=[
+  {id:'missing',title:'Diagnose the Missing Command',desc:'Try smartctl --version before it is installed',pts:40},
+  {id:'install',title:'Install smartmontools',desc:'Use the correct Windows or Linux package command',pts:60},
+  {id:'verify',title:'Verify the Tool',desc:'Run smartctl --version after installation',pts:50},
+  {id:'scan',title:'Find the Drive',desc:'Use smartctl --scan',pts:75},
+  {id:'health',title:'Quick Health Check',desc:'Run smartctl -H on the detected drive',pts:100},
+  {id:'all',title:'Read SMART Data',desc:'Run smartctl -a on the detected drive',pts:125},
+  {id:'short',title:'Start a Short Test',desc:'Run smartctl -t short',pts:150},
+  {id:'log',title:'Read the Test Log',desc:'Run smartctl -l selftest',pts:175}
+];
+const scenarios={
+ healthy:{name:'ST2000DM008 2TB HDD',ata:true,health:'PASSED',realloc:0,pending:0,offline:0,crc:0,temp:34,hours:4182,short:'Completed without error',long:'Completed without error'},
+ cable:{name:'WDC WD10EZEX 1TB HDD',ata:true,health:'PASSED',realloc:0,pending:0,offline:0,crc:184,temp:36,hours:8021,short:'Completed without error',long:'Completed without error'},
+ failing:{name:'TOSHIBA DT01ACA100 1TB HDD',ata:true,health:'FAILED',realloc:128,pending:19,offline:11,crc:1,temp:41,hours:26884,short:'Completed: read failure',long:'Completed: read failure'},
+ nvme:{name:'NVMe LAB-SSD 1TB',ata:false,health:'PASSED',used:92,spare:87,mediaErrors:24,temp:48,hours:17220,short:'Completed without error',long:'Completed without error'}
+};
+function currentDevice(){return os==='linux' ? (scenarios[driveScenario.value].ata?'/dev/sda':'/dev/nvme0') : (scenarios[driveScenario.value].ata?'/dev/sda':'/dev/nvme0');}
+function prefix(){return os==='linux'?'sudo ':''}
+function updateStats(){
+ document.getElementById('score').textContent=score;
+ document.getElementById('missionsDone').textContent=completed.size+'/'+missions.length;
+ document.getElementById('quizScore').textContent=quizCorrect+'/'+quizAnswered;
+ document.getElementById('missionMeter').style.width=(completed.size/missions.length*100)+'%';
+ let rank='ROOKIE'; if(score>=250)rank='TECH I'; if(score>=550)rank='TECH II'; if(score>=900)rank='SYSADMIN'; if(score>=1250)rank='DRIVE WIZARD';
+ document.getElementById('rank').textContent=rank;
+ renderMissions();
+}
+function renderMissions(){
+ const box=document.getElementById('missions');box.innerHTML='';
+ missions.forEach(m=>{const d=document.createElement('div');d.className='mission'+(completed.has(m.id)?' done':'');d.innerHTML=`<div class="mhead"><span>${completed.has(m.id)?'✓ ':''}${m.title}</span><span class="badge">+${m.pts} pts</span></div><div class="small" style="margin-top:5px">${m.desc}</div>`;box.appendChild(d)});
+}
+function award(id){const m=missions.find(x=>x.id===id);if(m&&!completed.has(id)){completed.add(id);score+=m.pts;print(`\n[MISSION COMPLETE] ${m.title}  +${m.pts} points\n`,'cyan');updateStats()}}
+function print(txt,cls=''){const out=document.getElementById('termOut');const span=document.createElement('span');if(cls==='red')span.style.color='#ff8799';if(cls==='yellow')span.style.color='#ffe45c';if(cls==='cyan')span.style.color='#62efff';span.textContent=txt;out.appendChild(span);out.scrollTop=out.scrollHeight}
+function boot(){document.getElementById('termOut').innerHTML='';print('SMART Drive Diagnostic Lab v1.1\nType help for simulator commands.\nNo real drives are modified.\n\n');print(os==='linux'?'Tip: This Linux lab starts with smartctl NOT installed. Try smartctl --version first.\n':'Tip: This Windows lab starts with smartctl NOT installed. Try smartctl --version first.\n');print(`Tool status: ${installed[os]?'smartmontools INSTALLED':'smartmontools NOT INSTALLED'}\n`);print(`Selected simulation: ${scenarios[driveScenario.value].name}\n\n`)}
+function normalize(s){return s.trim().replace(/^sudo\s+/i,'').replace(/\s+/g,' ')}
+function installHelp(){
+ if(os==='windows') return 'Install with: winget install -e --id smartmontools.smartmontools';
+ return 'Install with your distro package manager, for example: sudo apt install smartmontools';
+}
+function showMissingCommand(){
+ if(os==='windows'){
+   print("smartctl : The term 'smartctl' is not recognized as the name of a cmdlet, function, script file, or operable program.\nCheck the spelling of the name, or if a path was included, verify that the path is correct and try again.\n\n",'red');
+ } else {
+   print('bash: smartctl: command not found\n', 'red');
+   print('Hint: sudo apt install smartmontools   (Ubuntu/Debian)\n      sudo dnf install smartmontools   (Fedora/RHEL)\n      sudo pacman -S smartmontools     (Arch/Manjaro)\n\n','yellow');
+ }
+ award('missing');
+}
+function runCommand(raw){
+ if(!raw.trim())return;
+ print((os==='linux'?'student@lab:~$ ':'PS C:\\> ')+raw+'\n','cyan');
+ const c=normalize(raw), dev=currentDevice(), sc=scenarios[driveScenario.value];
+ if(c==='help'){
+   let installLine=os==='windows'?'winget install -e --id smartmontools.smartmontools':'sudo apt install smartmontools';
+   print('Commands to try:\n  smartctl --version   <-- try this BEFORE install\n  '+installLine+'\n  smartctl --version   <-- verify AFTER install\n  smartctl --scan\n  smartctl --scan-open\n  smartctl -H '+dev+'\n  smartctl -a '+dev+'\n  smartctl -x '+dev+'\n  smartctl -t short '+dev+'\n  smartctl -t long '+dev+'\n  smartctl -l selftest '+dev+'\n  clear\n\n');return}
+ if(c==='clear'||c==='cls'){document.getElementById('termOut').innerHTML='';return}
+
+ // Installation commands
+ if(os==='windows' && /^winget install(?: -e)? --id smartmontools\.smartmontools(?: -e)?$/i.test(c)){
+   installed.windows=true;
+   print('Found smartmontools.smartmontools\nInstalling smartmontools...\nSuccessfully installed.\nLAB NOTE: In real Windows, close and reopen PowerShell so PATH changes are picked up.\n\n','cyan');
+   award('install');return;
+ }
+ if(os==='linux' && (/^apt install smartmontools(?: -y)?$/i.test(c)||/^apt-get install smartmontools(?: -y)?$/i.test(c)||/^dnf install smartmontools(?: -y)?$/i.test(c)||/^yum install smartmontools(?: -y)?$/i.test(c)||/^pacman -S smartmontools(?: --noconfirm)?$/i.test(c))){
+   installed.linux=true;
+   print('Installing smartmontools...\nsmartmontools installed successfully.\n\n','cyan');
+   award('install');return;
+ }
+ if(os==='linux' && /^apt update(?: && apt install smartmontools)?$/i.test(c)){
+   if(/install smartmontools/i.test(c)){installed.linux=true;print('Package lists updated.\nInstalling smartmontools...\nsmartmontools installed successfully.\n\n','cyan');award('install');}
+   else print('Package lists updated. smartmontools is still not installed.\n\n','yellow');
+   return;
+ }
+ if(/^smartctl\b/i.test(c) && !installed[os]){showMissingCommand();return}
+ if(/^smartctl --version$/i.test(c)){print('smartctl 7.5 2025-04-30 r5714 [simulated lab build]\nCopyright smartmontools contributors\n\n');award('verify');return}
+ if(/^smartctl --scan(-open)?$/i.test(c)){
+   print(`${dev} -d ${sc.ata?'sat':'nvme'} # ${sc.name}\n\n`);award('scan');return;
+ }
+ if(/^smartctl -H\s+\S+/i.test(c)){
+   if(!c.includes(dev)){print(`smartctl: cannot open device. Try the device returned by smartctl --scan: ${dev}\n\n`,'red');return}
+   print(sc.ata?`SMART overall-health self-assessment test result: ${sc.health}\n\n`:`SMART overall-health self-assessment test result: ${sc.health}\nCritical Warning: ${sc.mediaErrors>0?'0x00':'0x00'}\n\n`,sc.health==='FAILED'?'red':'');award('health');return;
+ }
+ if(/^smartctl -(a|x)\s+\S+/i.test(c)){
+   if(!c.includes(dev)){print(`Use the detected device: ${dev}\n\n`,'red');return}
+   print(smartOutput(sc,dev));award('all');return;
+ }
+ if(/^smartctl -t short\s+\S+/i.test(c)){
+   if(!c.includes(dev)){print(`Use the detected device: ${dev}\n\n`,'red');return}
+   print('Drive command "Execute SMART Short self-test routine immediately in off-line mode" successful.\nTesting has begun. In a real system, wait the time reported by the drive, then check the self-test log.\n\n');award('short');return;
+ }
+ if(/^smartctl -t (long|extended)\s+\S+/i.test(c)){
+   if(!c.includes(dev)){print(`Use the detected device: ${dev}\n\n`,'red');return}
+   print('Extended self-test started. This simulator completes it instantly, but real long tests can take minutes or hours depending on the drive.\n\n');return;
+ }
+ if(/^smartctl -l selftest\s+\S+/i.test(c)){
+   if(!c.includes(dev)){print(`Use the detected device: ${dev}\n\n`,'red');return}
+   print(`# 1  Short offline       ${sc.short}\n# 2  Extended offline    ${sc.long}\n\n`,sc.short.includes('failure')?'red':'');award('log');return;
+ }
+ if(/^smartctl /i.test(c)){print('Command recognized as smartctl, but this simulator is waiting for one of the lab command forms. Type help.\n\n','yellow');return}
+ print(`'${raw}' is not a recognized SMART-LAB command. Type help.\n\n`,'red');
+}
+function smartOutput(sc,dev){
+ let s=`smartctl 7.5 [SIMULATED]\n=== START OF INFORMATION SECTION ===\nDevice Model:     ${sc.name}\nDevice:           ${dev}\nSMART support:    Available\nSMART support:    Enabled\n\n=== START OF READ SMART DATA SECTION ===\nSMART overall-health self-assessment test result: ${sc.health}\n\n`;
+ if(sc.ata){s+=`ID# ATTRIBUTE_NAME              RAW_VALUE\n  5 Reallocated_Sector_Ct       ${sc.realloc}\n  9 Power_On_Hours              ${sc.hours}\n194 Temperature_Celsius         ${sc.temp}\n197 Current_Pending_Sector      ${sc.pending}\n198 Offline_Uncorrectable       ${sc.offline}\n199 UDMA_CRC_Error_Count        ${sc.crc}\n\nSelf-test status: ${sc.short}\n`}
+ else{s+=`Critical Warning:                   0x00\nTemperature:                        ${sc.temp} Celsius\nAvailable Spare:                    ${sc.spare}%\nPercentage Used:                    ${sc.used}%\nPower On Hours:                     ${sc.hours}\nMedia and Data Integrity Errors:    ${sc.mediaErrors}\nError Information Log Entries:      ${sc.mediaErrors}\n\n`}
+ if(sc.health==='FAILED'||(!sc.ata&&sc.mediaErrors>0))s+='\nLAB NOTE: Treat this as a serious warning. Protect the data before additional stress testing.\n';
+ if(sc.ata&&sc.crc>50&&sc.realloc===0&&sc.pending===0)s+='\nLAB NOTE: CRC errors with otherwise clean media can point to the SATA cable/connection. Watch whether the count continues increasing.\n';
+ return s+'\n';
+}
+function hint(){const next=missions.find(m=>!completed.has(m.id));if(!next){alert('All terminal missions are complete. Move to the Diagnostic Challenge!');return}const d=currentDevice();const hints={missing:'Try: smartctl --version before installing it.',install:os==='windows'?'Try: winget install -e --id smartmontools.smartmontools':'Try: sudo apt install smartmontools',verify:'Try: smartctl --version',scan:'Try: '+prefix()+'smartctl --scan',health:'Try: '+prefix()+'smartctl -H '+d,all:'Try: '+prefix()+'smartctl -a '+d,short:'Try: '+prefix()+'smartctl -t short '+d,log:'Try: '+prefix()+'smartctl -l selftest '+d};alert(hints[next.id])}
+function copyText(t){navigator.clipboard?.writeText(t);}
+
+const qBank=[
+ {q:'A SATA HDD has Reallocated=0, Pending=0, Offline Uncorrectable=0, but UDMA CRC Error Count is 184 and still rising. What should you investigate first?',a:['SATA cable / connection','Immediately format the drive','CPU temperature','Windows activation'],c:0,e:'CRC errors are often interface/cabling related. Check the cable/connection and see whether the count continues to rise.'},
+ {q:'Which command is the best first step when you do not know the smartctl device name?',a:['smartctl --scan','smartctl -t long C:','format /q','fsck -y /dev/sda'],c:0,e:'smartctl --scan discovers devices smartctl can access.'},
+ {q:'What does smartctl -H DEVICE provide?',a:['Overall SMART health assessment','A full file-system repair','A disk benchmark','A partition table backup'],c:0,e:'-H reports the overall SMART health status. It is only one part of the diagnostic picture.'},
+ {q:'A drive shows Current Pending Sector Count = 19 and Offline Uncorrectable = 11. The data is important. Best next action?',a:['Protect/backup the data before stressing the drive further','Run repeated long tests until the numbers disappear','Defragment the disk','Ignore it because SMART says PASSED'],c:0,e:'Pending and uncorrectable sectors are serious media warnings. Protect important data first.'},
+ {q:'Which command starts an extended SMART self-test?',a:['smartctl -t long DEVICE','smartctl -H DEVICE','smartctl --scan','smartctl --version'],c:0,e:'-t long (or extended on supported devices) starts the long self-test.'},
+ {q:'After starting a SMART self-test, which command is useful for reviewing the self-test history?',a:['smartctl -l selftest DEVICE','ipconfig /all','chkdsk /?','smartctl --version'],c:0,e:'-l selftest shows the SMART self-test log.'},
+ {q:'Why should technicians avoid judging a drive only by one raw SMART number?',a:['Attributes can be vendor-specific and trends/context matter','SMART numbers are random','SMART works only on floppy disks','All drives use identical thresholds'],c:0,e:'Raw values and meanings can vary. Use trends, test logs, error logs, health status, and vendor guidance together.'},
+ {q:'On Linux, why is sudo commonly used with smartctl?',a:['Direct access to physical storage devices usually requires elevated privileges','It makes the test run faster','It converts SATA into NVMe','It repairs bad sectors automatically'],c:0,e:'Accessing physical device health data typically requires elevated privileges.'},
+ {q:'Which field is more typical of NVMe health data than classic ATA HDD SMART attributes?',a:['Percentage Used','UDMA CRC Error Count','Seek Error Rate','Spin Retry Count'],c:0,e:'NVMe commonly reports Percentage Used, Available Spare, Critical Warning, and media/data integrity errors.'},
+ {q:'What is the purpose of a SMART long self-test?',a:['A more extensive internal drive diagnostic than a short test','To reinstall the operating system','To securely erase the drive','To change the file system'],c:0,e:'A long/extended self-test performs a more thorough internal diagnostic. It does not repair the disk.'},
+ {q:'smartctl is part of which package?',a:['smartmontools','OpenSSH','Sysinternals','Samba'],c:0,e:'smartctl and smartd are provided by smartmontools.'},
+ {q:'The overall SMART status says PASSED. Does that prove the drive cannot fail soon?',a:['No—SMART is evidence, not a guarantee','Yes—PASSED guarantees one year of life','Yes, if temperature is under 50°C','Only on Windows'],c:0,e:'A passing status does not guarantee future reliability. Backups remain essential.'},
+ {q:"PowerShell says: smartctl is not recognized as the name of a cmdlet. What is the most likely first diagnosis?",a:['smartmontools is not installed or smartctl is not in PATH','The hard drive has failed SMART','Windows needs to be reformatted','The SATA cable is definitely bad'],c:0,e:'The error means the shell cannot find the executable. Install smartmontools or correct PATH first.'},
+ {q:'Which Windows command can install smartmontools using WinGet?',a:['winget install -e --id smartmontools.smartmontools','winget repair smartctl','smartctl --install','chkdsk /smart'],c:0,e:'The WinGet package ID is smartmontools.smartmontools.'},
+ {q:'On Ubuntu/Debian, smartctl returns command not found. Which package should you install?',a:['smartmontools','smart-drive-utils','diskpart','ntfs-3g'],c:0,e:'smartctl is provided by the smartmontools package.'},
+ {q:'After installing smartmontools on Windows, smartctl is still not found in an already-open PowerShell window. What is a good next step?',a:['Close and reopen PowerShell so PATH changes are reloaded','Run a long SMART test','Delete the partition table','Disable SMART in BIOS'],c:0,e:'A newly installed executable may not appear in an already-open terminal until the shell is restarted.'}
+];
+function shuffle(a){return a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1])}
+let activeQuiz=[];
+function newQuiz(){
+ quizCorrect=0; quizAnswered=0;
+ activeQuiz=shuffle(qBank).slice(0,8).map(q=>{
+   const opts=shuffle(q.a.map((text,i)=>({text,correct:i===q.c})));
+   return {...q,a:opts.map(o=>o.text),c:opts.findIndex(o=>o.correct)};
+ });
+ renderQuiz(); updateStats();
+}
+function renderQuiz(){
+ const qz=document.getElementById('quiz');qz.innerHTML='';
+ activeQuiz.forEach((q,qi)=>{const d=document.createElement('div');d.className='question';d.innerHTML=`<b>${qi+1}. ${q.q}</b><div class="answers"></div><div class="feedback"></div>`;const box=d.querySelector('.answers');
+ q.a.forEach((ans,ai)=>{const b=document.createElement('button');b.className='answer';b.textContent=ans;b.onclick=()=>answerQ(d,q,ai,b);box.appendChild(b)});qz.appendChild(d)})
+}
+function answerQ(div,q,choice,btn){if(div.dataset.done)return;div.dataset.done='1';quizAnswered++;const buttons=[...div.querySelectorAll('.answer')];buttons.forEach((b,i)=>{b.disabled=true;if(i===q.c)b.classList.add('correct')});if(choice===q.c){quizCorrect++;score+=60;div.querySelector('.feedback').innerHTML='<span class="lime">Correct +60 points.</span> '+q.e}else{btn.classList.add('wrong');div.querySelector('.feedback').innerHTML='<span class="bad">Not quite.</span> '+q.e}updateStats()}
+function resetGame(){if(!confirm('Reset score, missions, installs, and quiz?'))return;score=0;quizCorrect=0;quizAnswered=0;installed={linux:false,windows:false};completed.clear();newQuiz();boot();updateStats()}
+
+document.querySelectorAll('[data-install]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-install]').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.installPanel').forEach(x=>x.classList.add('hide'));document.getElementById('install-'+b.dataset.install).classList.remove('hide')}));
+document.querySelectorAll('.osbtn').forEach(b=>b.addEventListener('click',()=>{os=b.dataset.os;document.querySelectorAll('.osbtn').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.getElementById('osLabel').textContent=os==='linux'?'LINUX • sudo available':'WINDOWS • Administrator';document.getElementById('prompt').textContent=os==='linux'?'student@lab:~$':'PS C:\\>';boot()}));
+document.getElementById('driveScenario').addEventListener('change',boot);
+document.getElementById('cmdInput').addEventListener('keydown',e=>{if(e.key==='Enter'){const input=document.getElementById('cmdInput');const v=input.value;input.value='';runCommand(v)}});
+renderMissions();newQuiz();boot();updateStats();
+</script>
+</body>
+</html>

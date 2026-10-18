@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>pfSense Virtual Setup Practice Lab</title>
+<style>
+:root{
+  --bg:#071019;--panel:#0d1926;--panel2:#13243a;--line:#294760;--text:#eef7ff;--muted:#9fb7c9;
+  --blue:#2aa7ff;--green:#43dc8e;--yellow:#ffd166;--red:#ff6b78;--purple:#a887ff;--orange:#ff9f43
+}
+*{box-sizing:border-box}
+body{margin:0;background:
+radial-gradient(circle at 10% -8%,#163b62 0,transparent 25%),
+radial-gradient(circle at 95% 0,#25194a 0,transparent 24%),
+linear-gradient(#06101a,#09121b);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif;min-height:100vh}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.app{max-width:1500px;margin:auto;padding:16px 16px 60px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;padding:14px 18px;background:#0b1825e8;border:1px solid var(--line);border-radius:16px;position:sticky;top:8px;z-index:30;box-shadow:0 10px 35px #0006}
+.brand{display:flex;gap:13px;align-items:center}.logo{width:64px;height:64px;border-radius:12px;background:#17476b;display:grid;place-items:center;font-weight:1000;font-size:15px;text-align:center;line-height:1.05}.brand h1{margin:0;font-size:clamp(20px,3vw,34px)}.brand p{margin:2px 0 0;color:var(--muted);font-size:12px}
+.badges{display:flex;gap:8px;flex-wrap:wrap}.badge{padding:7px 10px;border-radius:999px;border:1px solid #365a78;background:#122a3d;color:#c9ecff;font-size:12px;font-weight:800}
+.shell{display:grid;grid-template-columns:285px 1fr;gap:14px;margin-top:14px}.side,.main{background:#0b1723e8;border:1px solid #243f59;border-radius:16px}.side{padding:12px;align-self:start;position:sticky;top:100px}
+.nav{width:100%;border:0;background:transparent;color:#dceeff;text-align:left;padding:11px;border-radius:9px;font-weight:800;margin:2px 0}.nav:hover,.nav.active{background:#153650}.nav span{display:block;font-size:10px;color:#7fa3bd;font-weight:500;margin-top:2px}
+.main{padding:18px;min-height:820px}.screen{display:none}.screen.active{display:block}
+.hero{padding:22px;border-radius:17px;border:1px solid #315270;background:linear-gradient(135deg,#102c47,#171d37);margin-bottom:14px}
+.hero h2{margin:0 0 8px}.hero p{color:#c8d8e5;line-height:1.5;margin:0}.heroActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.card{background:#0f2030;border:1px solid #2b4a62;border-radius:14px;padding:14px}.card h3{margin:0 0 8px}.small{font-size:12px;color:var(--muted);line-height:1.45}
+.primary,.secondary,.success,.warning,.danger{border:0;border-radius:9px;padding:10px 13px;font-weight:900}
+.primary{background:var(--blue);color:#04111b}.secondary{background:#24445c;color:white}.success{background:var(--green);color:#04150c}.warning{background:var(--yellow);color:#241700}.danger{background:var(--red);color:#24050a}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.spacer{flex:1}
+label{display:block;font-size:12px;color:#b8d0df;font-weight:800;margin:8px 0 4px}
+input,select{width:100%;padding:10px 11px;border-radius:8px;border:1px solid #375568;background:#09151e;color:white}
+.feedback{padding:11px;border-radius:9px;border:1px dashed #3b607c;background:#0b1824;margin-top:10px;min-height:45px;line-height:1.5}.good{border-color:#2c8059;background:#0f2a21}.bad{border-color:#803a44;background:#2b1519}
+.task{padding:10px;border:1px solid #31516a;border-radius:9px;background:#0d1d29;margin:7px 0}.task.done{border-color:#2c8059;background:#0f2a21}
+.console{background:#02070b;border:1px solid #31545d;border-radius:12px;padding:12px;font:13px Consolas,monospace;color:#bafbd1;white-space:pre-wrap;min-height:220px;max-height:420px;overflow:auto}
+.topology{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;align-items:center}.node{padding:14px 8px;background:#14293a;border:1px solid #31516a;border-radius:10px;text-align:center;font-size:12px}.link{height:3px;background:#46657a}
+.rule{display:grid;grid-template-columns:90px 1fr 1fr 100px 90px;gap:7px;align-items:center;padding:8px;border:1px solid #31516a;border-radius:9px;margin:8px 0;background:#0c1c29}
+.metric{font-size:32px;font-weight:1000}
+.progress{height:12px;background:#0a1520;border:1px solid #2a465a;border-radius:999px;overflow:hidden}.progress span{display:block;height:100%;background:linear-gradient(90deg,#2aa7ff,#43dc8e);width:0}
+.kv{display:grid;grid-template-columns:170px 1fr;gap:6px 10px;font-size:13px}.kv b{color:#bfeaff}
+.creator-footer{position:fixed;bottom:8px;left:50%;transform:translateX(-50%);z-index:9999;padding:6px 12px;border-radius:999px;background:rgba(7,16,25,.88);border:1px solid #365a78;color:#9fb7c9;font-size:11px;font-weight:700;letter-spacing:.5px;backdrop-filter:blur(6px);white-space:nowrap}
+@media(max-width:1050px){.shell{grid-template-columns:1fr}.side{position:static}.grid{grid-template-columns:1fr 1fr}.topology{grid-template-columns:1fr}.link{height:20px;width:3px;margin:auto}.rule{grid-template-columns:1fr 1fr}}
+@media(max-width:700px){.grid,.grid2{grid-template-columns:1fr}.rule{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="creator-footer" id="creatorMark"></div>
+<div class="app">
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo">pf<br>SENSE</div>
+      <div><h1>pfSense Virtual Setup Practice Lab</h1><p>Interfaces • LAN/WAN • DHCP • VLANs • Firewall • NAT • Diagnostics • Troubleshooting</p></div>
+    </div>
+    <div class="badges">
+      <div class="badge" id="xpBadge">XP 0</div>
+      <div class="badge" id="rankBadge">Rank: Rookie Tech</div>
+      <div class="badge">Safe Browser Simulation</div>
+    </div>
+  </div>
+
+  <div class="shell">
+    <aside class="side">
+      <button class="nav active" onclick="show('home',this)">🏠 Mission Brief<span>Overview and topology</span></button>
+      <button class="nav" onclick="show('console',this)">🖥️ Console Setup<span>Assign WAN/LAN interfaces</span></button>
+      <button class="nav" onclick="show('wizard',this)">🧙 Setup Wizard<span>Hostname, DNS, WAN, LAN</span></button>
+      <button class="nav" onclick="show('dhcp',this)">📡 DHCP Server<span>Build the LAN scope</span></button>
+      <button class="nav" onclick="show('vlans',this)">🏷️ VLAN Lab<span>10 / 20 / 30 / 40</span></button>
+      <button class="nav" onclick="show('firewall',this)">🛡️ Firewall Rules<span>Least-privilege access</span></button>
+      <button class="nav" onclick="show('nat',this)">🌐 NAT Lab<span>Outbound NAT and port forward</span></button>
+      <button class="nav" onclick="show('diag',this)">🧪 Diagnostics<span>ping, DNS, routes, states</span></button>
+      <button class="nav" onclick="show('tickets',this)">🎫 Trouble Tickets<span>Fix real configuration faults</span></button>
+      <button class="nav" onclick="show('final',this)">🏆 Final Validation<span>Grade the whole build</span></button>
+    </aside>
+
+    <main class="main">
+      <section id="home" class="screen active">
+        <div class="hero">
+          <h2>Mission: Build a Working pfSense Classroom Firewall</h2>
+          <p>You are the network technician. Configure a virtual pfSense appliance from first boot through segmented VLANs, DHCP, firewall rules, NAT, and troubleshooting. Nothing in this simulator touches a real network.</p>
+          <div class="heroActions"><button class="primary" onclick="document.querySelectorAll('.nav')[1].click()">START CONSOLE SETUP</button><button class="success" onclick="show('tickets')">JUMP TO TROUBLE TICKETS</button></div>
+        </div>
+        <div class="card">
+          <h3>Target Topology</h3>
+          <div class="topology">
+            <div class="node"><b>Internet / ISP</b><br>WAN DHCP</div><div class="link"></div>
+            <div class="node"><b>pfSense</b><br>WAN + LAN</div><div class="link"></div>
+            <div class="node"><b>Managed Switch</b><br>802.1Q trunk</div><div class="link"></div>
+            <div class="node"><b>Clients</b><br>VLANs 10/20/30/40</div>
+          </div>
+        </div>
+        <div class="grid" style="margin-top:12px">
+          <div class="card"><h3>VLAN 10 • STUDENTS</h3><div class="metric">192.168.10.0/24</div><p class="small">Gateway 192.168.10.1</p></div>
+          <div class="card"><h3>VLAN 20 • STAFF</h3><div class="metric">192.168.20.0/24</div><p class="small">Gateway 192.168.20.1</p></div>
+          <div class="card"><h3>VLAN 30 • PRINTERS</h3><div class="metric">192.168.30.0/24</div><p class="small">Gateway 192.168.30.1</p></div>
+          <div class="card"><h3>VLAN 40 • LAB</h3><div class="metric">192.168.40.0/24</div><p class="small">Gateway 192.168.40.1</p></div>
+          <div class="card"><h3>Goal</h3><p class="small">Build a segmented network that has internet access, controlled inter-VLAN traffic, DNS, DHCP, and working diagnostics.</p></div>
+          <div class="card"><h3>Safety</h3><p class="small">This is a browser-only teaching simulator. It does not configure a real pfSense appliance or send real packets.</p></div>
+        </div>
+      </section>
+
+      <section id="console" class="screen">
+        <div class="hero"><h2>Step 1 — pfSense Console Interface Assignment</h2><p>Map the virtual NICs correctly. A common failure is reversing WAN and LAN.</p></div>
+        <div class="grid2">
+          <div class="card">
+            <h3>Detected Interfaces</h3>
+            <div class="console">Valid interfaces are:
+vtnet0  52:54:00:10:00:01
+vtnet1  52:54:00:10:00:02
+
+Should VLANs be set up now? n
+Enter the WAN interface name:
+Enter the LAN interface name:</div>
+          </div>
+          <div class="card">
+            <label>WAN interface</label><select id="wanif"><option value="">Choose...</option><option>vtnet0</option><option>vtnet1</option></select>
+            <label>LAN interface</label><select id="lanif"><option value="">Choose...</option><option>vtnet0</option><option>vtnet1</option></select>
+            <label>Set VLANs from console now?</label><select id="consoleVlan"><option value="">Choose...</option><option value="no">No — configure in GUI later</option><option value="yes">Yes</option></select>
+            <button class="success" style="margin-top:10px" onclick="checkConsole()">VALIDATE ASSIGNMENT</button>
+            <div id="consoleFB" class="feedback">Hint: WAN is the adapter connected toward the upstream/ISP network.</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="wizard" class="screen">
+        <div class="hero"><h2>Step 2 — WebConfigurator Setup Wizard</h2><p>Configure a sensible hostname, DNS, WAN addressing, and the initial LAN management network.</p></div>
+        <div class="grid2">
+          <div class="card">
+            <label>Hostname</label><input id="hostname" value="pfsense-lab">
+            <label>Domain</label><input id="domain" value="lab.local">
+            <label>Primary DNS</label><input id="dns1" placeholder="1.1.1.1">
+            <label>Secondary DNS</label><input id="dns2" placeholder="8.8.8.8">
+          </div>
+          <div class="card">
+            <label>WAN Type</label><select id="wantype"><option value="">Choose...</option><option value="dhcp">DHCP</option><option value="static">Static</option></select>
+            <label>LAN IP</label><input id="lanip" placeholder="192.168.1.1">
+            <label>LAN Prefix</label><select id="lanprefix"><option>/24</option><option>/23</option><option>/25</option></select>
+            <label>Admin Password</label><input id="adminpw" type="password" placeholder="Use a strong lab password">
+          </div>
+        </div>
+        <button class="success" style="margin-top:10px" onclick="checkWizard()">SAVE WIZARD SETTINGS</button>
+        <div id="wizardFB" class="feedback">Use WAN DHCP and a private /24 LAN management network.</div>
+      </section>
+
+      <section id="dhcp" class="screen">
+        <div class="hero"><h2>Step 3 — DHCP Server</h2><p>Build a DHCP scope for the initial LAN before creating the VLAN-specific scopes.</p></div>
+        <div class="grid2">
+          <div class="card">
+            <label>Enable DHCP on LAN</label><select id="dhcpen"><option value="">Choose...</option><option value="yes">Enabled</option><option value="no">Disabled</option></select>
+            <label>Range Start</label><input id="dhcpstart" placeholder="192.168.1.100">
+            <label>Range End</label><input id="dhcpend" placeholder="192.168.1.199">
+            <label>DNS Server</label><input id="dhcpdns" placeholder="192.168.1.1">
+            <button class="success" style="margin-top:10px" onclick="checkDhcp()">VALIDATE DHCP</button>
+            <div id="dhcpFB" class="feedback">The gateway is pfSense itself. Use an address range inside the LAN subnet.</div>
+          </div>
+          <div class="card">
+            <h3>Client Lease Test</h3>
+            <div id="leaseConsole" class="console">C:\> ipconfig /release
+C:\> ipconfig /renew
+
+Waiting for DHCP configuration...</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="vlans" class="screen">
+        <div class="hero"><h2>Step 4 — VLAN Interfaces</h2><p>Create 802.1Q VLANs on the LAN parent interface and assign each a gateway.</p></div>
+        <div class="card">
+          <div class="grid">
+            <div><label>VLAN 10 Parent</label><select id="v10p"><option>LAN</option><option>WAN</option></select><label>Gateway</label><input id="v10ip" placeholder="192.168.10.1"></div>
+            <div><label>VLAN 20 Parent</label><select id="v20p"><option>LAN</option><option>WAN</option></select><label>Gateway</label><input id="v20ip" placeholder="192.168.20.1"></div>
+            <div><label>VLAN 30 Parent</label><select id="v30p"><option>LAN</option><option>WAN</option></select><label>Gateway</label><input id="v30ip" placeholder="192.168.30.1"></div>
+            <div><label>VLAN 40 Parent</label><select id="v40p"><option>LAN</option><option>WAN</option></select><label>Gateway</label><input id="v40ip" placeholder="192.168.40.1"></div>
+          </div>
+          <button class="success" style="margin-top:10px" onclick="checkVlans()">VALIDATE VLAN INTERFACES</button>
+          <div id="vlanFB" class="feedback">All VLANs should be created on the LAN-side parent interface.</div>
+        </div>
+      </section>
+
+      <section id="firewall" class="screen">
+        <div class="hero"><h2>Step 5 — Firewall Rules</h2><p>pfSense is stateful and interface rules are evaluated on traffic entering that interface. Build a simple classroom policy.</p></div>
+        <div class="card">
+          <h3>Rule 1 — Students to Internet</h3>
+          <div class="rule"><select id="r1a"><option>Pass</option><option>Block</option></select><select id="r1s"><option>VLAN10 net</option><option>VLAN20 net</option></select><select id="r1d"><option>any</option><option>VLAN20 net</option></select><select id="r1p"><option>any</option><option>TCP</option></select><span>OUT</span></div>
+          <h3>Rule 2 — Students to Staff</h3>
+          <div class="rule"><select id="r2a"><option>Pass</option><option>Block</option></select><select id="r2s"><option>VLAN10 net</option><option>VLAN20 net</option></select><select id="r2d"><option>VLAN20 net</option><option>any</option></select><select id="r2p"><option>any</option><option>TCP</option></select><span>INTER-VLAN</span></div>
+          <h3>Rule 3 — Staff to Printer VLAN</h3>
+          <div class="rule"><select id="r3a"><option>Pass</option><option>Block</option></select><select id="r3s"><option>VLAN20 net</option><option>VLAN10 net</option></select><select id="r3d"><option>VLAN30 net</option><option>any</option></select><select id="r3p"><option>any</option><option>TCP</option></select><span>PRINT</span></div>
+          <button class="success" style="margin-top:10px" onclick="checkFirewall()">VALIDATE POLICY</button>
+          <div id="fwFB" class="feedback">Students should reach the internet, but not Staff. Staff may reach Printers.</div>
+        </div>
+      </section>
+
+      <section id="nat" class="screen">
+        <div class="hero"><h2>Step 6 — NAT</h2><p>Configure basic outbound NAT behavior and a sample inbound port forward.</p></div>
+        <div class="grid2">
+          <div class="card">
+            <h3>Outbound NAT</h3>
+            <label>Mode</label><select id="natmode"><option value="">Choose...</option><option value="auto">Automatic outbound NAT</option><option value="manual">Manual</option></select>
+            <label>Source</label><select id="natsrc"><option value="">Choose...</option><option value="internal">Internal networks</option><option value="wan">WAN net</option></select>
+          </div>
+          <div class="card">
+            <h3>Port Forward Example</h3>
+            <label>WAN Port</label><input id="pfwan" placeholder="8443">
+            <label>Internal Host</label><input id="pfhost" placeholder="192.168.40.10">
+            <label>Internal Port</label><input id="pfint" placeholder="443">
+            <label>Protocol</label><select id="pfproto"><option>TCP</option><option>UDP</option></select>
+          </div>
+        </div>
+        <button class="success" style="margin-top:10px" onclick="checkNat()">VALIDATE NAT</button>
+        <div id="natFB" class="feedback">Automatic outbound NAT is appropriate for this simple training build.</div>
+      </section>
+
+      <section id="diag" class="screen">
+        <div class="hero"><h2>Step 7 — Diagnostics</h2><p>Use evidence instead of guessing. Run simulated tests against the current build.</p></div>
+        <div class="grid2">
+          <div class="card">
+            <label>Diagnostic</label><select id="diagSel">
+              <option value="pinggw">Ping VLAN10 gateway</option>
+              <option value="ping8">Ping 8.8.8.8</option>
+              <option value="dns">Resolve example.com</option>
+              <option value="route">Show routing table</option>
+              <option value="states">Show firewall states</option>
+            </select>
+            <button class="primary" style="margin-top:10px" onclick="runDiag()">RUN TEST</button>
+          </div>
+          <div class="card"><div id="diagOut" class="console">pfSense Diagnostics Console
+Ready.</div></div>
+        </div>
+      </section>
+
+      <section id="tickets" class="screen">
+        <div class="hero"><h2>Trouble Ticket Arena</h2><p>Fix common pfSense configuration mistakes. Each correct ticket earns XP.</p></div>
+        <div class="grid">
+          <div class="card"><h3>Ticket 101 — No Internet</h3><p class="small">Client: 192.168.10.55/24<br>Gateway: 192.168.20.1<br>DNS: 1.1.1.1</p><select id="t1"><option value="">Choose fix...</option><option value="gw">Set gateway to 192.168.10.1</option><option>Change DNS to 8.8.8.8</option><option>Disable DHCP</option></select><button class="success" onclick="ticket(1)">FIX</button><div id="t1fb" class="feedback"></div></div>
+          <div class="card"><h3>Ticket 102 — Can Ping IP, Not Names</h3><p class="small">Ping 8.8.8.8 works.<br>nslookup example.com fails.</p><select id="t2"><option value="">Choose fix...</option><option value="dns">Correct DNS configuration</option><option>Replace switch</option><option>Change VLAN ID</option></select><button class="success" onclick="ticket(2)">FIX</button><div id="t2fb" class="feedback"></div></div>
+          <div class="card"><h3>Ticket 103 — Staff VLAN Dead</h3><p class="small">VLAN 20 interface exists on parent WAN instead of LAN.</p><select id="t3"><option value="">Choose fix...</option><option value="parent">Move VLAN 20 to LAN parent</option><option>Delete VLAN 20</option><option>Change DNS</option></select><button class="success" onclick="ticket(3)">FIX</button><div id="t3fb" class="feedback"></div></div>
+          <div class="card"><h3>Ticket 104 — Students Reach Staff</h3><p class="small">A broad PASS any rule is above the Student→Staff block rule.</p><select id="t4"><option value="">Choose fix...</option><option value="order">Reorder rules so the block is evaluated first</option><option>Disable firewall</option><option>Change DHCP range</option></select><button class="success" onclick="ticket(4)">FIX</button><div id="t4fb" class="feedback"></div></div>
+          <div class="card"><h3>Ticket 105 — Port Forward Fails</h3><p class="small">NAT rule exists, but no matching WAN firewall rule was created.</p><select id="t5"><option value="">Choose fix...</option><option value="wanrule">Add matching WAN pass rule</option><option>Disable NAT</option><option>Change LAN gateway</option></select><button class="success" onclick="ticket(5)">FIX</button><div id="t5fb" class="feedback"></div></div>
+          <div class="card"><h3>Ticket 106 — Client Gets 169.254.x.x</h3><p class="small">The VLAN 10 interface is up, but the DHCP server for VLAN 10 is disabled.</p><select id="t6"><option value="">Choose fix...</option><option value="dhcp">Enable/configure DHCP on VLAN 10</option><option>Change WAN MAC</option><option>Disable DNS Resolver</option></select><button class="success" onclick="ticket(6)">FIX</button><div id="t6fb" class="feedback"></div></div>
+        </div>
+      </section>
+
+      <section id="final" class="screen">
+        <div class="hero"><h2>Final Validation</h2><p>Check the whole firewall build. Your score is based on completed configuration stages and trouble tickets.</p></div>
+        <div class="grid2">
+          <div class="card">
+            <h3>Build Checklist</h3>
+            <div id="finalTasks"></div>
+            <button class="primary" onclick="gradeFinal()">RUN FINAL VALIDATION</button>
+          </div>
+          <div class="card">
+            <h3>Readiness</h3>
+            <div id="finalScore" class="metric">0%</div>
+            <div class="progress"><span id="finalBar"></span></div>
+            <div id="finalFB" class="feedback">Complete the lab, then validate.</div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<script>
+let XP=0;
+const state={console:false,wizard:false,dhcp:false,vlans:false,firewall:false,nat:false,tickets:[false,false,false,false,false,false]};
+function show(id,btn){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  document.querySelectorAll(".nav").forEach(n=>n.classList.remove("active"));
+  if(btn)btn.classList.add("active");
+  if(id==="final")renderFinal();
+}
+function addXP(n){
+  XP+=n;document.getElementById("xpBadge").textContent="XP "+XP;
+  const rank=XP>=120?"pfSense Lab Master":XP>=80?"Firewall Technician":XP>=40?"Junior Network Tech":"Rookie Tech";
+  document.getElementById("rankBadge").textContent="Rank: "+rank;
+}
+function fb(id,ok,a,b){const e=document.getElementById(id);e.className="feedback "+(ok?"good":"bad");e.textContent=ok?a:b}
+function checkConsole(){
+ const ok=wanif.value==="vtnet0"&&lanif.value==="vtnet1"&&consoleVlan.value==="no";
+ state.console=ok;fb("consoleFB",ok,"✅ Correct. WAN=vtnet0, LAN=vtnet1, VLANs will be configured later in the GUI.","❌ Re-check WAN/LAN mapping and VLAN timing.");if(ok)addXP(10)
+}
+function checkWizard(){
+ const ok=hostname.value.trim().length>2&&domain.value.trim()==="lab.local"&&dns1.value.trim()==="1.1.1.1"&&dns2.value.trim()==="8.8.8.8"&&wantype.value==="dhcp"&&lanip.value.trim()==="192.168.1.1"&&lanprefix.value==="/24"&&adminpw.value.length>=8;
+ state.wizard=ok;fb("wizardFB",ok,"✅ Wizard complete. WAN uses DHCP and LAN management is 192.168.1.1/24.","❌ Check DNS, WAN type, LAN address/prefix, and use an 8+ character lab password.");if(ok)addXP(10)
+}
+function checkDhcp(){
+ const ok=dhcpen.value==="yes"&&dhcpstart.value.trim()==="192.168.1.100"&&dhcpend.value.trim()==="192.168.1.199"&&dhcpdns.value.trim()==="192.168.1.1";
+ state.dhcp=ok;
+ leaseConsole.textContent=ok?"C:\\> ipconfig /renew\nIPv4 Address . . . : 192.168.1.101\nSubnet Mask  . . . : 255.255.255.0\nDefault Gateway .  : 192.168.1.1\nDNS Server . . . . : 192.168.1.1\n\nDHCP SUCCESS":"C:\\> ipconfig /renew\nUnable to contact your DHCP server.";
+ fb("dhcpFB",ok,"✅ DHCP scope is valid and the client received a lease.","❌ Re-check enabled state, pool range, and DNS.");if(ok)addXP(10)
+}
+function checkVlans(){
+ const ok=[v10p,v20p,v30p,v40p].every(x=>x.value==="LAN")&&v10ip.value.trim()==="192.168.10.1"&&v20ip.value.trim()==="192.168.20.1"&&v30ip.value.trim()==="192.168.30.1"&&v40ip.value.trim()==="192.168.40.1";
+ state.vlans=ok;fb("vlanFB",ok,"✅ VLANs 10/20/30/40 are on the LAN parent with the correct gateway IPs.","❌ Verify parent interface and each .1 gateway address.");if(ok)addXP(15)
+}
+function checkFirewall(){
+ const ok=r1a.value==="Pass"&&r1s.value==="VLAN10 net"&&r1d.value==="any"&&r2a.value==="Block"&&r2s.value==="VLAN10 net"&&r2d.value==="VLAN20 net"&&r3a.value==="Pass"&&r3s.value==="VLAN20 net"&&r3d.value==="VLAN30 net";
+ state.firewall=ok;fb("fwFB",ok,"✅ Policy works: Students→Internet PASS, Students→Staff BLOCK, Staff→Printers PASS.","❌ Re-check action, source, and destination on each rule.");if(ok)addXP(15)
+}
+function checkNat(){
+ const ok=natmode.value==="auto"&&natsrc.value==="internal"&&pfwan.value.trim()==="8443"&&pfhost.value.trim()==="192.168.40.10"&&pfint.value.trim()==="443"&&pfproto.value==="TCP";
+ state.nat=ok;fb("natFB",ok,"✅ NAT configuration is correct for the training scenario.","❌ Re-check automatic outbound NAT and the TCP 8443→192.168.40.10:443 forward.");if(ok)addXP(10)
+}
+function runDiag(){
+ const d=diagSel.value;let out="";
+ if(d==="pinggw")out="PING 192.168.10.1\n64 bytes from 192.168.10.1: icmp_seq=1 ttl=64 time=0.4 ms\n64 bytes from 192.168.10.1: icmp_seq=2 ttl=64 time=0.3 ms\n\n2 packets transmitted, 2 received";
+ if(d==="ping8")out=state.nat&&state.firewall?"PING 8.8.8.8\n64 bytes from 8.8.8.8: icmp_seq=1 ttl=116 time=18 ms\n\nInternet reachability: PASS":"PING 8.8.8.8\nRequest timeout\n\nCheck firewall/NAT.";
+ if(d==="dns")out=state.wizard?"Server: 192.168.1.1\nName: example.com\nAddress: 93.184.216.34\n\nDNS: PASS":"DNS request timed out.\nCheck resolver/DNS configuration.";
+ if(d==="route")out="IPv4 Routes\n0.0.0.0/0 -> WAN_DHCP\n192.168.1.0/24 -> LAN\n192.168.10.0/24 -> VLAN10\n192.168.20.0/24 -> VLAN20\n192.168.30.0/24 -> VLAN30\n192.168.40.0/24 -> VLAN40";
+ if(d==="states")out="Firewall States\nVLAN10 TCP 192.168.10.55:51001 -> 93.184.216.34:443 ESTABLISHED\nVLAN20 TCP 192.168.20.44:51515 -> 192.168.30.25:9100 ESTABLISHED";
+ diagOut.textContent=out;
+}
+function ticket(n){
+ const sel=document.getElementById("t"+n), fbEl="t"+n+"fb";
+ const answers={1:"gw",2:"dns",3:"parent",4:"order",5:"wanrule",6:"dhcp"};
+ const ok=sel.value===answers[n];
+ if(ok&&!state.tickets[n-1])addXP(10);
+ state.tickets[n-1]=ok;fb(fbEl,ok,"✅ Ticket resolved.","❌ That would not address the evidence in this ticket.");
+}
+function renderFinal(){
+ const items=[
+  ["Console interfaces assigned",state.console],
+  ["Setup wizard completed",state.wizard],
+  ["LAN DHCP configured",state.dhcp],
+  ["VLAN gateways configured",state.vlans],
+  ["Firewall policy configured",state.firewall],
+  ["NAT configured",state.nat],
+  ["Trouble tickets resolved",state.tickets.every(Boolean)]
+ ];
+ finalTasks.innerHTML=items.map(x=>`<div class="task ${x[1]?'done':''}">${x[1]?'✅':'⬜'} ${x[0]}</div>`).join("");
+}
+function gradeFinal(){
+ const checks=[state.console,state.wizard,state.dhcp,state.vlans,state.firewall,state.nat,...state.tickets];
+ const pct=Math.round(checks.filter(Boolean).length/checks.length*100);
+ finalScore.textContent=pct+"%";finalBar.style.width=pct+"%";
+ const msg=pct===100?"🏆 LAB MASTERED — the simulated pfSense build passes all validation checks.":pct>=75?"🛠️ Almost there. Review the incomplete stages or tickets.":"🔧 More configuration work is needed before this firewall is ready.";
+ fb("finalFB",pct>=75,msg,msg);renderFinal();
+}
+const _creatorHex=["43","72","65","61","74","65","64","20","62","79","20","44","65","72","72","69","63","6b","20","42","65","61","69","72","64"];
+document.getElementById("creatorMark").textContent=_creatorHex.map(x=>String.fromCharCode(parseInt(x,16))).join("");
+</script>
+</body>
+</html>

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Network+ N10-009 — 100 Tricky Questions Game</title>
+<style>
+:root {
+  --bg:#070812; --panel:#0e1023; --panel2:#151733; --text:#f5f7ff;
+  --cyan:#00f6ff; --pink:#ff2bd6; --purple:#9d5cff; --yellow:#ffe66d;
+  --green:#4dff9b; --red:#ff5c7a; --muted:#aeb4d6;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; color:var(--text); font-family:Inter,Segoe UI,Arial,sans-serif;
+  background:
+    radial-gradient(circle at 20% 10%, rgba(157,92,255,.20), transparent 25%),
+    radial-gradient(circle at 80% 20%, rgba(0,246,255,.14), transparent 22%),
+    linear-gradient(180deg,#050611 0%,#0a0d20 60%,#090611 100%);
+  min-height:100vh; overflow-x:hidden;
+}
+body:before{
+  content:""; position:fixed; inset:0; pointer-events:none; opacity:.22;
+  background-image:
+    radial-gradient(#fff 1px, transparent 1px),
+    radial-gradient(#00f6ff 1px, transparent 1px);
+  background-size:45px 45px, 70px 70px;
+  background-position:0 0, 20px 10px;
+}
+.gridfloor{
+  position:fixed; left:-10%; right:-10%; bottom:-16vh; height:48vh; pointer-events:none; opacity:.24;
+  background:
+    linear-gradient(rgba(255,43,214,.55) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,246,255,.55) 1px,transparent 1px);
+  background-size:50px 34px; transform:perspective(420px) rotateX(58deg); transform-origin:bottom;
+}
+.wrap{max-width:1180px;margin:auto;padding:26px 18px 70px;position:relative;z-index:1}
+.hero{text-align:center;padding:16px 12px 24px}
+.kicker{letter-spacing:.18em;color:var(--cyan);font-weight:800;text-transform:uppercase;font-size:.78rem}
+h1{margin:.35rem 0 .4rem;font-size:clamp(2rem,5vw,4.6rem);line-height:.95;text-transform:uppercase;
+ text-shadow:0 0 14px rgba(0,246,255,.55),0 0 28px rgba(255,43,214,.35)}
+h1 span{color:var(--pink)}
+.sub{max-width:820px;margin:10px auto;color:var(--muted);line-height:1.55}
+.badge{display:inline-block;border:1px solid rgba(0,246,255,.45);padding:7px 10px;border-radius:999px;margin:6px 4px;background:rgba(0,246,255,.06);font-size:.82rem}
+.panel{background:linear-gradient(180deg,rgba(21,23,51,.95),rgba(10,12,30,.96));border:1px solid rgba(157,92,255,.45);
+ border-radius:18px;box-shadow:0 20px 70px rgba(0,0,0,.35), inset 0 0 35px rgba(157,92,255,.04);}
+.controls{padding:16px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
+label{font-size:.72rem;color:var(--muted);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em}
+select,button{font:inherit}
+select{width:100%;background:#090b1b;color:#fff;border:1px solid #343866;padding:11px;border-radius:10px}
+.btn{border:none;border-radius:11px;padding:11px 15px;font-weight:800;cursor:pointer;transition:.18s transform,.18s box-shadow,.18s opacity}
+.btn:hover{transform:translateY(-1px);box-shadow:0 0 20px rgba(0,246,255,.22)}
+.btn-primary{background:linear-gradient(90deg,var(--cyan),#62b9ff);color:#001018}
+.btn-secondary{background:linear-gradient(90deg,var(--pink),var(--purple));color:white}
+.btn-ghost{background:#11142e;color:#fff;border:1px solid #383c70}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:0 0 16px}
+.stat{padding:12px 10px;text-align:center;border-radius:14px;background:rgba(10,12,30,.9);border:1px solid rgba(0,246,255,.18)}
+.stat b{display:block;font-size:1.35rem;color:var(--cyan)} .stat span{font-size:.72rem;color:var(--muted);text-transform:uppercase}
+.game{padding:22px}
+.topline{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+.chip{font-size:.74rem;font-weight:800;padding:7px 10px;border-radius:999px;background:rgba(157,92,255,.16);border:1px solid rgba(157,92,255,.48);color:#e8dcff}
+.chip.trap{background:rgba(255,230,109,.10);border-color:rgba(255,230,109,.55);color:var(--yellow)}
+.chip.pbq{background:rgba(255,43,214,.10);border-color:rgba(255,43,214,.55);color:#ff9deb}
+.progress{height:10px;background:#080a18;border-radius:999px;overflow:hidden;margin:16px 0 20px;border:1px solid #25294c}
+.progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--pink),var(--cyan));transition:width .25s}
+.question{font-size:clamp(1.2rem,2vw,1.65rem);line-height:1.45;margin:8px 0 18px}
+.answers{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.answer{text-align:left;background:#10132d;border:1px solid #30345f;color:#fff;padding:15px 16px;border-radius:13px;cursor:pointer;line-height:1.35;min-height:62px}
+.answer:hover{border-color:var(--cyan);box-shadow:0 0 20px rgba(0,246,255,.13)}
+.answer.correct{background:rgba(77,255,155,.12);border-color:var(--green);box-shadow:0 0 20px rgba(77,255,155,.16)}
+.answer.wrong{background:rgba(255,92,122,.12);border-color:var(--red)}
+.answer:disabled{cursor:default}
+.feedback{margin-top:18px;padding:16px;border-radius:14px;background:#090b1d;border-left:4px solid var(--cyan);display:none;line-height:1.55}
+.feedback.good{border-left-color:var(--green)} .feedback.bad{border-left-color:var(--red)}
+.examclue{margin-top:10px;color:var(--yellow);font-weight:700}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.sidegrid{display:grid;grid-template-columns:1.4fr .6fr;gap:16px;margin-top:16px}
+.cheat,.missed{padding:18px}
+.cheat h3,.missed h3{margin-top:0;color:var(--cyan)}
+.mini{font-size:.9rem;color:var(--muted);line-height:1.6}
+.kbd{font-family:ui-monospace,Consolas,monospace;background:#080a18;border:1px solid #343866;border-radius:6px;padding:2px 6px;color:#fff}
+#missedList{max-height:350px;overflow:auto;padding-right:6px}
+.miss{padding:10px 0;border-bottom:1px solid #242746;font-size:.88rem}
+.miss b{color:#ffb2df}
+.modal{position:fixed;inset:0;background:rgba(3,4,12,.86);display:none;align-items:center;justify-content:center;padding:20px;z-index:20}
+.modal.open{display:flex}
+.modalbox{width:min(980px,100%);max-height:86vh;overflow:auto;background:#0b0d20;border:1px solid var(--pink);border-radius:18px;padding:20px;box-shadow:0 0 60px rgba(255,43,214,.18)}
+.cheatgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.card{background:#12152e;border:1px solid #30345f;border-radius:12px;padding:13px}
+.card h4{margin:0 0 8px;color:var(--cyan)} .card p{margin:.3rem 0;color:#dce0fa;font-size:.9rem;line-height:1.45}
+.footer{text-align:center;color:#777fa7;font-size:.78rem;margin-top:26px;line-height:1.5}
+.splash{padding:22px;text-align:center}
+.splash h2{font-size:2rem;margin:0 0 8px;color:var(--cyan)}
+.small{font-size:.82rem;color:var(--muted)}
+.hidden{display:none!important}
+@media(max-width:800px){
+ .controls{grid-template-columns:1fr 1fr} .stats{grid-template-columns:repeat(3,1fr)} .answers{grid-template-columns:1fr}
+ .sidegrid{grid-template-columns:1fr} .cheatgrid{grid-template-columns:1fr} 
+}
+@media(max-width:520px){.controls{grid-template-columns:1fr} .stats{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="gridfloor"></div>
+<div class="wrap">
+  <div class="hero">
+    <div class="kicker">N10-009 Exam Trainer</div>
+    <h1>Network+ <span>100 Tricky Questions</span></h1>
+    <p class="sub">Exactly 100 original, scenario-heavy N10-009 practice questions focused on the concepts students most often confuse: subnetting, routing decisions, VLANs/trunks, Wi‑Fi/antennas, DHCP/DNS, tools, physical faults, security, operations, and PBQ-style troubleshooting.</p>
+    <span class="badge">Exactly 100 questions</span><span class="badge">Randomized answers</span><span class="badge">Immediate teaching</span><span class="badge">Missed-question review</span><span class="badge">PBQ mode</span>
+  </div>
+
+  <div class="panel controls">
+    <div><label>Mode</label>
+      <select id="mode">
+        <option value="random">Random Cram</option>
+        <option value="traps">Common Traps</option>
+        <option value="pbq">PBQ Scenarios</option>
+        <option value="missed">Review Missed</option>
+      </select>
+    </div>
+    <div><label>Category</label><select id="category"></select></div>
+    <div><label>Session Length</label>
+      <select id="length"><option>10</option><option selected>20</option><option>40</option><option>60</option></select>
+    </div>
+    <div style="display:flex;gap:8px;align-items:end">
+      <button class="btn btn-primary" id="startBtn" style="flex:1">START / RESET</button>
+      <button class="btn btn-ghost" id="cheatBtn">CHEAT SHEET</button>
+      <button class="btn btn-ghost" id="studyBtn">100-Q STUDY LIST</button>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><b id="score">0</b><span>Score</span></div>
+    <div class="stat"><b id="accuracy">0%</b><span>Accuracy</span></div>
+    <div class="stat"><b id="streak">0</b><span>Streak</span></div>
+    <div class="stat"><b id="qnum">0/0</b><span>Question</span></div>
+    <div class="stat"><b id="best">0</b><span>Best Streak</span></div>
+  </div>
+
+  <div class="panel game">
+    <div id="splash" class="splash">
+      <h2>READY?</h2>
+      <p class="mini">Choose a mode and press <b>START / RESET</b>. Each answer teaches the reasoning and gives an exam clue. Use <b>Common Traps</b> for a fast cram, <b>PBQ Scenarios</b> for troubleshooting logic, and <b>100-Q STUDY LIST</b> to review every question with its answer and explanation.</p>
+    </div>
+    <div id="gameArea" class="hidden">
+      <div class="topline">
+        <div><span id="catChip" class="chip"></span> <span id="diffChip" class="chip trap"></span></div>
+        <div class="small">Press <span class="kbd">1</span>–<span class="kbd">4</span> to answer</div>
+      </div>
+      <div class="progress"><div id="bar"></div></div>
+      <div id="question" class="question"></div>
+      <div id="answers" class="answers"></div>
+      <div id="feedback" class="feedback"></div>
+      <div class="actions">
+        <button class="btn btn-secondary hidden" id="nextBtn">NEXT QUESTION</button>
+        <button class="btn btn-ghost" id="hintBtn">SHOW EXAM CLUE</button>
+        <button class="btn btn-ghost" id="markBtn">MARK FOR REVIEW</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sidegrid">
+    <div class="panel cheat">
+      <h3>⚡ High-Yield Confusion Map</h3><div class="small" style="margin-bottom:8px;color:var(--yellow)">Rule: do not memorize only the answer. Say out loud why the other choices are wrong.</div>
+      <div class="mini">
+        <b>Signal:</b> dBi = antenna gain; dBm = signal/power level; closer to 0 dBm = stronger. &nbsp;
+        <b>Wi‑Fi:</b> 2.4 GHz = range/penetration; 5/6 GHz = more spectrum/capacity. &nbsp;
+        <b>Switching:</b> access = one VLAN; trunk = many VLANs; STP = stop loops. &nbsp;
+        <b>Routing:</b> longest prefix wins. &nbsp;
+        <b>Symptoms:</b> IP works but names fail = DNS; local works but remote fails = gateway/routing; 169.254 = DHCP failure. &nbsp;
+        <b>Physical:</b> CRC = cable/interface first; TX must cross to RX on duplex fiber.
+      </div>
+    </div>
+    <div class="panel missed">
+      <h3>☠ Missed / Marked</h3>
+      <div id="missedList" class="mini">Nothing missed yet.</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    100 original practice questions for study use — not actual, remembered, or leaked CompTIA exam questions. Built from N10‑009 objective areas and common candidate-reported trouble spots; designed to teach reasoning rather than answer memorization.
+  </div>
+</div>
+
+<div id="modal" class="modal">
+ <div class="modalbox">
+  <div style="display:flex;justify-content:space-between;gap:12px;align-items:center">
+    <h2 style="margin:0;color:var(--pink)">NETWORK+ CRAM WALL</h2>
+    <button class="btn btn-ghost" id="closeModal">CLOSE</button>
+  </div>
+  <p class="mini">Use this only after you try the question. The goal is pattern recognition under pressure.</p>
+  <div class="cheatgrid">
+   <div class="card"><h4>Wi‑Fi</h4><p>2.4 GHz: range/penetration, crowded. Classic 20 MHz plan: 1/6/11.</p><p>5 GHz: more channels/capacity, less range.</p><p>dBi = antenna gain. dBm = signal level. -45 dBm is stronger than -80 dBm.</p></div>
+   <div class="card"><h4>Antennas</h4><p>Omni = broad around AP. Directional = focus down aisle / building-to-building.</p><p>MIMO = multiple spatial streams. Beamforming = steer energy toward client.</p></div>
+   <div class="card"><h4>Subnet Shortcuts</h4><p>/24 254 hosts • /25 126 • /26 62 • /27 30 • /28 14 • /29 6 • /30 2.</p><p>Block size: /25=128, /26=64, /27=32, /28=16.</p></div>
+   <div class="card"><h4>VLAN / Switching</h4><p>Endpoint = access port. Multiple VLANs between devices = trunk. 802.1Q = VLAN tagging.</p><p>STP prevents L2 loops. LACP bundles links.</p></div>
+   <div class="card"><h4>Routing</h4><p>Longest-prefix match first. Default route = fallback. OSPF = link-state IGP. BGP = inter-AS.</p><p>Local works, remote fails → gateway/routing/ACL.</p></div>
+   <div class="card"><h4>DHCP / DNS / ARP</h4><p>DHCP = DORA, UDP 67/68. Remote DHCP server → relay/helper.</p><p>DNS 53. A=IPv4, AAAA=IPv6, MX=mail, PTR=reverse.</p><p>ARP = IPv4 to MAC.</p></div>
+   <div class="card"><h4>Ports</h4><p>SSH 22 • DNS 53 • HTTP 80 • NTP 123 • SNMP 161/162 • LDAP 389 • HTTPS 443 • SMB 445 • Syslog 514 • LDAPS 636 • RDP 3389.</p></div>
+   <div class="card"><h4>Troubleshooting</h4><p>Identify → theory → test theory → plan → implement/escalate → verify/prevent → document.</p><p>Change one thing at a time and verify.</p></div>
+   <div class="card"><h4>Tools</h4><p>ping=reachability • traceroute=path • nslookup/dig=DNS • arp=IP/MAC cache • tcpdump=packets • Nmap=host/port discovery • LLDP/CDP=neighbors.</p></div>
+   <div class="card"><h4>Physical</h4><p>CRC errors → cable/termination/interference/interface. Attenuation = signal loss over distance. Crosstalk = pair-to-pair interference.</p><p>Single-mode = longest fiber distances.</p></div>
+   <div class="card"><h4>Security</h4><p>802.1X = port-based NAC. RADIUS = centralized AAA. Evil twin = fake AP. ARP poisoning = forged IP↔MAC mappings.</p></div>
+   <div class="card"><h4>Performance</h4><p>Latency = delay. Jitter = variation in delay. Packet loss = missing packets. QoS = prioritize/classify important traffic.</p></div>
+  </div>
+ </div>
+</div>
+
+
+<div id="studyModal" class="modal">
+ <div class="modalbox">
+  <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;position:sticky;top:0;background:#0b0d20;padding-bottom:10px;z-index:2">
+    <div><h2 style="margin:0;color:var(--cyan)">100 TRICKY QUESTION STUDY LIST</h2><div class="small">Question → answer → reasoning → memory clue</div></div>
+    <button class="btn btn-ghost" id="closeStudy">CLOSE</button>
+  </div>
+  <div id="studyList" style="margin-top:12px"></div>
+ </div>
+</div>
+
+<script>
+const BANK = [{"cat": "Wi‑Fi & Antennas", "diff": "trap", "q": "A warehouse needs Wi‑Fi coverage focused straight down a long aisle. Which antenna choice is BEST?", "options": ["Omnidirectional", "Directional panel/Yagi", "Dipole only", "Loopback antenna"], "answer": "Directional panel/Yagi", "why": "A directional antenna concentrates RF energy into a specific area, which fits a long aisle better than an omnidirectional pattern.", "clue": "Long aisle / point-to-point / focused coverage → directional."}, {"cat": "Wi‑Fi & Antennas", "diff": "trap", "q": "An AP is mounted in the center of a classroom and should cover users in all horizontal directions. Which antenna pattern is BEST?", "options": ["Omnidirectional", "Highly directional dish", "Yagi only", "Parabolic grid"], "answer": "Omnidirectional", "why": "Omnidirectional antennas spread RF energy broadly around the AP, making them a good fit for central room coverage.", "clue": "Center of room + users all around → omni."}, {"cat": "Wi‑Fi & Antennas", "diff": "common", "q": "Which measurement most directly describes antenna gain?", "options": ["dBi", "dBm", "Mbps", "dBμV only"], "answer": "dBi", "why": "dBi expresses antenna gain relative to an isotropic radiator. dBm expresses absolute power level.", "clue": "Gain → dBi. Signal/power level → dBm."}, {"cat": "Wi‑Fi & Antennas", "diff": "trap", "q": "Which received signal is stronger?", "options": ["-45 dBm", "-82 dBm", "-95 dBm", "They are equal"], "answer": "-45 dBm", "why": "For dBm, values closer to zero are stronger. -45 dBm is much stronger than -82 or -95 dBm.", "clue": "Closer to zero = stronger."}, {"cat": "Wi‑Fi & Antennas", "diff": "common", "q": "On 2.4 GHz Wi‑Fi in North America using 20 MHz channels, which set is traditionally used to minimize overlap?", "options": ["1, 6, 11", "1, 5, 9", "2, 7, 12", "3, 8, 13"], "answer": "1, 6, 11", "why": "Channels 1, 6, and 11 are the classic non-overlapping 20 MHz plan in the 2.4 GHz band in North America.", "clue": "2.4 GHz → memorize 1 / 6 / 11."}, {"cat": "Wi‑Fi & Antennas", "diff": "trap", "q": "Several neighboring APs are all using channel 6. What problem is MOST likely?", "options": ["Co-channel contention/interference", "A DNS loop", "VLAN hopping", "Duplex mismatch"], "answer": "Co-channel contention/interference", "why": "Devices sharing the same channel must contend for airtime, reducing performance.", "clue": "Same channel → co-channel contention."}, {"cat": "Wi‑Fi & Antennas", "diff": "trap", "q": "APs on overlapping 2.4 GHz channels are interfering with each other. What is this called?", "options": ["Adjacent-channel interference", "Route poisoning", "Broadcast suppression", "Split horizon"], "answer": "Adjacent-channel interference", "why": "Partially overlapping channels interfere with one another and can be worse than sharing a well-planned channel.", "clue": "Overlapping channels → adjacent-channel interference."}, {"cat": "Wi‑Fi & Antennas", "diff": "common", "q": "A user far from the AP and behind multiple walls can connect on 2.4 GHz but struggles on 5 GHz. Why?", "options": ["2.4 GHz generally has better range and wall penetration", "5 GHz cannot carry IP traffic", "2.4 GHz is always faster", "5 GHz uses only directional antennas"], "answer": "2.4 GHz generally has better range and wall penetration", "why": "Lower-frequency 2.4 GHz signals generally propagate farther and penetrate obstacles better than 5 GHz.", "clue": "2.4 = farther. 5 = more capacity/less congestion."}, {"cat": "Wi‑Fi & Antennas", "diff": "common", "q": "Which technology uses multiple spatial streams/antennas to improve wireless throughput and reliability?", "options": ["MIMO", "NAT", "STP", "ARP"], "answer": "MIMO", "why": "MIMO stands for Multiple Input Multiple Output and uses multiple antennas/spatial streams.", "clue": "Multiple antennas → MIMO."}, {"cat": "Wi‑Fi & Antennas", "diff": "trap", "q": "Which technology steers RF energy toward a client instead of radiating equally in every direction?", "options": ["Beamforming", "PAT", "LACP", "GRE"], "answer": "Beamforming", "why": "Beamforming shapes transmission to improve signal toward a client.", "clue": "Direct the RF toward the client → beamforming."}, {"cat": "Wi‑Fi & Antennas", "diff": "trap", "q": "Users lose Wi‑Fi in the break room whenever the microwave is running. Which band is MOST likely affected?", "options": ["2.4 GHz", "60 GHz only", "Fiber channel", "900 MHz cellular only"], "answer": "2.4 GHz", "why": "Microwave ovens can create significant interference around the 2.4 GHz band.", "clue": "Microwave oven → think 2.4 GHz interference."}, {"cat": "Wi‑Fi & Antennas", "diff": "trap", "q": "A client roams poorly between APs with the same SSID. Which issue should you investigate?", "options": ["Coverage overlap and roaming configuration", "The DNS MX record", "The CPU socket type", "The RAID level"], "answer": "Coverage overlap and roaming configuration", "why": "Roaming depends on usable overlapping coverage, consistent WLAN settings, and client/AP behavior.", "clue": "Moves between APs → roaming/coverage."}, {"cat": "Wi‑Fi & Antennas", "diff": "common", "q": "Which tool is BEST for viewing nearby SSIDs, channels, and signal strengths?", "options": ["Wi‑Fi analyzer", "Tone generator", "Loopback plug", "Visual fault locator"], "answer": "Wi‑Fi analyzer", "why": "A Wi‑Fi analyzer helps identify channel use, signal strength, and interference patterns.", "clue": "Channels + RSSI + SSIDs → Wi‑Fi analyzer."}, {"cat": "IPv4 & Subnetting", "diff": "common", "q": "A Windows host self-assigns 169.254.23.8. What should you suspect FIRST?", "options": ["DHCP failure", "DNS poisoning", "STP root change", "NTP drift"], "answer": "DHCP failure", "why": "169.254.0.0/16 is APIPA, commonly indicating the client could not obtain a DHCP lease.", "clue": "169.254.x.x → DHCP problem."}, {"cat": "IPv4 & Subnetting", "diff": "common", "q": "Which is a private IPv4 address?", "options": ["172.20.5.10", "172.40.5.10", "11.0.0.10", "198.51.100.25"], "answer": "172.20.5.10", "why": "RFC1918 includes 172.16.0.0 through 172.31.255.255.", "clue": "Private 172 range is only 172.16–172.31."}, {"cat": "IPv4 & Subnetting", "diff": "trap", "q": "A host is 192.168.20.70/26. What is the network address?", "options": ["192.168.20.64", "192.168.20.0", "192.168.20.70", "192.168.20.128"], "answer": "192.168.20.64", "why": "A /26 has block size 64: 0, 64, 128, 192. Address .70 falls in the .64–.127 subnet.", "clue": "/26 block size = 64."}, {"cat": "IPv4 & Subnetting", "diff": "trap", "q": "For 192.168.20.70/26, what is the broadcast address?", "options": ["192.168.20.127", "192.168.20.255", "192.168.20.63", "192.168.20.71"], "answer": "192.168.20.127", "why": "The .64/26 subnet spans .64 through .127; the final address is the broadcast.", "clue": "Network .64 → next network .128 → broadcast .127."}, {"cat": "IPv4 & Subnetting", "diff": "common", "q": "How many usable host addresses are in a traditional /27 IPv4 subnet?", "options": ["30", "32", "62", "14"], "answer": "30", "why": "A /27 leaves 5 host bits: 2^5 = 32 addresses; subtract network and broadcast = 30 usable.", "clue": "/27 → 32 total → 30 usable."}, {"cat": "IPv4 & Subnetting", "diff": "common", "q": "You need at least 60 usable IPv4 addresses in one subnet. What is the smallest common prefix?", "options": ["/26", "/27", "/28", "/25"], "answer": "/26", "why": "A /26 provides 64 total addresses and 62 usable hosts.", "clue": "60 hosts → /26."}, {"cat": "IPv4 & Subnetting", "diff": "common", "q": "You need exactly enough room for about 14 usable hosts. Which prefix is the usual answer?", "options": ["/28", "/27", "/29", "/30"], "answer": "/28", "why": "A /28 provides 16 total and 14 usable addresses.", "clue": "14 hosts → /28."}, {"cat": "IPv4 & Subnetting", "diff": "trap", "q": "A PC is 10.5.4.25/24 and its default gateway is 10.5.5.1. What is the likely issue?", "options": ["The gateway is on a different subnet", "The gateway must always end in .254", "The PC address is APIPA", "The subnet mask is /8"], "answer": "The gateway is on a different subnet", "why": "With /24, the host's local subnet is 10.5.4.0/24, so a directly reachable gateway should normally be in that subnet.", "clue": "Gateway should be directly reachable on the local subnet."}, {"cat": "IPv4 & Subnetting", "diff": "trap", "q": "Which prefix has a block size of 32 in the last octet?", "options": ["/27", "/26", "/28", "/29"], "answer": "/27", "why": "255.255.255.224 gives 256 - 224 = 32.", "clue": "Block size = 256 minus mask value."}, {"cat": "IPv4 & Subnetting", "diff": "common", "q": "Which IPv6 prefix is link-local?", "options": ["FE80::/10", "2000::/3", "FC00::/7", "FF00::/8"], "answer": "FE80::/10", "why": "IPv6 link-local addresses use FE80::/10 and are automatically present on interfaces.", "clue": "FE80 → link-local."}, {"cat": "VLANs & Switching", "diff": "common", "q": "A normal desktop connects to a switch and belongs to one VLAN. What switchport mode is usually appropriate?", "options": ["Access", "Trunk", "Routed port only", "SPAN destination"], "answer": "Access", "why": "Access ports typically carry one VLAN for an endpoint.", "clue": "Endpoint → access port."}, {"cat": "VLANs & Switching", "diff": "common", "q": "A link between switches must carry VLANs 10, 20, and 30. What should it be?", "options": ["802.1Q trunk", "Access port in VLAN 1", "Loopback", "Port mirror only"], "answer": "802.1Q trunk", "why": "A trunk carries traffic for multiple VLANs and commonly uses 802.1Q tagging.", "clue": "Multiple VLANs on one link → trunk."}, {"cat": "VLANs & Switching", "diff": "trap", "q": "Two PCs are both in VLAN 20 but sit on different switches. Their access ports are correct, yet they cannot communicate. What should you check next?", "options": ["Whether VLAN 20 is allowed on the inter-switch trunk", "Whether both PCs use the same DNS server", "Whether STP is disabled globally", "Whether the AP uses 6 GHz"], "answer": "Whether VLAN 20 is allowed on the inter-switch trunk", "why": "If the VLAN is not carried across the trunk, same-VLAN hosts on separate switches cannot exchange frames.", "clue": "Same VLAN + different switches → check trunk/allowed VLAN list."}, {"cat": "VLANs & Switching", "diff": "trap", "q": "What is the main purpose of STP?", "options": ["Prevent Layer 2 loops", "Assign IP addresses", "Encrypt switch traffic", "Resolve hostnames"], "answer": "Prevent Layer 2 loops", "why": "Spanning Tree Protocol blocks redundant Layer 2 paths as needed to prevent switching loops and broadcast storms.", "clue": "Redundant switch links → STP."}, {"cat": "VLANs & Switching", "diff": "trap", "q": "A switch network suddenly shows massive broadcast traffic and unstable MAC tables after someone adds a redundant cable. What is the likely cause?", "options": ["Layer 2 loop", "DNS cache miss", "DHCP reservation", "NAT exhaustion"], "answer": "Layer 2 loop", "why": "An unmanaged or STP-failing redundant Layer 2 path can create a broadcast storm and MAC flapping.", "clue": "Redundant cable + chaos → switching loop."}, {"cat": "VLANs & Switching", "diff": "common", "q": "What does a switch primarily use to forward Ethernet frames?", "options": ["Destination MAC address", "Destination TCP port", "DNS record", "Default gateway metric"], "answer": "Destination MAC address", "why": "Layer 2 switching forwards frames using the MAC address table.", "clue": "Switch = MAC. Router = IP."}, {"cat": "VLANs & Switching", "diff": "common", "q": "Which command would most directly help you see learned Layer 2 addresses on a switch?", "options": ["show mac-address-table", "show route", "nslookup", "traceroute"], "answer": "show mac-address-table", "why": "The MAC address table shows which MAC addresses were learned on which switchports.", "clue": "Where did the switch learn this device? → MAC table."}, {"cat": "VLANs & Switching", "diff": "trap", "q": "Which feature combines multiple physical Ethernet links into one logical bundle for redundancy and added aggregate capacity?", "options": ["LACP", "ARP", "DNSSEC", "VRRP only"], "answer": "LACP", "why": "LACP negotiates link aggregation groups between compatible devices.", "clue": "Bundle links → LACP."}, {"cat": "VLANs & Switching", "diff": "trap", "q": "What is an SVI?", "options": ["A Layer 3 interface associated with a VLAN on a switch", "A wireless encryption algorithm", "A fiber connector", "A DHCP relay packet"], "answer": "A Layer 3 interface associated with a VLAN on a switch", "why": "A Switch Virtual Interface provides Layer 3 addressing/functionality for a VLAN on a multilayer switch.", "clue": "VLAN interface on Layer 3 switch → SVI."}, {"cat": "VLANs & Switching", "diff": "trap", "q": "On a typical 802.1Q trunk, traffic for the native VLAN is commonly what?", "options": ["Untagged", "Double-tagged", "Encrypted with WPA3", "Converted to IPv6"], "answer": "Untagged", "why": "The native VLAN is commonly transmitted untagged on an 802.1Q trunk, depending on configuration/vendor behavior.", "clue": "Native VLAN → usually untagged."}, {"cat": "Routing & NAT", "diff": "trap", "q": "A router has 10.0.0.0/8, 10.10.0.0/16, and 10.10.20.0/24 routes. Destination is 10.10.20.50. Which route wins?", "options": ["10.10.20.0/24", "10.10.0.0/16", "10.0.0.0/8", "Whichever was learned first"], "answer": "10.10.20.0/24", "why": "Routers prefer the most specific matching route: the longest prefix match.", "clue": "Most specific prefix wins."}, {"cat": "Routing & NAT", "diff": "common", "q": "What is the purpose of a default route?", "options": ["Forward traffic when no more-specific route matches", "Resolve MAC addresses", "Assign VLAN IDs", "Encrypt all traffic"], "answer": "Forward traffic when no more-specific route matches", "why": "A default route is the fallback route used when the routing table has no more-specific match.", "clue": "No specific route? → default route."}, {"cat": "Routing & NAT", "diff": "trap", "q": "When two routing sources advertise the same prefix, what value helps a router choose which source is more trustworthy/preferred?", "options": ["Administrative distance", "SSID", "MTU only", "DNS TTL"], "answer": "Administrative distance", "why": "Administrative distance ranks the trustworthiness/preference of route sources on many routers.", "clue": "Same prefix from different routing sources → administrative distance."}, {"cat": "Routing & NAT", "diff": "common", "q": "Which dynamic routing protocol is link-state and commonly used inside an enterprise?", "options": ["OSPF", "ARP", "DHCP", "SNMP"], "answer": "OSPF", "why": "OSPF is a link-state interior gateway protocol used for dynamic routing within an autonomous system.", "clue": "Link-state IGP → OSPF."}, {"cat": "Routing & NAT", "diff": "common", "q": "Which routing protocol is primarily associated with exchanging routes between autonomous systems on the Internet?", "options": ["BGP", "STP", "LACP", "NTP"], "answer": "BGP", "why": "BGP is the primary inter-domain routing protocol used between autonomous systems.", "clue": "Internet between ASes → BGP."}, {"cat": "Routing & NAT", "diff": "common", "q": "What does PAT allow?", "options": ["Many private hosts to share one public IP by using different source ports", "One switch to carry many VLANs", "A DNS server to resolve aliases", "An AP to use multiple antennas"], "answer": "Many private hosts to share one public IP by using different source ports", "why": "Port Address Translation multiplexes many internal sessions behind one or a small number of public addresses.", "clue": "Many-to-one NAT using ports → PAT."}, {"cat": "Routing & NAT", "diff": "trap", "q": "A router-on-a-stick design usually relies on what?", "options": ["Router subinterfaces with 802.1Q tagging", "One physical router interface per host", "Only Layer 2 switching", "A wireless controller"], "answer": "Router subinterfaces with 802.1Q tagging", "why": "Router-on-a-stick uses one physical interface divided into VLAN-tagged subinterfaces for inter-VLAN routing.", "clue": "One router link, many VLANs → subinterfaces."}, {"cat": "Routing & NAT", "diff": "trap", "q": "A host can reach devices in its own subnet but nothing on remote networks. Which setting should you verify FIRST?", "options": ["Default gateway", "DNS MX record", "NTP stratum", "SSID broadcast"], "answer": "Default gateway", "why": "Remote-subnet traffic must be sent to a router, so a missing or wrong gateway is a prime suspect.", "clue": "Local works, remote fails → gateway/routing."}, {"cat": "Services & Ports", "diff": "common", "q": "A user can ping 8.8.8.8 but cannot browse to example.com. Which service is the likely problem?", "options": ["DNS", "DHCP only", "STP", "LACP"], "answer": "DNS", "why": "IP connectivity works, but name resolution fails.", "clue": "IP works, names fail → DNS."}, {"cat": "Services & Ports", "diff": "common", "q": "Which DHCP message sequence is correct?", "options": ["Discover, Offer, Request, Acknowledge", "Discover, Request, Offer, Acknowledge", "Offer, Discover, Acknowledge, Request", "Request, Offer, Discover, Acknowledge"], "answer": "Discover, Offer, Request, Acknowledge", "why": "DORA is the classic DHCP lease acquisition sequence.", "clue": "DHCP = DORA."}, {"cat": "Services & Ports", "diff": "trap", "q": "Clients in VLAN 30 cannot get DHCP leases, but clients in the server's own VLAN can. What is commonly missing?", "options": ["DHCP relay/IP helper", "DNS CNAME record", "STP root priority", "A second SSID"], "answer": "DHCP relay/IP helper", "why": "DHCP broadcasts do not normally cross routers. A relay forwards DHCP messages between subnets.", "clue": "DHCP server on another subnet → relay/helper."}, {"cat": "Services & Ports", "diff": "common", "q": "What does ARP do on an IPv4 LAN?", "options": ["Maps an IPv4 address to a MAC address", "Maps a hostname to an IPv4 address", "Assigns a subnet mask", "Chooses a wireless channel"], "answer": "Maps an IPv4 address to a MAC address", "why": "ARP resolves local IPv4 next-hop addresses to Layer 2 MAC addresses.", "clue": "IP → MAC = ARP."}, {"cat": "Services & Ports", "diff": "common", "q": "Which DNS record maps a hostname to an IPv4 address?", "options": ["A", "AAAA", "MX", "PTR"], "answer": "A", "why": "An A record maps a name to an IPv4 address.", "clue": "A = IPv4; AAAA = IPv6."}, {"cat": "Services & Ports", "diff": "common", "q": "Which DNS record is used for mail server routing?", "options": ["MX", "CNAME", "PTR", "TXT only"], "answer": "MX", "why": "MX records identify mail exchangers for a domain.", "clue": "Mail → MX."}, {"cat": "Services & Ports", "diff": "trap", "q": "Which DNS record is commonly used for reverse DNS lookup?", "options": ["PTR", "A", "MX", "SRV only"], "answer": "PTR", "why": "PTR records map an IP address back to a hostname in reverse lookup zones.", "clue": "Reverse lookup → PTR."}, {"cat": "Services & Ports", "diff": "common", "q": "Which ports are used by DHCP server/client?", "options": ["UDP 67/68", "TCP 20/21", "UDP 161/162", "TCP 389/636"], "answer": "UDP 67/68", "why": "DHCP commonly uses UDP 67 on the server side and UDP 68 on the client side.", "clue": "DHCP = 67/68 UDP."}, {"cat": "Services & Ports", "diff": "trap", "q": "Which port is SMB commonly associated with?", "options": ["445", "443", "514", "3389"], "answer": "445", "why": "Modern SMB commonly uses TCP 445.", "clue": "SMB = 445."}, {"cat": "Services & Ports", "diff": "common", "q": "Which port is RDP commonly associated with?", "options": ["3389", "1433", "5060", "587"], "answer": "3389", "why": "Remote Desktop Protocol commonly uses TCP/UDP 3389.", "clue": "RDP = 3389."}, {"cat": "Services & Ports", "diff": "common", "q": "Which ports are used by SNMP queries and traps?", "options": ["161 and 162", "67 and 68", "20 and 21", "5060 and 5061"], "answer": "161 and 162", "why": "SNMP managers commonly query agents on UDP 161, while traps/informs are associated with UDP 162.", "clue": "SNMP 161; traps 162."}, {"cat": "Troubleshooting & Tools", "diff": "common", "q": "What is the FIRST step in CompTIA's troubleshooting methodology?", "options": ["Identify the problem", "Implement the solution", "Document findings", "Replace hardware"], "answer": "Identify the problem", "why": "Start by gathering information, questioning users, identifying symptoms, and checking what changed.", "clue": "First: identify. Last: document."}, {"cat": "Troubleshooting & Tools", "diff": "trap", "q": "You formed a probable cause. What should you do next?", "options": ["Test the theory to determine the cause", "Immediately replace the switch", "Document and close the ticket", "Change multiple settings at once"], "answer": "Test the theory to determine the cause", "why": "After establishing a theory, test it before implementing broad changes.", "clue": "Theory → test it."}, {"cat": "Troubleshooting & Tools", "diff": "common", "q": "Which command is BEST for checking whether a host is reachable at the IP layer?", "options": ["ping", "nslookup", "arp -a", "show vlan"], "answer": "ping", "why": "Ping uses ICMP echo messages to test basic reachability and round-trip behavior.", "clue": "Can I reach it? → ping."}, {"cat": "Troubleshooting & Tools", "diff": "common", "q": "Which tool shows the sequence of Layer 3 hops to a destination?", "options": ["traceroute/tracert", "nslookup", "netstat", "arp"], "answer": "traceroute/tracert", "why": "Traceroute manipulates TTL/hop-limit behavior to reveal intermediary routers along a path.", "clue": "Where does the path break? → traceroute."}, {"cat": "Troubleshooting & Tools", "diff": "common", "q": "Which tool is BEST for testing DNS name resolution from a client?", "options": ["nslookup or dig", "show mac-address-table", "tone generator", "visual fault locator"], "answer": "nslookup or dig", "why": "nslookup and dig query DNS servers and help troubleshoot name resolution.", "clue": "DNS question → nslookup/dig."}, {"cat": "Troubleshooting & Tools", "diff": "common", "q": "Which command shows a host's ARP cache?", "options": ["arp -a", "tracert", "nslookup", "show power"], "answer": "arp -a", "why": "The ARP cache stores known IPv4-to-MAC mappings for local next hops.", "clue": "IP-to-MAC cache → arp."}, {"cat": "Troubleshooting & Tools", "diff": "trap", "q": "Which tool would you use to capture and inspect packets directly from an interface on Linux?", "options": ["tcpdump", "ipconfig", "toner", "LLDP"], "answer": "tcpdump", "why": "tcpdump is a command-line packet capture/analyzer tool.", "clue": "Capture packets → tcpdump/protocol analyzer."}, {"cat": "Troubleshooting & Tools", "diff": "trap", "q": "Which tool is designed to discover hosts, ports, and services on a network?", "options": ["Nmap", "NTP", "ARP only", "TFTP"], "answer": "Nmap", "why": "Nmap performs network discovery and port/service scanning.", "clue": "Scan hosts/ports → Nmap."}, {"cat": "Troubleshooting & Tools", "diff": "common", "q": "Which tool helps identify the far end of an unlabeled copper cable run?", "options": ["Toner and probe", "Wi‑Fi analyzer", "Visual fault locator", "Protocol analyzer"], "answer": "Toner and probe", "why": "A toner injects a signal that a probe can detect to trace a copper cable.", "clue": "Find this mystery cable → toner/probe."}, {"cat": "Troubleshooting & Tools", "diff": "common", "q": "Which tool checks copper wiremap/continuity and may identify opens, shorts, or split pairs?", "options": ["Cable tester", "Nmap", "nslookup", "Wi‑Fi analyzer"], "answer": "Cable tester", "why": "Cable testers validate physical copper wiring and pinout.", "clue": "Copper physical test → cable tester."}, {"cat": "Troubleshooting & Tools", "diff": "trap", "q": "Which tool is useful for visually identifying breaks or excessive loss points in short fiber runs by injecting visible light?", "options": ["Visual fault locator", "Tone generator", "Nmap", "Loopback IP"], "answer": "Visual fault locator", "why": "A VFL sends visible laser light through fiber to help identify faults, breaks, or bad bends/connectors.", "clue": "Fiber + visible red light → VFL."}, {"cat": "Troubleshooting & Tools", "diff": "trap", "q": "LLDP and CDP are primarily useful for what?", "options": ["Discovering directly connected neighboring network devices", "Resolving DNS records", "Assigning IP addresses", "Encrypting wireless traffic"], "answer": "Discovering directly connected neighboring network devices", "why": "LLDP and CDP advertise neighbor identity and interface information at Layer 2.", "clue": "Who is plugged into this port? → LLDP/CDP."}, {"cat": "Cabling & Interfaces", "diff": "common", "q": "What is attenuation?", "options": ["Loss of signal strength over distance", "Electrical noise from adjacent pairs only", "A Layer 2 loop", "A duplicate IP address"], "answer": "Loss of signal strength over distance", "why": "Attenuation is the gradual reduction of signal strength as it travels through a medium.", "clue": "Signal gets weaker with distance → attenuation."}, {"cat": "Cabling & Interfaces", "diff": "common", "q": "What is crosstalk?", "options": ["Unwanted signal coupling between wire pairs", "A routing loop between autonomous systems", "A DNS alias", "A wireless roaming event"], "answer": "Unwanted signal coupling between wire pairs", "why": "Crosstalk occurs when electrical signals on one pair interfere with another pair.", "clue": "Pair-to-pair interference → crosstalk."}, {"cat": "Cabling & Interfaces", "diff": "trap", "q": "A switch interface shows increasing CRC errors. What should you suspect FIRST?", "options": ["Physical-layer/cabling or interface problem", "Incorrect DNS MX record", "Wrong NTP stratum", "Missing DHCP reservation"], "answer": "Physical-layer/cabling or interface problem", "why": "CRC errors often point to corrupted Ethernet frames caused by cabling, interference, bad termination, or interface issues.", "clue": "CRC errors → physical layer first."}, {"cat": "Cabling & Interfaces", "diff": "trap", "q": "A fiber link remains down after replacing optics. Each side's transmitter is connected to the other side's transmitter. What is wrong?", "options": ["TX/RX are transposed incorrectly", "The DNS cache is stale", "The VLAN is native", "The subnet is /24"], "answer": "TX/RX are transposed incorrectly", "why": "Fiber links need transmitter on one end connected to receiver on the other.", "clue": "Fiber pair → TX must cross to RX."}, {"cat": "Cabling & Interfaces", "diff": "common", "q": "Which fiber type is generally used for the longest distances?", "options": ["Single-mode", "Multimode", "UTP", "Twinax only"], "answer": "Single-mode", "why": "Single-mode fiber uses a small core and is suited for long-distance optical links.", "clue": "Long distance fiber → single-mode."}, {"cat": "Cabling & Interfaces", "diff": "common", "q": "Which connector is a small-form-factor fiber connector commonly used with SFPs?", "options": ["LC", "RJ11", "F-type", "BNC"], "answer": "LC", "why": "LC connectors are compact and extremely common on SFP-based fiber links.", "clue": "Small fiber connector on SFP → LC."}, {"cat": "Cabling & Interfaces", "diff": "trap", "q": "An IP phone does not power on from the switch, but data ports work. What should you check?", "options": ["PoE standard and switch power budget", "DNS TTL", "STP root ID only", "The user's browser cache"], "answer": "PoE standard and switch power budget", "why": "PoE failures may result from incompatible standards, disabled PoE, bad cabling, or exceeding the switch's available power budget.", "clue": "Data works but phone/AP won't power → PoE."}, {"cat": "Cabling & Interfaces", "diff": "common", "q": "What is the standard maximum channel length commonly associated with twisted-pair Ethernet?", "options": ["100 meters", "500 meters", "2 kilometers", "10 meters"], "answer": "100 meters", "why": "Structured copper Ethernet is commonly designed around a 100-meter channel maximum.", "clue": "Copper Ethernet → 100 m."}, {"cat": "Network Security", "diff": "common", "q": "Which technology provides port-based network access control and commonly works with RADIUS?", "options": ["802.1X", "802.1Q", "802.3ad", "STP"], "answer": "802.1X", "why": "802.1X authenticates devices/users before granting network access and commonly uses a RADIUS backend.", "clue": "Authenticate at the switch/AP port → 802.1X."}, {"cat": "Network Security", "diff": "common", "q": "Which AAA service is especially common for centralized network access authentication?", "options": ["RADIUS", "ARP", "NTP", "TFTP"], "answer": "RADIUS", "why": "RADIUS commonly centralizes Authentication, Authorization, and Accounting for network access.", "clue": "Wi‑Fi/VPN/802.1X authentication → RADIUS."}, {"cat": "Network Security", "diff": "trap", "q": "An attacker sends forged ARP messages so victims associate the gateway IP with the attacker's MAC address. What attack is this?", "options": ["ARP poisoning/spoofing", "VLAN trunking", "DNS recursion", "DHCP reservation"], "answer": "ARP poisoning/spoofing", "why": "ARP poisoning manipulates local ARP caches to redirect traffic through the attacker.", "clue": "Fake IP-to-MAC mapping → ARP poisoning."}, {"cat": "Network Security", "diff": "trap", "q": "A malicious AP copies the SSID of a legitimate wireless network to lure users. What is this called?", "options": ["Evil twin", "Split horizon", "Root bridge", "Anycast"], "answer": "Evil twin", "why": "An evil twin impersonates a trusted wireless network to trick clients into connecting.", "clue": "Fake copy of real Wi‑Fi → evil twin."}, {"cat": "Network Security", "diff": "trap", "q": "A rogue device starts handing out incorrect IP configurations to clients. What service is it impersonating?", "options": ["DHCP", "NTP", "SNMP", "SIP"], "answer": "DHCP", "why": "A rogue DHCP server can provide malicious gateways, DNS servers, or addressing information.", "clue": "Wrong IP/gateway/DNS delivered automatically → rogue DHCP."}, {"cat": "Network Security", "diff": "common", "q": "What is the core difference between IDS and IPS?", "options": ["IDS detects; IPS can actively block/prevent", "IDS assigns IPs; IPS resolves DNS", "IDS is wireless only; IPS is wired only", "There is no difference"], "answer": "IDS detects; IPS can actively block/prevent", "why": "An IDS alerts on suspicious activity, while an IPS sits inline or otherwise takes preventive action.", "clue": "D = detect; P = prevent."}, {"cat": "Network Security", "diff": "common", "q": "Which principle means giving users only the permissions they need?", "options": ["Least privilege", "Anycast", "Split tunneling", "Port mirroring"], "answer": "Least privilege", "why": "Least privilege reduces risk by limiting access to the minimum needed for a task.", "clue": "Minimum permissions → least privilege."}, {"cat": "Network Security", "diff": "trap", "q": "What is MAC flooding intended to do to a switch?", "options": ["Overflow its MAC table so traffic may be flooded", "Change DNS records", "Exhaust IPv4 TTL", "Increase antenna gain"], "answer": "Overflow its MAC table so traffic may be flooded", "why": "MAC flooding attempts to overwhelm the switch's CAM/MAC table, potentially causing unknown-unicast flooding.", "clue": "Flood MAC table → switch starts flooding frames."}, {"cat": "Performance & Operations", "diff": "common", "q": "What does latency measure?", "options": ["Delay", "Variation in delay", "Packets lost", "Antenna gain"], "answer": "Delay", "why": "Latency is the time it takes traffic to traverse a path.", "clue": "Latency = delay."}, {"cat": "Performance & Operations", "diff": "common", "q": "What does jitter measure?", "options": ["Variation in packet delay", "Total bandwidth capacity", "Number of VLANs", "Fiber attenuation only"], "answer": "Variation in packet delay", "why": "Jitter is variation in packet arrival timing and is especially harmful to real-time traffic.", "clue": "Voice sounds choppy even with bandwidth → jitter."}, {"cat": "Performance & Operations", "diff": "common", "q": "Which traffic is typically MOST sensitive to jitter?", "options": ["VoIP", "Nightly file backup", "Email download", "DNS zone file stored offline"], "answer": "VoIP", "why": "Real-time voice expects packets to arrive at steady intervals, so jitter can cause gaps and distortion.", "clue": "Real-time audio/video → jitter matters."}, {"cat": "Performance & Operations", "diff": "trap", "q": "A 1 Gbps uplink is constantly saturated during backups, slowing all users. What is the issue?", "options": ["Bottleneck/congestion", "ARP loopback", "Native VLAN mismatch only", "Incorrect DNS PTR record"], "answer": "Bottleneck/congestion", "why": "The uplink has become the limiting resource, causing queueing and reduced performance.", "clue": "One link maxed out → bottleneck."}, {"cat": "Performance & Operations", "diff": "common", "q": "What is QoS used for?", "options": ["Prioritizing or classifying important traffic", "Assigning MAC addresses", "Creating DNS records", "Increasing cable length"], "answer": "Prioritizing or classifying important traffic", "why": "QoS can classify, mark, queue, shape, or prioritize traffic such as voice and video.", "clue": "Voice must win during congestion → QoS."}, {"cat": "Performance & Operations", "diff": "common", "q": "Which protocol is used to synchronize system clocks?", "options": ["NTP", "SNMP", "LDAP", "SMB"], "answer": "NTP", "why": "Network Time Protocol synchronizes clocks across networked systems.", "clue": "Time synchronization → NTP."}, {"cat": "Performance & Operations", "diff": "common", "q": "Which protocol is commonly used to collect device status/counters and receive alerts from network devices?", "options": ["SNMP", "SMTP only", "ARP", "SIP"], "answer": "SNMP", "why": "SNMP provides monitoring/management data and supports traps/informs for alerts.", "clue": "Monitor routers/switches → SNMP."}, {"cat": "Performance & Operations", "diff": "trap", "q": "What is the difference between scalability and elasticity in cloud networking?", "options": ["Scalability handles growth; elasticity dynamically expands/contracts resources with demand", "They are identical terms", "Elasticity is only about encryption", "Scalability means reducing MTU"], "answer": "Scalability handles growth; elasticity dynamically expands/contracts resources with demand", "why": "Scalability is the ability to support increased load; elasticity emphasizes dynamic adjustment to changing demand.", "clue": "Elasticity = stretch/shrink with demand."}, {"cat": "Performance & Operations", "diff": "trap", "q": "What does east-west traffic usually describe?", "options": ["Traffic between systems within a data center/cloud environment", "Traffic from a LAN out to the Internet only", "Wireless traffic moving east geographically", "Only BGP peering traffic"], "answer": "Traffic between systems within a data center/cloud environment", "why": "East-west generally refers to internal lateral traffic, while north-south is traffic entering or leaving the environment.", "clue": "Inside-to-inside → east-west."}, {"cat": "Performance & Operations", "diff": "trap", "q": "What does SD-WAN emphasize?", "options": ["Central policy control across multiple WAN transports", "Replacing all IP addresses with MAC addresses", "Only one carrier and one circuit", "Removing routing entirely"], "answer": "Central policy control across multiple WAN transports", "why": "SD-WAN is application-aware, centrally managed, and transport-agnostic across WAN links.", "clue": "Central policy + multiple transports → SD-WAN."}, {"cat": "PBQ Scenarios", "diff": "pbq", "q": "PBQ: PC-A = 192.168.50.25/24, gateway 192.168.50.1. PC-B = 192.168.60.25/24, gateway 192.168.60.1. Both can ping their own gateways but not each other. What is the BEST next place to investigate?", "options": ["Routing/ACLs between VLAN 50 and VLAN 60", "PC-A's loopback interface", "The cable category of PC-B only", "DNS records"], "answer": "Routing/ACLs between VLAN 50 and VLAN 60", "why": "Both hosts can reach their local gateways, so Layer 1/2 and local addressing are likely working. The failure is between subnets: routing or policy/ACL is the logical next check.", "clue": "Local gateway reachable on both sides → investigate the routed path/policy."}, {"cat": "PBQ Scenarios", "diff": "pbq", "q": "PBQ: A laptop gets 192.168.10.55/24, gateway 192.168.10.1, DNS 192.168.10.10. It can ping the gateway and 1.1.1.1, but nslookup times out. What should you troubleshoot?", "options": ["DNS server/reachability", "DHCP address pool exhaustion", "STP loop", "PoE budget"], "answer": "DNS server/reachability", "why": "The host has IP connectivity to the Internet, but its DNS query fails. Focus on DNS service/address/reachability.", "clue": "Ping IP works + name lookup fails → DNS."}, {"cat": "PBQ Scenarios", "diff": "pbq", "q": "PBQ: Switch A and Switch B are connected by two cables. After the second cable is connected, the LAN slows dramatically and broadcasts spike. What should prevent this?", "options": ["STP or a properly configured link aggregation", "DNSSEC", "NAT64", "DHCP snooping only"], "answer": "STP or a properly configured link aggregation", "why": "Two independent Layer 2 paths can loop. STP blocks redundant paths, or the links can be intentionally bundled with LACP.", "clue": "Two switch links ≠ automatically safe."}, {"cat": "PBQ Scenarios", "diff": "pbq", "q": "PBQ: An AP reports strong signal near users, but throughput is terrible. A Wi‑Fi analyzer shows many nearby APs overlapping the same 2.4 GHz spectrum. What is the BEST fix?", "options": ["Re-plan channels and consider 5/6 GHz where supported", "Increase DNS TTL", "Change the default gateway", "Disable STP"], "answer": "Re-plan channels and consider 5/6 GHz where supported", "why": "The symptom is RF contention/interference, not IP addressing. Channel planning and moving capable clients to cleaner spectrum are appropriate.", "clue": "Strong RSSI + poor throughput + crowded spectrum → interference/contention."}, {"cat": "PBQ Scenarios", "diff": "pbq", "q": "PBQ: VLAN 20 users on Switch 1 work. VLAN 20 users on Switch 2 get no connectivity. The trunk between switches carries VLANs 10 and 30 only. What is the fix?", "options": ["Allow VLAN 20 on the trunk", "Change all hosts to VLAN 1", "Replace DNS", "Set every port to trunk"], "answer": "Allow VLAN 20 on the trunk", "why": "The VLAN must exist and be carried across the trunk to reach hosts on the other switch.", "clue": "VLAN missing only across switches → allowed VLAN list."}, {"cat": "PBQ Scenarios", "diff": "pbq", "q": "PBQ: A switch port's CRC counter rises quickly after a new cable is installed. Speed/duplex are auto on both ends. What should you try FIRST?", "options": ["Replace/reterminate the cable and inspect interference", "Change DNS servers", "Add a static route", "Clear ARP on every router"], "answer": "Replace/reterminate the cable and inspect interference", "why": "Rising CRC errors strongly suggest a Layer 1/2 physical integrity problem.", "clue": "CRC + recent cable change → cable/termination."}, {"cat": "PBQ Scenarios", "diff": "pbq", "q": "PBQ: A user moved desks. Their PC gets a valid address for the wrong department and cannot access department resources. Other users are fine. What should you check?", "options": ["The VLAN assigned to the new switch port", "BGP configuration", "NTP server", "The remote website's certificate"], "answer": "The VLAN assigned to the new switch port", "why": "A moved endpoint that lands in the wrong subnet/department often indicates the access port is assigned to the wrong VLAN.", "clue": "Moved desk + wrong subnet → switchport VLAN."}, {"cat": "PBQ Scenarios", "diff": "pbq", "q": "PBQ: A router has routes 172.16.0.0/12 via A and 172.16.40.0/24 via B. A packet is destined to 172.16.40.88. Which next hop is used?", "options": ["B, because /24 is the longest prefix match", "A, because /12 covers more addresses", "Whichever route has the lower DNS TTL", "Both equally"], "answer": "B, because /24 is the longest prefix match", "why": "Route selection first considers the most specific matching prefix. /24 is more specific than /12.", "clue": "Longest prefix beats broader summary."}, {"cat": "PBQ Scenarios", "diff": "pbq", "q": "PBQ: Phones stop powering up after several new PoE cameras are added to the same switch. Data switching still works. What should you inspect?", "options": ["PoE power budget", "DNS cache", "Subnet broadcast address", "BGP AS number"], "answer": "PoE power budget", "why": "A switch can have enough data-port capacity while exhausting the total power available for PoE devices.", "clue": "Many new PoE devices + power failures → budget."}, {"cat": "PBQ Scenarios", "diff": "pbq", "q": "PBQ: A workstation has IP 192.168.30.130, mask 255.255.255.192, gateway 192.168.30.129. Is the gateway in the same subnet?", "options": ["Yes", "No, it is in 192.168.30.64/26", "No, it is in 192.168.30.192/26", "No, because gateways must end in .1"], "answer": "Yes", "why": "255.255.255.192 is /26. The .130 host is in 192.168.30.128/26, whose usable range is .129–.190. Gateway .129 is valid and local.", "clue": "/26 blocks: 0, 64, 128, 192."}];
+function esc(x){return String(x).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]||m));}
+function renderStudyList(){
+  const box=document.getElementById("studyList");
+  box.innerHTML=BANK.map((q,i)=>`<div class="card" style="margin-bottom:12px"><h4 style="margin-bottom:6px">${i+1}. ${esc(q.cat)}</h4><p style="font-size:1rem;color:white"><b>${esc(q.q)}</b></p><p><span style="color:var(--green);font-weight:800">ANSWER:</span> ${esc(q.answer)}</p><p><span style="color:var(--cyan);font-weight:800">WHY:</span> ${esc(q.why)}</p><p><span style="color:var(--yellow);font-weight:800">MEMORY CLUE:</span> ${esc(q.clue)}</p></div>`).join("");
+}
+const $ = id => document.getElementById(id);
+const shuffle = arr => {
+  let a=[...arr];
+  for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}
+  return a;
+};
+const cats = ["All", ...Array.from(new Set(BANK.map(q=>q.cat)))];
+cats.forEach(c=>{const o=document.createElement("option");o.value=c;o.textContent=c;$("category").appendChild(o)});
+
+let session=[], idx=0, score=0, correct=0, streak=0, bestStreak=Number(localStorage.getItem("nplusBestStreak")||0);
+let answered=false, missed=[], marked=[], current=null;
+$("best").textContent=bestStreak;
+
+function pickPool(){
+  let pool=[...BANK], mode=$("mode").value, cat=$("category").value;
+  if(cat!=="All") pool=pool.filter(q=>q.cat===cat);
+  if(mode==="traps") pool=pool.filter(q=>q.diff==="trap" || q.diff==="pbq");
+  if(mode==="pbq") pool=pool.filter(q=>q.cat==="PBQ Scenarios");
+  if(mode==="missed"){
+    const keys=new Set([...missed,...marked].map(x=>x.q));
+    pool=BANK.filter(q=>keys.has(q.q));
+    if(cat!=="All") pool=pool.filter(q=>q.cat===cat);
+  }
+  return pool;
+}
+function start(){
+  const pool=pickPool();
+  if(!pool.length){alert("No questions available for that filter yet. Miss some or mark some first, or change mode/category.");return}
+  const n=Math.min(Number($("length").value), pool.length);
+  session=shuffle(pool).slice(0,n); idx=0; score=0; correct=0; streak=0; answered=false; missed=[]; marked=[];
+  $("splash").classList.add("hidden"); $("gameArea").classList.remove("hidden");
+  renderMissed(); updateStats(); showQuestion();
+}
+function showQuestion(){
+  if(idx>=session.length) return finish();
+  answered=false; current=session[idx];
+  $("feedback").style.display="none"; $("feedback").className="feedback"; $("feedback").innerHTML="";
+  $("nextBtn").classList.add("hidden");
+  $("hintBtn").disabled=false;
+  $("catChip").textContent=current.cat;
+  $("diffChip").textContent=current.diff==="pbq"?"PBQ-STYLE":current.diff==="trap"?"COMMON TRAP":"CORE";
+  $("diffChip").className="chip "+(current.diff==="pbq"?"pbq":"trap");
+  $("question").textContent=current.q;
+  const ans=shuffle(current.options);
+  $("answers").innerHTML="";
+  ans.forEach((opt,i)=>{
+    const b=document.createElement("button"); b.className="answer"; b.dataset.opt=opt;
+    b.innerHTML=`<b>${i+1}.</b> ${opt}`;
+    b.onclick=()=>choose(b,opt); $("answers").appendChild(b);
+  });
+  $("bar").style.width=((idx)/session.length*100)+"%";
+  updateStats();
+}
+function choose(btn,opt){
+  if(answered)return; answered=true;
+  const isCorrect=opt===current.answer;
+  document.querySelectorAll(".answer").forEach(b=>{
+    b.disabled=true;
+    if(b.dataset.opt===current.answer)b.classList.add("correct");
+  });
+  if(!isCorrect){btn.classList.add("wrong"); missed.push(current); streak=0;}
+  else {correct++; streak++; score += current.diff==="pbq"?150:100; if(streak>=3)score+=25;}
+  if(streak>bestStreak){bestStreak=streak;localStorage.setItem("nplusBestStreak",bestStreak)}
+  const f=$("feedback"); f.style.display="block"; f.classList.add(isCorrect?"good":"bad");
+  f.innerHTML=`<b>${isCorrect?"✓ Correct":"✗ Not quite"}</b><br>${current.why}<div class="examclue">Exam clue: ${current.clue}</div>`;
+  $("nextBtn").classList.remove("hidden"); $("bar").style.width=((idx+1)/session.length*100)+"%";
+  renderMissed(); updateStats();
+}
+function next(){if(!answered)return; idx++; showQuestion();}
+function updateStats(){
+  $("score").textContent=score; $("streak").textContent=streak; $("best").textContent=bestStreak;
+  const attempted=idx+(answered?1:0);
+  $("accuracy").textContent=(attempted?Math.round(correct/attempted*100):0)+"%";
+  $("qnum").textContent=Math.min(idx+1,session.length)+"/"+session.length;
+}
+function renderMissed(){
+  const all=[...missed,...marked];
+  if(!all.length){$("missedList").textContent="Nothing missed or marked yet.";return}
+  const seen=new Set();
+  $("missedList").innerHTML=all.filter(x=>!seen.has(x.q)&&seen.add(x.q)).map(x=>`<div class="miss"><b>${x.cat}</b><br>${x.q}</div>`).join("");
+}
+function finish(){
+  $("gameArea").classList.add("hidden"); $("splash").classList.remove("hidden");
+  const attempted=session.length, pct=attempted?Math.round(correct/attempted*100):0;
+  let msg=pct>=90?"EXAM MODE: SHARP.":pct>=75?"SOLID — REVIEW THE MISSES.":"KEEP DRILLING THE TRAPS.";
+  $("splash").innerHTML=`<h2>${msg}</h2><p class="mini">Score: <b>${score}</b> • Correct: <b>${correct}/${attempted}</b> • Accuracy: <b>${pct}%</b><br><br>Choose <b>Review Missed</b> to attack weak spots, or reset for a fresh randomized run.</p>`;
+  $("qnum").textContent=attempted+"/"+attempted;
+}
+$("startBtn").onclick=start; $("nextBtn").onclick=next;
+$("hintBtn").onclick=()=>{if(!current)return;$("feedback").style.display="block";$("feedback").innerHTML=`<b>Hint:</b> ${current.clue}`; $("hintBtn").disabled=true;};
+$("markBtn").onclick=()=>{if(current){marked.push(current);renderMissed();$("markBtn").textContent="MARKED ✓";setTimeout(()=>$("markBtn").textContent="MARK FOR REVIEW",800)}};
+$("cheatBtn").onclick=()=>$("modal").classList.add("open");
+$("closeModal").onclick=()=>$("modal").classList.remove("open");
+$("modal").onclick=e=>{if(e.target===$("modal"))$("modal").classList.remove("open")};
+$("studyBtn").onclick=()=>{renderStudyList();$("studyModal").classList.add("open")};
+$("closeStudy").onclick=()=>$("studyModal").classList.remove("open");
+$("studyModal").onclick=e=>{if(e.target===$("studyModal"))$("studyModal").classList.remove("open")};
+document.addEventListener("keydown",e=>{
+  if(e.key>="1"&&e.key<="4"&&!answered&&!$("gameArea").classList.contains("hidden")){
+    const b=document.querySelectorAll(".answer")[Number(e.key)-1]; if(b)b.click();
+  } else if(e.key==="Enter"&&answered&&!$("nextBtn").classList.contains("hidden")) next();
+});
+</script>
+</body>
+</html>

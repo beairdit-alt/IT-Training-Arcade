@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CompTIA Server+ SK0-005 Exam Lab Simulator</title>
+<style>
+:root{
+  --bg:#071019; --panel:#0d1926; --panel2:#122438; --line:#294760;
+  --text:#eef7ff; --muted:#9fb7c9; --blue:#2aa7ff; --green:#43dc8e;
+  --yellow:#ffd166; --red:#ff6b78; --purple:#a887ff; --orange:#ff9f43;
+}
+*{box-sizing:border-box}
+body{margin:0;background:
+radial-gradient(circle at 10% -10%,#173d64 0,transparent 26%),
+radial-gradient(circle at 95% 0,#24184a 0,transparent 23%),
+linear-gradient(#06101a,#09121b);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif;min-height:100vh}
+button,input,select{font:inherit}button{cursor:pointer}
+.app{max-width:1500px;margin:auto;padding:16px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;padding:14px 18px;background:#0b1825e8;border:1px solid var(--line);border-radius:16px;position:sticky;top:8px;z-index:30;box-shadow:0 10px 35px #0006}
+.brand{display:flex;gap:13px;align-items:center}.logo{width:58px;height:58px;border-radius:11px;background:#d71920;color:white;display:grid;place-items:center;font-weight:1000;font-size:20px}.brand h1{margin:0;font-size:clamp(20px,3vw,34px)}.brand p{margin:2px 0 0;color:var(--muted);font-size:12px}
+.badges{display:flex;gap:8px;flex-wrap:wrap}.badge{padding:7px 10px;border-radius:999px;border:1px solid #365a78;background:#122a3d;color:#c9ecff;font-size:12px;font-weight:800}
+.shell{display:grid;grid-template-columns:265px 1fr;gap:14px;margin-top:14px}
+.side,.main{background:#0b1723e8;border:1px solid #243f59;border-radius:16px}
+.side{padding:12px;align-self:start;position:sticky;top:96px}.nav{width:100%;border:0;background:transparent;color:#dceeff;text-align:left;padding:11px;border-radius:9px;font-weight:800;margin:2px 0}.nav:hover,.nav.active{background:#153650}.nav span{display:block;font-size:10px;color:#7fa3bd;font-weight:500;margin-top:2px}
+.main{padding:18px;min-height:820px}.screen{display:none}.screen.active{display:block}
+.hero{padding:22px;border-radius:17px;border:1px solid #315270;background:linear-gradient(135deg,#102c47,#171d37);margin-bottom:14px}.hero h2{font-size:clamp(28px,4vw,44px);margin:0 0 7px}.hero p{line-height:1.55;color:#c0d6e7;max-width:1000px}.heroActions{display:flex;gap:9px;flex-wrap:wrap}
+.primary,.secondary,.danger,.warning,.success{border:0;border-radius:9px;padding:10px 14px;font-weight:900}.primary{background:var(--blue);color:#041727}.secondary{background:#1b344b;color:white;border:1px solid #3b607d}.danger{background:#a53a46;color:white}.warning{background:#a97113;color:white}.success{background:#198d58;color:white}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.card{background:#101f30;border:1px solid #294a65;border-radius:13px;padding:15px}.card h3{margin:0 0 8px}.small{font-size:12px;color:var(--muted)}.muted{color:var(--muted)}.mono{font-family:Consolas,monospace}
+.domainBar{height:8px;border-radius:99px;background:#07101a;overflow:hidden;margin:8px 0}.domainBar span{height:100%;display:block;background:linear-gradient(90deg,var(--blue),var(--green))}
+.examHeader{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.timer{font:900 28px Consolas,monospace;color:var(--yellow)}.examName{font-size:18px;font-weight:900}
+.navgrid{display:grid;grid-template-columns:repeat(15,1fr);gap:4px;margin:10px 0}.qnav{border:1px solid #36536a;background:#102638;color:white;border-radius:6px;padding:6px 2px;font-size:11px}.qnav.done{background:#176642}.qnav.flag{outline:2px solid var(--yellow)}.qnav.current{border-color:#50cfff;box-shadow:0 0 0 1px #50cfff}
+.questionCard{background:#101f30;border:1px solid #2d4d68;border-radius:14px;padding:20px}.qmeta{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}.tag{padding:4px 7px;border-radius:999px;background:#17364c;color:#c7eaff;font-size:10px;font-weight:900}.selectTag{background:#4e3d13;color:#ffe59b}.pbqTag{background:#422b59;color:#e7caff}
+.question{font-size:21px;font-weight:800;line-height:1.45;margin:10px 0 14px}.answers{display:grid;gap:8px}.answer{border:1px solid #355b78;background:#153149;color:#f0f8ff;border-radius:10px;padding:12px;text-align:left}.answer:hover{filter:brightness(1.13)}.answer.selected{outline:2px solid var(--green);background:#153d31}
+.feedback{padding:11px;border-radius:9px;border:1px dashed #3b607c;background:#0b1824;margin-top:10px;min-height:45px;line-height:1.5}.good{border-color:#2c8059;background:#0f2a21}.bad{border-color:#803a44;background:#2b1519}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.spacer{flex:1}.preset{display:flex;gap:8px;flex-wrap:wrap}
+.choiceBox{border:1px solid #2d526c;border-radius:11px;padding:12px;background:#0f2231}
+.pbqBoard{display:grid;grid-template-columns:1fr 1fr;gap:12px}.dropzone{min-height:170px;border:2px dashed #365e7b;border-radius:12px;padding:10px}.item{padding:9px 10px;border:1px solid #3b617c;border-radius:8px;background:#163149;margin:7px 0;cursor:pointer}.item:hover{filter:brightness(1.15)}.slot{padding:10px;border:1px solid #304d63;border-radius:9px;background:#0b1a26;margin:7px 0}.slot b{display:block}.slot .placed{margin-top:6px;color:#bfffe0}
+.console{background:#02070c;color:#b7ffca;border:1px solid #315042;border-radius:10px;padding:12px;font:14px Consolas,monospace;min-height:250px;white-space:pre-wrap}.cmdrow{display:flex;gap:8px}.cmdrow input{flex:1;background:#061019;color:#e9f8ff;border:1px solid #31516a;border-radius:8px;padding:10px}
+.resultBig{font-size:54px;font-weight:1000}.reviewQ{padding:12px;border-radius:10px;border:1px solid #294b65;background:#0e1e2d;margin-bottom:9px}.correctTxt{color:#7effb4}.wrongTxt{color:#ff8d98}
+.studyQ{font-size:18px;font-weight:800;margin:10px 0}.studyCard{margin-bottom:12px}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:8px;border-bottom:1px solid #29475e;text-align:left}th{color:#bfeaff}
+label{display:block;font-size:12px;color:#a9c6d7;font-weight:800;margin-top:9px;margin-bottom:4px}
+input,select{width:100%;padding:10px 11px;border-radius:8px;border:1px solid #375568;background:#09151e;color:white}
+.raidGrid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}.drive{padding:14px 8px;background:#152b3e;border:1px solid #35546b;border-radius:8px;text-align:center}.drive.failed{background:#3a171b;border-color:#9b4550}.drive.hot{background:#173a2a;border-color:#42a673}
+@media(max-width:1050px){.shell{grid-template-columns:1fr}.side{position:static}.grid{grid-template-columns:1fr 1fr}.pbqBoard{grid-template-columns:1fr}}
+@media(max-width:700px){.grid,.grid2{grid-template-columns:1fr}.navgrid{grid-template-columns:repeat(10,1fr)}.raidGrid{grid-template-columns:repeat(3,1fr)}}
+
+/* CREATED BY FOOTER */
+.creator-footer{
+  position:fixed;
+  bottom:8px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:9999;
+  padding:6px 12px;
+  border-radius:999px;
+  background:rgba(7,16,25,.88);
+  border:1px solid #365a78;
+  color:#9fb7c9;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.5px;
+  backdrop-filter:blur(6px);
+  white-space:nowrap;
+}
+
+</style>
+</head>
+<body>
+<div class="creator-footer" id="creatorMark"></div>
+
+<div class="app">
+<div class="topbar">
+  <div class="brand">
+    <div class="logo">SVR+</div>
+    <div><h1>CompTIA Server+ SK0-005 Exam Lab</h1><p>Server hardware • administration • security/DR • troubleshooting</p></div>
+  </div>
+  <div class="badges"><div class="badge" id="xpBadge">XP 0</div><div class="badge">90-minute exam mode</div><div class="badge">Original practice content</div></div>
+</div>
+
+<div class="shell">
+<aside class="side">
+  <button class="nav active" onclick="show('home',this)">🏠 Exam Center<span>Start exams, study, or PBQs</span></button>
+  <button class="nav" onclick="showStudy(this)">📘 Study Mode<span>Immediate explanations</span></button>
+  <button class="nav" onclick="show('pbq',this)">🧪 PBQ Lab<span>RAID, server build, CLI, DR, troubleshooting</span></button>
+  <button class="nav" onclick="setupExam(this)">📝 SK0-005 Exam<span>90 min • weighted domains</span></button>
+  <button class="nav" onclick="show('objectives',this)">📊 Objective Map<span>18% / 30% / 24% / 28%</span></button>
+</aside>
+
+<main class="main">
+<section id="home" class="screen active">
+<div class="hero">
+  <h2>Server Administrator Certification Challenge</h2>
+  <p>Practice the current Server+ SK0-005 domains in a certification-style environment. Exam mode uses 120 distinct questions, weighted domain selection, randomized question order, shuffled answer positions, harder scenarios, Select TWO items, flag-for-review, a question navigator, and no answer feedback until submission. PBQ labs focus on actual server-administration skills instead of simple recall.</p>
+  <div class="heroActions"><button class="primary" onclick="setupExam()">START SERVER+ EXAM</button><button class="success" onclick="document.querySelectorAll('.nav')[2].click()">OPEN PBQ LAB</button></div>
+</div>
+<div class="grid">
+  <div class="card"><h3>1.0 Server Hardware</h3><div class="resultBig" style="font-size:30px">18%</div><p class="small">Rack/tower/blade systems, CPUs, memory, power, cooling, storage, RAID, NICs, cabling, installation and management.</p></div>
+  <div class="card"><h3>2.0 Server Administration</h3><div class="resultBig" style="font-size:30px">30%</div><p class="small">Server OS installation, services, networking, virtualization, containers, storage, monitoring, scripting, patching and lifecycle management.</p></div>
+  <div class="card"><h3>3.0 Security & Disaster Recovery</h3><div class="resultBig" style="font-size:30px">24%</div><p class="small">Hardening, identity, permissions, physical security, encryption, backups, replication, high availability, RPO/RTO and recovery.</p></div>
+  <div class="card"><h3>4.0 Troubleshooting</h3><div class="resultBig" style="font-size:30px">28%</div><p class="small">Hardware, storage, OS, networking, performance, environmental and service troubleshooting using a systematic methodology.</p></div>
+  <div class="card"><h3>Exam Format</h3><div class="resultBig" style="font-size:30px">90 min</div><p class="small">Maximum 90 questions. Multiple-choice and performance-based question types. Published passing score: 750 on a 100–900 scale.</p></div>
+  <div class="card"><h3>Simulator Scoring</h3><p class="small">This game reports an unscaled percentage and domain mastery. It does not attempt to duplicate CompTIA's proprietary scaled-scoring method.</p></div>
+</div>
+</section>
+
+<section id="study" class="screen">
+<div class="hero"><h2>Server+ Study Mode</h2><p>Immediate explanations. Choose one domain or mix all four.</p></div>
+<div class="toolbar"><select id="studyDomain" onchange="renderStudy()"></select><button class="secondary" onclick="renderStudy()">NEW QUESTION</button></div>
+<div id="studyArea"></div>
+</section>
+
+<section id="examSetup" class="screen">
+<div class="hero"><h2>Server+ SK0-005 Exam Simulator</h2><p>Choose a full endurance run or a shorter classroom session. All modes preserve the published domain weighting approximately.</p></div>
+<div class="grid">
+  <div class="card"><h3>Full Simulation</h3><div class="resultBig" style="font-size:32px">90 Q</div><p class="small">90 minutes. 90 randomized questions drawn without repeats, weighted by domain, with shuffled answers and Select TWO items.</p><button class="primary" onclick="startExam(90)">START FULL EXAM</button></div>
+  <div class="card"><h3>Class Practice</h3><div class="resultBig" style="font-size:32px">45 Q</div><p class="small">45 randomized questions with the same weighted, shuffled exam behavior.</p><button class="primary" onclick="startExam(45)">START 45 QUESTIONS</button></div>
+  <div class="card"><h3>Quick Check</h3><div class="resultBig" style="font-size:32px">20 Q</div><p class="small">20 randomized questions for bell work or Friday review; answer positions reshuffle each run.</p><button class="primary" onclick="startExam(20)">START 20 QUESTIONS</button></div>
+</div>
+</section>
+
+<section id="exam" class="screen">
+<div class="examHeader"><div><div class="examName">CompTIA Server+ SK0-005 Practice Exam</div><div class="small">Question <span id="qNum"></span> of <span id="qTotal"></span></div></div><div class="timer" id="timer">90:00</div></div>
+<div class="domainBar"><span id="examProgress"></span></div><div id="qNav" class="navgrid"></div>
+<div class="questionCard"><div class="qmeta"><span class="tag" id="qDomain"></span><span class="tag" id="qType"></span></div><div id="qText" class="question"></div><div id="answers" class="answers"></div>
+<div class="toolbar"><button class="secondary" onclick="prevQ()">← PREVIOUS</button><button class="warning" onclick="toggleFlag()">⚑ FLAG FOR REVIEW</button><div class="spacer"></div><button class="secondary" onclick="nextQ()">NEXT →</button><button class="danger" onclick="submitExam()">SUBMIT EXAM</button></div></div>
+</section>
+
+<section id="results" class="screen"><div id="resultsArea"></div></section>
+
+<section id="pbq" class="screen">
+<div class="hero"><h2>Server+ PBQ Lab</h2><p>Practice hands-on server tasks: RAID recovery, rack-server build planning, Linux administration, backup/DR planning, network troubleshooting, and service recovery.</p></div>
+<div class="preset">
+<button class="primary" onclick="loadPBQ('raid')">RAID Recovery</button>
+<button class="primary" onclick="loadPBQ('build')">Server Build</button>
+<button class="primary" onclick="loadPBQ('linux')">Linux Admin CLI</button>
+<button class="primary" onclick="loadPBQ('dr')">Backup & DR</button>
+<button class="primary" onclick="loadPBQ('network')">Network Fault</button>
+<button class="warning" onclick="randomPBQ()">🎲 RANDOM PBQ</button>
+</div>
+<div id="pbqArea" style="margin-top:14px"></div>
+</section>
+
+<section id="objectives" class="screen">
+<div class="hero"><h2>SK0-005 Objective Map</h2><p>The 120-question bank uses the exam-domain percentages approximately, with randomized selection and shuffled answers each run.</p></div>
+<div class="card"><table><tr><th>Domain</th><th>Weight</th><th>Simulator Focus</th></tr>
+<tr><td>1.0 Server Hardware Installation and Management</td><td>18%</td><td>CPU/RAM, storage, RAID, NICs, power, cooling, server form factors, firmware</td></tr>
+<tr><td>2.0 Server Administration</td><td>30%</td><td>OS, services, networking, virtualization, storage, patching, monitoring, automation</td></tr>
+<tr><td>3.0 Security and Disaster Recovery</td><td>24%</td><td>Hardening, IAM, encryption, backups, HA, replication, recovery planning</td></tr>
+<tr><td>4.0 Troubleshooting</td><td>28%</td><td>Hardware, network, OS, storage, services, performance, environmental faults</td></tr></table></div>
+</section>
+</main></div></div>
+
+<script>
+let XP=0,examItems=[],responses=[],flags=[],qi=0,timerHandle=null,timeLeft=5400,studyItem=null;
+
+const Q=[
+["1.0 Server Hardware Installation and Management","A rack server requires memory fault tolerance and correction beyond standard non-ECC memory. Which memory type is MOST appropriate?",["ECC memory","Standard unbuffered non-ECC memory","VRAM","Flash cache only"],[0],"ECC memory can detect and correct certain memory errors and is commonly used in servers.","Single answer"],
+["1.0 Server Hardware Installation and Management","Which TWO features are commonly associated with server-class power design?",["Redundant hot-swappable PSUs","Power distribution units","Single consumer wall adapter only","Laptop battery calibration"],[0,1],"Server environments commonly use redundant PSUs and PDUs to improve power availability.","Select TWO"],
+["1.0 Server Hardware Installation and Management","A server has 12 physical CPU cores with simultaneous multithreading enabled for two threads per core. How many logical processors are available to the OS?",["6","12","24","48"],[2],"12 cores × 2 threads per core = 24 logical processors.","Single answer"],
+["1.0 Server Hardware Installation and Management","Which RAID level stripes data across disks with no redundancy and provides the highest capacity efficiency?",["RAID 0","RAID 1","RAID 5","RAID 10"],[0],"RAID 0 stripes without redundancy.","Single answer"],
+["1.0 Server Hardware Installation and Management","Which RAID level requires at least three disks and can tolerate the loss of one disk?",["RAID 0","RAID 1 only","RAID 5","JBOD"],[2],"RAID 5 uses distributed parity and can tolerate one disk failure.","Single answer"],
+["1.0 Server Hardware Installation and Management","A technician needs both mirroring and striping with strong performance and redundancy. Which RAID level is MOST appropriate?",["RAID 0","RAID 5","RAID 10","JBOD"],[2],"RAID 10 combines mirrored pairs with striping.","Single answer"],
+["1.0 Server Hardware Installation and Management","Which storage interface is commonly used for enterprise SAS drives?",["SAS controller/backplane","RJ11","HDMI","M.2 Wi-Fi key only"],[0],"SAS drives use SAS-capable controllers and backplanes.","Single answer"],
+["1.0 Server Hardware Installation and Management","A server requires two independent paths to shared storage for high availability. What design concept is being used?",["Multipathing","NAT overload","Single-path cabling","RAID 0 only"],[0],"Multipathing provides alternate I/O paths to storage.","Single answer"],
+["1.0 Server Hardware Installation and Management","Which TWO server components are commonly monitored for thermal health?",["CPU temperature","Fan RPM","DNS suffix","RAID stripe size only"],[0,1],"CPU temperature and fan speed are direct thermal indicators.","Select TWO"],
+["1.0 Server Hardware Installation and Management","A technician installs a second NIC specifically so management traffic can remain separated from production traffic. What is this MOST likely supporting?",["Out-of-band or dedicated management network","RAID parity","CPU NUMA only","Printer sharing"],[0],"Dedicated management interfaces isolate administrative access from production traffic.","Single answer"],
+["1.0 Server Hardware Installation and Management","Which server form factor is designed to slide into a chassis enclosure that provides shared power, cooling, and networking?",["Blade server","Tower server","Desktop workstation","Thin client"],[0],"Blade servers install into a shared enclosure/chassis.","Single answer"],
+["1.0 Server Hardware Installation and Management","A server uses dual CPU sockets and NUMA. Why can memory placement matter?",["Memory local to a CPU can reduce access latency","It changes DNS names","It determines the RAID level","It replaces ECC"],[0],"NUMA locality affects memory-access performance.","Single answer"],
+
+["2.0 Server Administration","Which protocol is commonly used for secure command-line administration of Linux servers?",["SSH","Telnet only","SMTP","TFTP"],[0],"SSH provides encrypted remote shell access.","Single answer"],
+["2.0 Server Administration","Which TWO tasks are typical after installing a new server OS?",["Apply current patches","Configure networking and hostname","Disable all logging","Remove all administrative accounts"],[0,1],"Initial server configuration normally includes patching and network/identity settings.","Select TWO"],
+["2.0 Server Administration","A Linux administrator needs to display active systemd services. Which command is MOST appropriate?",["systemctl","format","diskpart","ipconfig"],[0],"systemctl manages and reports systemd units/services.","Single answer"],
+["2.0 Server Administration","Which Linux command is commonly used to display filesystem free space?",["df","grep","chmod","ps"],[0],"df reports filesystem disk usage and free space.","Single answer"],
+["2.0 Server Administration","Which command is commonly used to inspect running processes on Linux?",["ps","mkdir","touch","mount only"],[0],"ps displays process information.","Single answer"],
+["2.0 Server Administration","A Windows Server administrator wants to review event logs. Which tool should be used?",["Event Viewer","Paint","Disk Cleanup only","Character Map"],[0],"Event Viewer provides access to Windows event logs.","Single answer"],
+["2.0 Server Administration","Which Windows command-line utility can display network configuration including DNS servers?",["ipconfig /all","format","chkdsk /x only","shutdown /r"],[0],"ipconfig /all shows detailed IP configuration.","Single answer"],
+["2.0 Server Administration","A server administrator wants to automate a recurring Linux task at a fixed time. Which mechanism is appropriate?",["cron","RAID","PXE only","SNMP trap only"],[0],"cron schedules recurring Linux tasks.","Single answer"],
+["2.0 Server Administration","Which TWO are common server monitoring data points?",["CPU utilization","Memory utilization","Wallpaper color","Keyboard layout"],[0,1],"CPU and memory utilization are core monitoring metrics.","Select TWO"],
+["2.0 Server Administration","A virtualized environment needs to move a running VM between hosts with minimal downtime. What feature is being used?",["Live migration","Cold imaging only","RAID rebuild","DNS round robin"],[0],"Live migration moves an active VM between hosts with little or no service interruption.","Single answer"],
+["2.0 Server Administration","Which virtualization component directly manages hardware resources for virtual machines?",["Hypervisor","DNS resolver","Patch panel","UPS"],[0],"The hypervisor abstracts hardware for VMs.","Single answer"],
+["2.0 Server Administration","Which technology packages an application with its dependencies while sharing the host OS kernel?",["Container","Full physical server per app","BIOS image","RAID group"],[0],"Containers provide isolated application environments while sharing the kernel.","Single answer"],
+["2.0 Server Administration","A server needs a static IP address. Which settings are required for normal routed IP connectivity? SELECT TWO.",["IP address and subnet mask","Default gateway when accessing remote networks","Printer toner level","RAID cache policy only"],[0,1],"A host needs addressing/mask locally and a gateway for off-subnet traffic.","Select TWO"],
+["2.0 Server Administration","A technician wants remote hardware management even when the server OS is down. Which capability is MOST useful?",["BMC/iDRAC/iLO-style management controller","RDP only","SMB share","Application console"],[0],"A baseboard management controller supports out-of-band hardware management.","Single answer"],
+["2.0 Server Administration","A server's log files are consuming the entire root filesystem. What is the BEST administrative response?",["Investigate log growth and configure appropriate rotation/retention","Delete the operating system","Disable every log permanently","Replace RAM"],[0],"Log rotation and root-cause analysis prevent uncontrolled log growth.","Single answer"],
+["2.0 Server Administration","Which service translates hostnames into IP addresses?",["DNS","DHCP","NTP","SNMP"],[0],"DNS performs name resolution.","Single answer"],
+["2.0 Server Administration","Which service automatically provides IP configuration to clients?",["DHCP","DNS","LDAP only","NFS"],[0],"DHCP leases IP addressing information.","Single answer"],
+["2.0 Server Administration","A server administrator needs to synchronize clocks across systems for log correlation and authentication. Which protocol should be configured?",["NTP","FTP","SMTP","SIP"],[0],"NTP synchronizes system clocks.","Single answer"],
+["2.0 Server Administration","Which TWO are common reasons to use VLANs in a server environment?",["Traffic segmentation","Security/isolation boundaries","Increase CPU clock rate","Provide RAID parity"],[0,1],"VLANs segment Layer 2 networks and can support security boundaries.","Select TWO"],
+["2.0 Server Administration","A storage volume must be extended without interrupting service, and the platform supports logical volume management. What feature is MOST useful?",["Online logical volume expansion","Reformatting the entire server","Replacing DNS","Changing the hostname"],[0],"LVM-style management can allow flexible volume resizing.","Single answer"],
+["2.0 Server Administration","Which protocol is commonly used to monitor and collect information from network and server devices?",["SNMP","SMTP","SMB only","SATA"],[0],"SNMP is widely used for infrastructure monitoring.","Single answer"],
+["2.0 Server Administration","Why should firmware and server drivers be updated through an approved change process?",["Updates can affect stability and compatibility","They only change wallpaper","They cannot affect servers","They replace backups"],[0],"Firmware and driver changes can materially affect hardware stability.","Single answer"],
+
+["3.0 Security and Disaster Recovery","Which principle gives an administrator only the permissions required to perform assigned tasks?",["Least privilege","Full access by default","Shared root password","Anonymous administration"],[0],"Least privilege limits access to required permissions.","Single answer"],
+["3.0 Security and Disaster Recovery","Which TWO controls can improve physical server-room security?",["Badge-controlled access","Locked racks","Publicly shared door code","Disable surveillance"],[0,1],"Controlled entry and secured racks reduce physical access risk.","Select TWO"],
+["3.0 Security and Disaster Recovery","What is the primary purpose of full-disk or volume encryption?",["Protect data at rest","Improve CPU performance","Increase RAID capacity","Provide DNS resolution"],[0],"Encryption protects stored data if media is lost or stolen.","Single answer"],
+["3.0 Security and Disaster Recovery","Which backup type copies data changed since the most recent backup of any type?",["Incremental","Full","Differential","Snapshot only"],[0],"Incremental backups copy changes since the last backup.","Single answer"],
+["3.0 Security and Disaster Recovery","Which backup type copies data changed since the last full backup?",["Differential","Incremental","Synthetic only","Mirror without backup"],[0],"Differential backups accumulate changes since the last full backup.","Single answer"],
+["3.0 Security and Disaster Recovery","What does RPO describe?",["Acceptable amount of data loss measured in time","Target restoration duration","RAID rebuild speed","Password length"],[0],"Recovery Point Objective defines acceptable data loss in time.","Single answer"],
+["3.0 Security and Disaster Recovery","What does RTO describe?",["Target time to restore service","Number of backup copies","RAID parity count","CPU failover threshold"],[0],"Recovery Time Objective is the target restoration duration.","Single answer"],
+["3.0 Security and Disaster Recovery","A business requires service to continue if one application server fails. Which design BEST supports this?",["High-availability clustering or redundant servers","Single standalone server","RAID 0 only","One UPS with no redundancy"],[0],"Redundant clustered services reduce single points of failure.","Single answer"],
+["3.0 Security and Disaster Recovery","Which TWO practices improve backup resilience against ransomware?",["Offline/immutable backup copies","Regular restore testing","Keep every backup mounted read-write to production","Use one copy only"],[0,1],"Offline/immutable copies and restore testing strengthen recovery capability.","Select TWO"],
+["3.0 Security and Disaster Recovery","Why should backup restoration be tested periodically?",["A backup is only useful if it can be restored","Testing makes RAID faster","It replaces monitoring","It disables malware"],[0],"Recovery testing verifies backups are usable and procedures work.","Single answer"],
+["3.0 Security and Disaster Recovery","Which authentication design is stronger than a password alone?",["Multifactor authentication","Shared admin password","Anonymous access","Guest account"],[0],"MFA combines independent authentication factors.","Single answer"],
+["3.0 Security and Disaster Recovery","A server must accept administrative connections only from a dedicated management subnet. What control is appropriate?",["Firewall/ACL restriction","RAID 5","Disk defragmentation","Open access from any network"],[0],"Network ACLs/firewalls can limit management access by source.","Single answer"],
+["3.0 Security and Disaster Recovery","Which protocol should replace Telnet for secure remote administration?",["SSH","FTP","TFTP","SNMPv1"],[0],"SSH encrypts remote shell sessions.","Single answer"],
+["3.0 Security and Disaster Recovery","A company has a second site that can take over critical workloads with minimal downtime and synchronized data. This is MOST similar to which DR strategy?",["Hot site","Cold site","No recovery site","Tape-only archive"],[0],"A hot site is provisioned for rapid failover.","Single answer"],
+["3.0 Security and Disaster Recovery","Which disaster recovery site generally requires the MOST setup before services can resume?",["Cold site","Hot site","Active-active site","Fully replicated site"],[0],"A cold site has facilities but minimal preinstalled systems.","Single answer"],
+["3.0 Security and Disaster Recovery","Which TWO activities are part of server hardening?",["Disable unused services","Apply security patches","Enable all default accounts","Allow unrestricted management ports"],[0,1],"Reducing attack surface and patching are core hardening actions.","Select TWO"],
+
+["4.0 Troubleshooting","A server will not power on after maintenance. What should be checked FIRST?",["Power connections, PSU status, and PDU/UPS availability","DNS zone","RAID stripe size","NTP source"],[0],"Start with basic power-path checks.","Single answer"],
+["4.0 Troubleshooting","A server reports a degraded RAID 5 array with one failed drive. What is the BEST next step if a compatible replacement is available?",["Replace the failed drive and monitor the rebuild","Delete the array","Remove another healthy drive","Disable alerts"],[0],"RAID 5 can continue after one failure; replace the failed member promptly and verify rebuild.","Single answer"],
+["4.0 Troubleshooting","A RAID 5 array already has one failed disk and a second disk begins reporting errors during rebuild. What is the primary concern?",["A second disk failure can cause data loss","The array becomes RAID 10 automatically","DNS will stop","CPU frequency doubles"],[0],"RAID 5 tolerates only one disk failure.","Single answer"],
+["4.0 Troubleshooting","A server has high CPU utilization but low memory and disk utilization. What should be investigated FIRST?",["Processes consuming CPU","RAID cable seating only","DNS TTL","UPS battery age"],[0],"High CPU with other resources normal points to CPU-consuming workloads/processes.","Single answer"],
+["4.0 Troubleshooting","A server is swapping heavily and application performance is poor. Which resource is MOST likely constrained?",["Memory","Printer toner","Rack depth","DNS name"],[0],"Heavy swapping commonly indicates memory pressure.","Single answer"],
+["4.0 Troubleshooting","A server cannot resolve hostnames but can ping external IP addresses. What is the MOST likely issue?",["DNS","Default gateway","CPU","RAID parity"],[0],"IP connectivity with hostname failure points to DNS.","Single answer"],
+["4.0 Troubleshooting","A server can reach devices on its local subnet but not remote networks. Which setting should be checked FIRST?",["Default gateway","Hostname","RAID cache","CPU socket"],[0],"The default gateway is required for off-subnet routing.","Single answer"],
+["4.0 Troubleshooting","Users report an application is unavailable, but the server responds to ping. What should be checked NEXT?",["Application/service status and listening port","Replace the motherboard immediately","Change the server name","Rebuild every disk"],[0],"Network reachability does not guarantee application service availability.","Single answer"],
+["4.0 Troubleshooting","Which TWO log sources are useful when diagnosing an unexpected server reboot?",["System/event logs","Hardware management/BMC logs","Desktop wallpaper history","Printer queue only"],[0,1],"OS and hardware-controller logs can reveal reboot causes.","Select TWO"],
+["4.0 Troubleshooting","A server repeatedly overheats after a rack rearrangement. Which TWO conditions should be checked?",["Blocked airflow","Hot/cold aisle orientation","DNS records","RAID level only"],[0,1],"Rack airflow and aisle orientation affect cooling.","Select TWO"],
+["4.0 Troubleshooting","A Linux service fails to start after a configuration edit. What should be checked FIRST?",["Service status and configuration syntax/logs","Replace RAM immediately","Change the gateway","Rebuild RAID"],[0],"Service logs and config validation are direct first checks after an edit.","Single answer"],
+["4.0 Troubleshooting","A server's network interface shows link up but no traffic passes after a switch change. What should be compared?",["VLAN/tagging and IP configuration","CPU thermal paste only","BIOS time only","Backup retention"],[0],"A switch change can introduce VLAN/tagging mismatches.","Single answer"],
+["4.0 Troubleshooting","A NIC team loses redundancy after one adapter fails, but traffic continues. What does this indicate?",["Failover is working but redundancy is reduced","All network connectivity is lost","RAID has failed","DNS is corrupt"],[0],"Teaming can maintain connectivity through a surviving adapter.","Single answer"],
+["4.0 Troubleshooting","A server's disk latency rises sharply and application response time degrades. Which subsystem should be investigated?",["Storage I/O","Keyboard controller","Display resolution","NTP only"],[0],"High disk latency directly implicates the storage path.","Single answer"],
+["4.0 Troubleshooting","A newly installed memory module causes POST memory errors. Which TWO actions are appropriate?",["Reseat the module","Verify compatibility and population rules","Reconfigure DNS","Replace the network cable"],[0,1],"Seating and platform population/compatibility are first checks.","Select TWO"],
+["4.0 Troubleshooting","A server loses time rapidly even though the OS is configured correctly. Which component may be failing?",["RTC/CMOS battery","RAID controller cache only","NIC transceiver","Power button LED"],[0],"A failing RTC battery can cause clock retention problems.","Single answer"],
+["4.0 Troubleshooting","A VM host is overcommitted and all guests become sluggish during peak usage. Which should be reviewed?",["CPU/memory resource contention and allocation","Printer queue","DNS MX records","Rack label"],[0],"Host overcommitment can cause contention across VMs.","Single answer"],
+["4.0 Troubleshooting","A server boots but immediately reports a fan failure and then shuts down. Why might the system shut down?",["Hardware protection against overheating","DNS failure","RAID 1 behavior","Operating system licensing"],[0],"Servers may shut down to prevent thermal damage.","Single answer"],
+["4.0 Troubleshooting","A technician replaces a failed power supply in a redundant PSU pair, but the new unit is not sharing load. What should be verified?",["PSU compatibility, seating, input power, and status","DNS suffix","Filesystem permissions","NTP stratum"],[0],"Redundant power supplies must be compatible, fully seated, powered, and healthy.","Single answer"],
+["1.0 Server Hardware Installation and Management", "A virtualization host has experienced several corrected memory errors on the same DIMM over the last week. The system is still online. What is the BEST next action?", ["Schedule replacement of the suspect DIMM and verify the slot/channel in hardware logs", "Disable ECC so the alerts stop", "Increase the RAID stripe size", "Replace the default gateway"], [0], "Repeated corrected ECC events on one DIMM can indicate a degrading module. Use hardware logs to identify it and replace it through change control before errors become uncorrectable.", "Single answer"],
+["1.0 Server Hardware Installation and Management", "A storage server must remain available after ANY two drive failures in the same RAID set. Capacity efficiency is more important than write performance. Which RAID level BEST meets the requirement?", ["RAID 5", "RAID 6", "RAID 10 with only two disks", "RAID 0"], [1], "RAID 6 uses dual distributed parity and can tolerate two drive failures in the array.", "Single answer"],
+["1.0 Server Hardware Installation and Management", "A database server uses dual-port SAS drives and two independent storage controllers. Which design should the administrator configure to use both paths and survive a controller-path failure?", ["Multipathing", "NIC teaming", "RAID 0", "DNS round robin"], [0], "Multipathing provides redundant I/O paths between a host and shared storage and can survive loss of one path.", "Single answer"],
+["1.0 Server Hardware Installation and Management", "A technician is replacing a failed hot-swap drive in a production server. Which TWO checks are MOST important before removing the drive?", ["Verify the failed drive's physical slot/indicator against controller data", "Confirm the replacement drive is supported and at least the required capacity", "Shut down every server in the rack", "Delete the RAID virtual disk first"], [0, 1], "Correct drive identification prevents removing a healthy member, and a supported replacement of sufficient capacity is required for a successful rebuild.", "Select TWO"],
+["1.0 Server Hardware Installation and Management", "A new server has two power supplies. PSU1 is connected to UPS-A and PSU2 is also connected to UPS-A. What availability weakness remains?", ["Both PSUs depend on the same upstream power source", "The server cannot use ECC memory", "The server cannot have a BMC", "RAID parity will be disabled"], [0], "Redundant PSUs do not provide full power-path redundancy if both depend on the same UPS/PDU/feed.", "Single answer"],
+["1.0 Server Hardware Installation and Management", "A dual-socket NUMA server shows one CPU accessing most memory attached to the other socket. Which consequence is MOST likely?", ["Higher memory-access latency", "Loss of DNS resolution", "Automatic RAID rebuild", "Lower rack power consumption"], [0], "Remote NUMA memory access crosses the inter-socket fabric and can add latency compared with local memory access.", "Single answer"],
+["1.0 Server Hardware Installation and Management", "A server needs 25Gb Ethernet connectivity to a switch using short-reach fiber. Which TWO components must be compatible with each other and the switch?", ["Server NIC/HBA port type", "Transceiver and fiber type", "CPU microcode only", "RAID cache battery only"], [0, 1], "High-speed links depend on compatible interfaces/transceivers and the correct optical media type.", "Select TWO"],
+["1.0 Server Hardware Installation and Management", "A server's BMC reports power, temperature, and fan status even when the operating system is shut down. What makes this possible?", ["The management controller operates independently of the host OS", "The hypervisor emulates the BMC", "DNS stores hardware telemetry", "The RAID controller provides the remote console"], [0], "A BMC such as iLO/iDRAC provides out-of-band management independently from the host operating system.", "Single answer"],
+["1.0 Server Hardware Installation and Management", "Two 10Gb NIC ports are configured as an LACP team, but only one link forwards traffic after the server is connected to a new switch. What should be verified FIRST on the switch?", ["Both ports are in the same correctly configured LACP aggregation", "The DNS TTL is reduced", "The server disks use RAID 6", "The BMC firmware is disabled"], [0], "LACP must be configured consistently on both ends; the switch ports need to participate in the same aggregation group.", "Single answer"],
+["1.0 Server Hardware Installation and Management", "A SAN presents block storage over Fibre Channel to a server. Which adapter is normally required in the server?", ["Fibre Channel HBA", "Analog modem", "HDMI capture card", "Wireless access point"], [0], "A Fibre Channel host bus adapter connects the server to a Fibre Channel SAN fabric.", "Single answer"],
+["2.0 Server Administration", "After editing an nginx configuration file, the service will not restart. Which sequence BEST follows a safe troubleshooting approach?", ["Validate the configuration, review service logs, correct the error, then restart and verify", "Reboot the server repeatedly until nginx starts", "Disable the firewall and leave it disabled", "Reinstall the operating system immediately"], [0], "Configuration validation plus service logs usually identifies syntax or dependency errors before a controlled restart.", "Single answer"],
+["2.0 Server Administration", "A Linux logical volume has free extents available in its volume group. The filesystem needs more space without replacing the underlying disks. Which TWO operations are typically required?", ["Extend the logical volume", "Grow the filesystem to use the new logical volume space", "Rebuild the RAID array as RAID 0", "Change the server hostname"], [0, 1], "LVM capacity and filesystem capacity are separate layers; the LV is extended first and the filesystem is then grown when supported.", "Select TWO"],
+["2.0 Server Administration", "An application requires shared BLOCK storage from an IP-based storage network rather than a file share. Which protocol is MOST appropriate?", ["iSCSI", "NFS", "SMB", "SMTP"], [0], "iSCSI transports SCSI block commands over IP, presenting block devices to initiators.", "Single answer"],
+["2.0 Server Administration", "A Linux server must provide a shared directory to several Linux clients while preserving normal POSIX-style ownership behavior. Which service is MOST appropriate?", ["NFS", "RDP", "SMTP", "SNMP trap receiver"], [0], "NFS is commonly used for Unix/Linux network file sharing and integrates naturally with POSIX-style permissions.", "Single answer"],
+["2.0 Server Administration", "A company is migrating an application to a new server IP tonight. What DNS change made BEFORE the migration can reduce the time clients retain the old address?", ["Lower the record TTL in advance", "Increase the RAID stripe size", "Disable NTP", "Change the subnet mask on every client"], [0], "Reducing TTL before a planned DNS change can shorten cache retention when the new record is published.", "Single answer"],
+["2.0 Server Administration", "Kerberos authentication begins failing across several servers after a time-source outage. Which service should be checked FIRST?", ["NTP/time synchronization", "DHCP relay only", "RAID controller cache", "Print spooler"], [0], "Kerberos is time-sensitive; significant clock skew can cause authentication failures.", "Single answer"],
+["2.0 Server Administration", "An administrator wants a patch deployment to minimize production risk. Which approach is BEST?", ["Test in a representative nonproduction group, deploy in stages, monitor, and maintain rollback plans", "Patch every production server simultaneously with no validation", "Disable monitoring during deployment", "Skip backups because patches are vendor supplied"], [0], "Staged testing and deployment reduce blast radius and improve rollback readiness.", "Single answer"],
+["2.0 Server Administration", "Monitoring software needs an immediate notification when a redundant power supply fails rather than waiting for the next scheduled poll. Which SNMP mechanism BEST fits?", ["Trap/inform", "GET polling only", "DNS zone transfer", "NTP broadcast"], [0], "SNMP traps/informs provide event-driven notifications from managed devices.", "Single answer"],
+["2.0 Server Administration", "A configuration-management system applies the same desired server configuration repeatedly without making unnecessary changes once the system is compliant. What property is this?", ["Idempotence", "Parity", "Deduplication only", "Multipathing"], [0], "Idempotent automation can be run repeatedly and converges on the desired state without changing already-correct resources.", "Single answer"],
+["2.0 Server Administration", "A virtual host is severely overcommitted for memory and several guests begin swapping or ballooning under load. Which TWO metrics are MOST useful to correlate?", ["Host memory pressure", "Guest memory/swap activity", "DNS MX priority", "Rack-unit height"], [0, 1], "Host and guest memory metrics together help identify contention caused by overcommitment.", "Select TWO"],
+["2.0 Server Administration", "A Linux administrator wants to view logs only for the current boot for a systemd-based server. Which command is MOST appropriate?", ["journalctl -b", "df -h", "ip neigh", "chmod 755"], [0], "journalctl -b filters the system journal to the current boot.", "Single answer"],
+["2.0 Server Administration", "A filesystem should mount consistently even if Linux assigns the disk a different /dev/sdX name after a hardware change. What should be used in /etc/fstab?", ["Filesystem UUID or another persistent identifier", "The current process ID", "The DNS search suffix", "The CPU serial number"], [0], "Persistent identifiers such as UUIDs are safer than device names that can change across boots or hardware changes.", "Single answer"],
+["2.0 Server Administration", "A Windows Server administrator needs a repeatable command-line method to query and restart a service across many servers. Which tool is MOST appropriate?", ["PowerShell", "Paint", "Disk Management GUI only", "Notepad"], [0], "PowerShell provides scriptable service-management cmdlets and remote administration capabilities.", "Single answer"],
+["2.0 Server Administration", "A containerized application needs to preserve database files after the container is replaced. What should the administrator configure?", ["Persistent volume/storage outside the disposable container layer", "A larger container image only", "A lower DNS TTL", "A second CPU socket"], [0], "Persistent storage decouples application data from the ephemeral container filesystem lifecycle.", "Single answer"],
+["3.0 Security and Disaster Recovery", "A backup architecture must follow a modern resilience model with three copies, two media types, one offsite copy, one offline/immutable copy, and verified recoverability. Which concept BEST describes this?", ["3-2-1-1-0 backup strategy", "RAID 0", "Single-site mirroring", "Full backup only"], [0], "3-2-1-1-0 extends 3-2-1 with an offline/immutable copy and zero unverified backup errors through testing/validation.", "Single answer"],
+["3.0 Security and Disaster Recovery", "A database can lose no more than 10 minutes of transactions, but the business can tolerate a two-hour service outage. Which values are correct?", ["RPO 10 minutes; RTO 2 hours", "RPO 2 hours; RTO 10 minutes", "RPO 10 hours; RTO 2 days", "RPO and RTO are both 10 minutes"], [0], "RPO defines acceptable data-loss time; RTO defines the target time to restore service.", "Single answer"],
+["3.0 Security and Disaster Recovery", "A full backup is taken Sunday. Incremental backups are taken Monday, Tuesday, and Wednesday. To restore through Wednesday using this scheme, which backups are required?", ["Sunday full plus Monday, Tuesday, and Wednesday incrementals", "Wednesday incremental only", "Sunday full plus Wednesday incremental only", "Tuesday and Wednesday only"], [0], "Incremental restore requires the last full backup plus each incremental in sequence since that full.", "Single answer"],
+["3.0 Security and Disaster Recovery", "A ransomware incident encrypts production data and attempts to delete connected backup repositories. Which backup control MOST directly protects a recovery copy from alteration?", ["Immutable or offline backup storage", "A longer DNS TTL", "RAID 0", "A shared administrator password"], [0], "Offline or immutable copies cannot be modified through normal production credentials and provide stronger ransomware resilience.", "Single answer"],
+["3.0 Security and Disaster Recovery", "Administrators are assigned permissions based on job functions such as Backup Operator and Server Operator. What access-control model is being applied?", ["Role-based access control (RBAC)", "Open access", "Mandatory RAID control", "Round-robin access"], [0], "RBAC maps permissions to roles and then assigns users to those roles.", "Single answer"],
+["3.0 Security and Disaster Recovery", "Which TWO choices represent different authentication factors for MFA?", ["Password", "Hardware security key", "PIN plus password", "Two different passwords"], [0, 1], "A password is something you know; a hardware security key is something you have. Two knowledge factors do not provide true multi-factor authentication.", "Select TWO"],
+["3.0 Security and Disaster Recovery", "An HTTPS management interface suddenly produces certificate warnings on every client, and the certificate's validity period ended yesterday. What is the MOST likely cause?", ["Expired TLS certificate", "RAID parity corruption", "DHCP exhaustion", "CPU thermal throttling"], [0], "An expired server certificate causes trust/validity warnings even when the network path is working.", "Single answer"],
+["3.0 Security and Disaster Recovery", "A security baseline requires reducing the attack surface of a newly deployed server. Which TWO actions BEST support that goal?", ["Disable unused services and listening ports", "Remove unnecessary software/packages", "Enable all sample accounts", "Expose management interfaces to every VLAN"], [0, 1], "Removing unnecessary software and disabling unused services reduces potential vulnerabilities and attack paths.", "Select TWO"],
+["3.0 Security and Disaster Recovery", "A disaster recovery location has networking and some hardware available but requires systems to be restored and configured before production can resume. Which site type BEST matches?", ["Warm site", "Hot site", "Cold site with no equipment", "Production primary site"], [0], "A warm site is partially provisioned and faster to activate than a cold site but not immediately live like a hot site.", "Single answer"],
+["3.0 Security and Disaster Recovery", "A critical service is replicated synchronously to a second site so that failover can occur with almost no data loss. Which business objective is this design primarily reducing?", ["RPO", "Password complexity", "Rack density", "DNS recursion"], [0], "Synchronous replication is intended to minimize the amount of data that could be lost at failover, reducing RPO.", "Single answer"],
+["3.0 Security and Disaster Recovery", "Backups are encrypted with a key stored only on the failed production server. What recovery problem does this create?", ["The backup may be unusable if the encryption key cannot be recovered", "The backup becomes a differential backup", "The RAID level changes", "NTP will fail"], [0], "Encryption keys must be protected and recoverable separately; otherwise encrypted backups can become inaccessible during disaster recovery.", "Single answer"],
+["3.0 Security and Disaster Recovery", "An administrator leaves a shared root password in a team document because it is convenient during emergencies. Which TWO security principles are MOST directly violated?", ["Individual accountability", "Least privilege/controlled privileged access", "RAID redundancy", "Storage multipathing"], [0, 1], "Shared privileged credentials weaken accountability and bypass controlled assignment of administrative privileges.", "Select TWO"],
+["3.0 Security and Disaster Recovery", "A company keeps seven years of backups because of a legal requirement. What should drive the exact retention schedule and secure disposal process?", ["Organizational policy plus legal/regulatory requirements", "The CPU vendor", "RAID stripe size", "DHCP lease duration"], [0], "Retention and disposal should be defined by policy and applicable legal/regulatory obligations.", "Single answer"],
+["4.0 Troubleshooting", "A server has two redundant PSUs. One PSU's amber fault LED is on, but the server remains operational. What is the BEST interpretation?", ["The server has lost power redundancy and the failed path should be repaired promptly", "The server has full redundancy because it is still running", "The RAID array has failed", "DNS is unavailable"], [0], "A redundant PSU design can keep the server running after one failure, but redundancy is degraded until the failed path is restored.", "Single answer"],
+["4.0 Troubleshooting", "After adding memory, a server fails POST and reports a memory population error. What should the technician do FIRST?", ["Consult the system's DIMM population rules and verify the modules are seated in supported slots", "Reconfigure DNS", "Replace all storage drives", "Disable the BMC"], [0], "Server platforms often require specific DIMM population order, ranks, capacities, and channel symmetry.", "Single answer"],
+["4.0 Troubleshooting", "Hardware logs show an increasing number of corrected ECC errors from DIMM B2, but no crash has occurred. What is the BEST conclusion?", ["DIMM B2 may be degrading and should be monitored/replaced according to policy", "ECC is causing the failure and should be disabled", "The default gateway is wrong", "The array needs RAID 0"], [0], "A rising corrected-error trend tied to one module can indicate impending memory failure even before an uncorrectable error occurs.", "Single answer"],
+["4.0 Troubleshooting", "A RAID array is rebuilding after a failed drive replacement. Users report high application latency, while CPU and memory are normal. What is the MOST likely explanation?", ["The rebuild is competing for storage I/O", "DNS cache is full", "The server hostname is too long", "NTP stratum is too high"], [0], "RAID rebuilds generate substantial disk I/O and can reduce application storage performance until completed.", "Single answer"],
+["4.0 Troubleshooting", "A server NIC shows link up after a switch migration. The server can communicate with no peers, and its ARP/neighbor entry for the gateway remains INCOMPLETE. Which issue is MOST likely?", ["VLAN/access-tagging mismatch", "High CPU utilization", "Expired TLS certificate", "RAID cache battery failure"], [0], "Link up proves physical connectivity, while failed neighbor resolution after a switch change strongly suggests a Layer 2/VLAN mismatch.", "Single answer"],
+["4.0 Troubleshooting", "A service works by IP address but users still connect to an old server when using the hostname shortly after a migration. Which issue should be checked?", ["DNS record/cache and TTL", "ECC memory", "RAID parity", "UPS load"], [0], "Stale DNS records or cached responses can continue directing clients to an old address after migration.", "Single answer"],
+["4.0 Troubleshooting", "Large file transfers fail between two server networks, while ping with normal packet sizes succeeds. One side recently enabled jumbo frames. What should be checked FIRST?", ["MTU consistency along the entire path", "The DNS MX record", "The RAID rebuild percentage", "The CPU socket count"], [0], "An MTU mismatch can allow small packets while causing larger packets or fragmentation-sensitive traffic to fail.", "Single answer"],
+["4.0 Troubleshooting", "A new web service cannot start because TCP 443 is already in use. Which command BEST identifies the process holding the listening socket on Linux?", ["ss -ltnp", "df -i", "free -h", "lsblk"], [0], "ss -ltnp shows listening TCP sockets and, with sufficient privileges, the associated process information.", "Single answer"],
+["4.0 Troubleshooting", "A Linux filesystem still shows 95% usage after a 20GB log file was deleted. Which condition should be investigated?", ["A running process still has the deleted file open", "The DNS resolver has cached the file", "RAID 1 duplicated the file invisibly", "The CPU is holding the blocks in cache permanently"], [0], "Deleted files continue consuming filesystem blocks until processes holding open file descriptors release them; lsof can identify them.", "Single answer"],
+["4.0 Troubleshooting", "A filesystem has plenty of free gigabytes but applications receive 'No space left on device' when creating many small files. Which command should be used NEXT?", ["df -i", "ping", "lscpu", "ip route"], [0], "Inode exhaustion can prevent new files even when data-block capacity remains; df -i displays inode usage.", "Single answer"],
+["4.0 Troubleshooting", "A Linux server has low CPU user time but very high I/O wait and applications feel slow. Which subsystem should be investigated FIRST?", ["Storage I/O path", "DNS suffix", "Password policy", "BMC username"], [0], "High I/O wait indicates CPUs are frequently waiting for storage or other I/O completion.", "Single answer"],
+["4.0 Troubleshooting", "A server begins swapping heavily after a new application deployment. Which TWO observations would support memory pressure as the root cause?", ["Low available RAM", "Sustained swap activity/page-in/page-out", "Low DNS TTL", "Healthy fan RPM"], [0, 1], "Low available memory combined with sustained swap activity is strong evidence of memory pressure.", "Select TWO"],
+["4.0 Troubleshooting", "A rack server thermally throttles only after another server was installed directly in front of its intake path. What should be corrected FIRST?", ["Restore unobstructed front-to-back airflow", "Change the server's DNS record", "Rebuild the RAID array", "Disable ECC"], [0], "Physical airflow obstruction should be corrected before software changes when the thermal issue correlates directly with rack layout.", "Single answer"],
+["4.0 Troubleshooting", "Domain authentication fails on one server, TLS logs show certificate-not-yet-valid messages, and its clock is 18 minutes behind. What is the BEST first fix?", ["Restore correct time synchronization", "Replace the NIC", "Change RAID levels", "Increase disk cache"], [0], "Large time skew can break Kerberos and certificate validation. Correcting time synchronization addresses the common cause.", "Single answer"]
+];
+
+function fisherYates(arr){
+ const a=[...arr];
+ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}
+ return a;
+}
+function shuffleQuestion(q){
+ const order=fisherYates(q[2].map((_,i)=>i));
+ const answers=order.map(i=>q[2][i]);
+ const correct=q[3].map(oldIndex=>order.indexOf(oldIndex));
+ return [q[0],q[1],answers,correct,q[4],q[5]];
+}
+const BANK=Q;
+const WEIGHTS={"1.0 Server Hardware Installation and Management":18,"2.0 Server Administration":30,"3.0 Security and Disaster Recovery":24,"4.0 Troubleshooting":28};
+
+function show(id,btn){
+ document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+ document.getElementById(id).classList.add("active");
+ document.querySelectorAll(".nav").forEach(n=>n.classList.remove("active"));
+ if(btn)btn.classList.add("active");
+}
+function setupExam(btn){show("examSetup",btn)}
+function weightedSet(n){
+ const result=[],entries=Object.entries(WEIGHTS);let assigned=0;
+ entries.forEach(([dom,pct],idx)=>{
+   let count=idx===entries.length-1?n-assigned:Math.round(n*pct/100);
+   const subset=fisherYates(BANK.filter(q=>q[0]===dom));
+   count=Math.min(count,subset.length);assigned+=count;
+   result.push(...subset.slice(0,count));
+ });
+ if(result.length<n){
+   const used=new Set(result);
+   result.push(...fisherYates(BANK.filter(q=>!used.has(q))).slice(0,n-result.length));
+ }
+ return fisherYates(result).map(shuffleQuestion);
+}
+function startExam(n){
+ examItems=weightedSet(n);responses=Array(n).fill(null).map(()=>[]);flags=Array(n).fill(false);qi=0;timeLeft=5400;show("exam");
+ document.getElementById("qTotal").textContent=n;clearInterval(timerHandle);timerHandle=setInterval(tick,1000);renderQ();tick(true);
+}
+function tick(noDec=false){
+ if(!noDec)timeLeft--;let m=Math.floor(timeLeft/60),s=timeLeft%60;document.getElementById("timer").textContent=String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");if(timeLeft<=0)submitExam();
+}
+function renderQ(){
+ const q=examItems[qi],selected=responses[qi]||[];document.getElementById("qNum").textContent=qi+1;document.getElementById("qDomain").textContent=q[0];document.getElementById("qType").textContent=q[5];document.getElementById("qType").className="tag "+(q[5].includes("TWO")?"selectTag":"");document.getElementById("qText").textContent=q[1];
+ document.getElementById("answers").innerHTML=q[2].map((a,i)=>`<button class="answer ${selected.includes(i)?'selected':''}" onclick="selectAns(${i})">${String.fromCharCode(65+i)}. ${a}</button>`).join("");
+ document.getElementById("examProgress").style.width=((qi+1)/examItems.length*100)+"%";
+ document.getElementById("qNav").innerHTML=examItems.map((_,i)=>`<button class="qnav ${responses[i]?.length?'done':''} ${flags[i]?'flag':''} ${i===qi?'current':''}" onclick="qi=${i};renderQ()">${i+1}</button>`).join("");
+}
+function selectAns(i){
+ const q=examItems[qi],max=q[3].length;
+ if(max===1)responses[qi]=[i];else{let a=responses[qi]||[];if(a.includes(i))a=a.filter(x=>x!==i);else if(a.length<max)a=[...a,i];responses[qi]=a}renderQ();
+}
+function nextQ(){if(qi<examItems.length-1)qi++;renderQ()}function prevQ(){if(qi>0)qi--;renderQ()}function toggleFlag(){flags[qi]=!flags[qi];renderQ()}
+function sameSet(a,b){return a.length===b.length&&a.slice().sort().every((x,i)=>x===b.slice().sort()[i])}
+function submitExam(){
+ if(!examItems.length)return;clearInterval(timerHandle);let correct=0;const domains={};
+ examItems.forEach((q,i)=>{if(!domains[q[0]])domains[q[0]]=[0,0];domains[q[0]][1]++;if(sameSet(responses[i]||[],q[3])){correct++;domains[q[0]][0]++}});
+ const pct=Math.round(correct/examItems.length*100);show("results");
+ let html=`<div class="hero"><div class="resultBig">${pct>=83?"STRONG READINESS ✅":pct>=75?"NEAR TARGET — KEEP DRILLING":"REVIEW NEEDED 🛠️"}</div><h2>${correct}/${examItems.length} • ${pct}%</h2><p>This is an unscaled practice percentage, not the official 100–900 CompTIA score. Review the weakest domains below.</p><div class="heroActions"><button class="primary" onclick="setupExam()">NEW EXAM</button><button class="secondary" onclick="showStudy()">STUDY MODE</button></div></div><div class="grid">`;
+ Object.entries(domains).forEach(([d,v])=>{let p=Math.round(v[0]/v[1]*100);html+=`<div class="card"><h3>${d}</h3><div class="resultBig" style="font-size:30px">${p}%</div><div class="domainBar"><span style="width:${p}%"></span></div><div class="small">${v[0]} correct of ${v[1]}</div></div>`});html+="</div><h2 style='margin-top:18px'>Answer Review</h2>";
+ examItems.forEach((q,i)=>{const ok=sameSet(responses[i]||[],q[3]);html+=`<div class="reviewQ"><b>${i+1}. ${q[1]}</b><div class="${ok?'correctTxt':'wrongTxt'}">${ok?'Correct':'Incorrect'}</div><div class="small">Correct answer: ${q[3].map(x=>q[2][x]).join(" + ")}</div><div class="small">${q[4]}</div></div>`});
+ document.getElementById("resultsArea").innerHTML=html;XP+=correct;document.getElementById("xpBadge").textContent="XP "+XP;
+}
+function showStudy(btn){
+ show("study",btn);document.getElementById("studyDomain").innerHTML=`<option value="ALL">All Domains</option>`+Object.keys(WEIGHTS).map(d=>`<option>${d}</option>`).join("");renderStudy();
+}
+function renderStudy(){
+ const d=document.getElementById("studyDomain").value||"ALL";let pool=BANK.filter(q=>d==="ALL"||q[0]===d);studyItem=shuffleQuestion(pool[Math.floor(Math.random()*pool.length)]);window.studyChosen=[];
+ document.getElementById("studyArea").innerHTML=`<div class="card studyCard"><span class="tag">${studyItem[0]}</span><span class="tag ${studyItem[5].includes("TWO")?'selectTag':''}">${studyItem[5]}</span><div class="studyQ">${studyItem[1]}</div><div class="answers">${studyItem[2].map((a,i)=>`<button class="answer" onclick="answerStudy(${i},this)">${a}</button>`).join("")}</div><div id="studyFeedback" class="feedback">Answer the question. Study mode explains why.</div></div>`;
+}
+function answerStudy(i,btn){
+ const max=studyItem[3].length;
+ if(max===1){const ok=studyItem[3].includes(i);document.querySelectorAll("#studyArea .answer").forEach(b=>b.classList.remove("selected"));btn.classList.add("selected");document.getElementById("studyFeedback").className="feedback "+(ok?"good":"bad");document.getElementById("studyFeedback").innerHTML=(ok?"✅ Correct. ":"❌ Incorrect. ")+studyItem[4];if(ok){XP+=5;document.getElementById("xpBadge").textContent="XP "+XP}}
+ else{if(window.studyChosen.includes(i))window.studyChosen=window.studyChosen.filter(x=>x!==i);else if(window.studyChosen.length<max)window.studyChosen.push(i);document.querySelectorAll("#studyArea .answer").forEach((b,j)=>b.classList.toggle("selected",window.studyChosen.includes(j)));if(window.studyChosen.length===max){const ok=sameSet(window.studyChosen,studyItem[3]);document.getElementById("studyFeedback").className="feedback "+(ok?"good":"bad");document.getElementById("studyFeedback").innerHTML=(ok?"✅ Correct. ":"❌ Incorrect. ")+studyItem[4]}}
+}
+
+// PBQs
+function randomPBQ(){const kinds=["raid","build","linux","dr","network"];loadPBQ(kinds[Math.floor(Math.random()*kinds.length)])}
+
+let pbqState={};
+function loadPBQ(kind){
+ if(kind==="raid"){
+  pbqState={kind};
+  const raidChoices=fisherYates([
+   {text:"Replace failed disk → start/verify rebuild → monitor array until optimal",ok:true},
+   {text:"Remove another online disk → replace both → initialize array",ok:false},
+   {text:"Delete RAID metadata → recreate RAID 0",ok:false},
+   {text:"Ignore the failure until a second disk fails",ok:false}
+  ]);pbqState.raidChoices=raidChoices;
+  document.getElementById("pbqArea").innerHTML=`<div class="card"><span class="tag pbqTag">PBQ • RAID RECOVERY</span><h3>Degraded RAID 5 Array</h3><p>A 4-disk RAID 5 array is degraded. Disk 3 has failed. A compatible replacement drive is available. Choose the BEST sequence.</p><div class="raidGrid"><div class="drive">Disk 1<br>ONLINE</div><div class="drive">Disk 2<br>ONLINE</div><div class="drive failed">Disk 3<br>FAILED</div><div class="drive">Disk 4<br>ONLINE</div><div class="drive hot">Spare<br>READY</div></div><div class="answers" style="margin-top:12px">${raidChoices.map((x,i)=>`<button class="answer" onclick="raidAns(${i})">${x.text}</button>`).join("")}</div><div id="pbqFeedback" class="feedback">Choose the safest recovery sequence.</div></div>`;
+ } else if(kind==="build"){
+  pbqState={kind,slots:{Memory:null,Storage:null,Power:null,Management:null}};
+  const items=fisherYates(["ECC RDIMM memory","Consumer non-ECC DIMM","Enterprise SAS SSDs","Single USB flash drive","Redundant hot-swap PSU pair","Single laptop adapter","Dedicated BMC/iDRAC/iLO interface","VGA cable"]);
+  document.getElementById("pbqArea").innerHTML=`<div class="card"><span class="tag pbqTag">PBQ • SERVER BUILD</span><h3>Build a Resilient Virtualization Host</h3><p>Select the most server-appropriate component for each required subsystem.</p><div class="pbqBoard"><div><h3>Inventory</h3><div class="dropzone">${items.map(x=>`<div class="item" onclick="pick('${x}')">${x}</div>`).join("")}</div></div><div><h3>Required Subsystems</h3><div id="buildSlots"></div><button class="success" onclick="checkBuild()">VALIDATE SERVER</button></div></div><div id="pbqFeedback" class="feedback">Select an inventory item, then click a subsystem slot.</div></div>`;renderBuild();
+ } else if(kind==="linux"){
+  document.getElementById("pbqArea").innerHTML=`<div class="card"><span class="tag pbqTag">PBQ • LINUX ADMIN</span><h3>Restore the Web Service</h3><p>The web server responds to ping, but the website is unavailable. Use the simulated shell.</p><div class="console" id="console">root@server01:~#</div><div class="cmdrow"><input id="cmd" placeholder="Try: systemctl status nginx, systemctl restart nginx, ss -tulpn"><button class="primary" onclick="runLinux()">RUN</button></div><div id="pbqFeedback" class="feedback">Diagnose the service and restore it.</div></div>`;
+ } else if(kind==="dr"){
+  document.getElementById("pbqArea").innerHTML=`<div class="card"><span class="tag pbqTag">PBQ • DISASTER RECOVERY</span><h3>Meet the Business Requirement</h3><p>The company can tolerate at most <b>15 minutes of data loss</b> and wants the service restored within <b>2 hours</b>. Enter the correct RPO and RTO.</p><div class="grid2"><div><label>RPO</label><select id="rpo"><option>24 hours</option><option>4 hours</option><option>15 minutes</option><option>2 hours</option></select></div><div><label>RTO</label><select id="rto"><option>15 minutes</option><option>2 hours</option><option>24 hours</option><option>7 days</option></select></div></div><button class="success" style="margin-top:12px" onclick="checkDR()">VALIDATE PLAN</button><div id="pbqFeedback" class="feedback">Translate the business language into recovery objectives.</div></div>`;
+ } else {
+  document.getElementById("pbqArea").innerHTML=`<div class="card"><span class="tag pbqTag">PBQ • NETWORK TROUBLESHOOTING</span><h3>Server Can Reach Local Hosts but Not Remote Networks</h3><p>Configure the missing field. Server address: 10.20.30.50/24. Router: 10.20.30.1. DNS: 10.20.30.10.</p><div class="grid2"><div><label>IPv4</label><input value="10.20.30.50" disabled><label>Mask</label><input value="255.255.255.0" disabled><label>Default Gateway</label><input id="ngw"><label>DNS</label><input value="10.20.30.10" disabled><button class="success" style="margin-top:10px" onclick="checkNet()">APPLY & TEST</button></div><div class="console" id="netcon">C:\\> ping 10.20.30.25
+Reply from 10.20.30.25
+
+C:\\> ping 8.8.8.8
+Destination host unreachable.
+
+IPv4: 10.20.30.50
+Mask: 255.255.255.0
+Gateway: [MISSING]</div></div><div id="pbqFeedback" class="feedback">Use the symptom and addressing plan.</div></div>`;
+ }
+}
+function raidAns(i){const ok=!!pbqState.raidChoices?.[i]?.ok;document.getElementById("pbqFeedback").className="feedback "+(ok?"good":"bad");document.getElementById("pbqFeedback").textContent=ok?"✅ Correct. Replace the failed member and verify the rebuild while monitoring for additional disk issues.":"❌ Unsafe or incorrect sequence. RAID 5 is already in a vulnerable degraded state."}
+let picked=null;
+function pick(x){picked=x;document.getElementById("pbqFeedback").textContent="Selected: "+x+". Click a subsystem slot."}
+function renderBuild(){document.getElementById("buildSlots").innerHTML=Object.entries(pbqState.slots).map(([s,v])=>`<div class="slot" onclick="place('${s}')"><b>${s}</b><div class="placed">${v||"Click to place selected component"}</div></div>`).join("")}
+function place(s){if(!picked)return;pbqState.slots[s]=picked;picked=null;renderBuild()}
+function checkBuild(){const s=pbqState.slots,ok=s.Memory==="ECC RDIMM memory"&&s.Storage==="Enterprise SAS SSDs"&&s.Power==="Redundant hot-swap PSU pair"&&s.Management==="Dedicated BMC/iDRAC/iLO interface";document.getElementById("pbqFeedback").className="feedback "+(ok?"good":"bad");document.getElementById("pbqFeedback").textContent=ok?"✅ Server build validated. The selected components support reliability and remote management.":"❌ One or more choices are not appropriate for the target resilient server design."}
+function runLinux(){
+ const c=document.getElementById("cmd").value.trim().toLowerCase(),con=document.getElementById("console");
+ if(c==="systemctl status nginx"){con.textContent+="\n\n# systemctl status nginx\nnginx.service - failed\nActive: failed\nReason: process exited";}
+ else if(c==="systemctl restart nginx"){con.textContent+="\n\n# systemctl restart nginx\n[OK]\nnginx.service restarted";document.getElementById("pbqFeedback").className="feedback good";document.getElementById("pbqFeedback").textContent="✅ Service restored. In production, also inspect logs/root cause before closing the ticket."}
+ else if(c==="ss -tulpn"){con.textContent+="\n\n# ss -tulpn\nNo process listening on TCP 80/443";}
+ else{con.textContent+="\n\nbash: command not included in this simulation";}
+}
+function checkDR(){const ok=document.getElementById("rpo").value==="15 minutes"&&document.getElementById("rto").value==="2 hours";document.getElementById("pbqFeedback").className="feedback "+(ok?"good":"bad");document.getElementById("pbqFeedback").textContent=ok?"✅ Correct. RPO = acceptable data-loss window; RTO = restoration-time target.":"❌ Re-check the definitions of RPO and RTO."}
+function checkNet(){const ok=document.getElementById("ngw").value.trim()==="10.20.30.1";document.getElementById("netcon").textContent=ok?"C:\\> ping 8.8.8.8\nReply from 8.8.8.8\n\nStatus: Routed connectivity restored.":"C:\\> ping 8.8.8.8\nDestination host unreachable.";document.getElementById("pbqFeedback").className="feedback "+(ok?"good":"bad");document.getElementById("pbqFeedback").textContent=ok?"✅ Default gateway restored off-subnet connectivity.":"❌ The server needs the router's local interface as its default gateway."}
+
+
+/* Creator mark is assembled from hex character values so the full name
+   is not stored as one plain-text phrase in the HTML source. */
+const _creatorHex = [
+  "43","72","65","61","74","65","64","20","62","79","20",
+  "44","65","72","72","69","63","6b","20","42","65","61","69","72","64"
+];
+document.getElementById("creatorMark").textContent =
+  _creatorHex.map(x => String.fromCharCode(parseInt(x,16))).join("");
+
+</script>
+</body>
+</html>

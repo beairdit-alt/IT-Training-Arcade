@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Information Technology Specialist Cybersecurity Exam Lab Simulator</title>
+<style>
+:root{
+  --bg:#071019;--panel:#0d1926;--panel2:#13243a;--line:#294760;--text:#eef7ff;--muted:#9fb7c9;
+  --blue:#2aa7ff;--green:#43dc8e;--yellow:#ffd166;--red:#ff6b78;--purple:#a887ff;--orange:#ff9f43
+}
+*{box-sizing:border-box}
+body{margin:0;background:
+radial-gradient(circle at 10% -8%,#163b62 0,transparent 25%),
+radial-gradient(circle at 95% 0,#25194a 0,transparent 24%),
+linear-gradient(#06101a,#09121b);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif;min-height:100vh}
+button,input,select{font:inherit}button{cursor:pointer}
+.app{max-width:1500px;margin:auto;padding:16px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;padding:14px 18px;background:#0b1825e8;border:1px solid var(--line);border-radius:16px;position:sticky;top:8px;z-index:30;box-shadow:0 10px 35px #0006}
+.brand{display:flex;gap:13px;align-items:center}.logo{width:62px;height:62px;border-radius:11px;background:#107c41;color:white;display:grid;place-items:center;font-weight:1000;font-size:16px;text-align:center;line-height:1.05}.brand h1{margin:0;font-size:clamp(20px,3vw,34px)}.brand p{margin:2px 0 0;color:var(--muted);font-size:12px}
+.badges{display:flex;gap:8px;flex-wrap:wrap}.badge{padding:7px 10px;border-radius:999px;border:1px solid #365a78;background:#122a3d;color:#c9ecff;font-size:12px;font-weight:800}
+.shell{display:grid;grid-template-columns:285px 1fr;gap:14px;margin-top:14px}.side,.main{background:#0b1723e8;border:1px solid #243f59;border-radius:16px}.side{padding:12px;align-self:start;position:sticky;top:100px}
+.nav{width:100%;border:0;background:transparent;color:#dceeff;text-align:left;padding:11px;border-radius:9px;font-weight:800;margin:2px 0}.nav:hover,.nav.active{background:#153650}.nav span{display:block;font-size:10px;color:#7fa3bd;font-weight:500;margin-top:2px}
+.main{padding:18px;min-height:820px}.screen{display:none}.screen.active{display:block}
+.hero{padding:22px;border-radius:17px;border:1px solid #315270;background:linear-gradient(135deg,#102c47,#171d37);margin-bottom:14px}.hero h2{font-size:clamp(28px,4vw,44px);margin:0 0 7px}.hero p{line-height:1.55;color:#c0d6e7;max-width:1050px}.heroActions{display:flex;gap:9px;flex-wrap:wrap}
+.primary,.secondary,.danger,.warning,.success{border:0;border-radius:9px;padding:10px 14px;font-weight:900}.primary{background:var(--blue);color:#041727}.secondary{background:#1b344b;color:white;border:1px solid #3b607d}.danger{background:#a53a46;color:white}.warning{background:#a97113;color:white}.success{background:#198d58;color:white}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.card{background:#101f30;border:1px solid #294a65;border-radius:13px;padding:15px}.card h3{margin:0 0 8px}.small{font-size:12px;color:var(--muted)}.muted{color:var(--muted)}.mono{font-family:Consolas,monospace}
+.domainBar{height:8px;border-radius:99px;background:#07101a;overflow:hidden;margin:8px 0}.domainBar span{height:100%;display:block;background:linear-gradient(90deg,var(--blue),var(--green))}
+.examHeader{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.timer{font:900 28px Consolas,monospace;color:var(--yellow)}.examName{font-size:18px;font-weight:900}
+.navgrid{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin:10px 0}.qnav{border:1px solid #36536a;background:#102638;color:white;border-radius:6px;padding:6px 2px;font-size:11px}.qnav.done{background:#176642}.qnav.flag{outline:2px solid var(--yellow)}.qnav.current{border-color:#50cfff;box-shadow:0 0 0 1px #50cfff}
+.questionCard{background:#101f30;border:1px solid #2d4d68;border-radius:14px;padding:20px}.qmeta{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}.tag{padding:4px 7px;border-radius:999px;background:#17364c;color:#c7eaff;font-size:10px;font-weight:900}.selectTag{background:#4e3d13;color:#ffe59b}.pbqTag{background:#422b59;color:#e7caff}
+.question{font-size:21px;font-weight:800;line-height:1.45;margin:10px 0 14px}.answers{display:grid;gap:8px}.answer{border:1px solid #355b78;background:#153149;color:#f0f8ff;border-radius:10px;padding:12px;text-align:left}.answer:hover{filter:brightness(1.13)}.answer.selected{outline:2px solid var(--green);background:#153d31}
+.feedback{padding:11px;border-radius:9px;border:1px dashed #3b607c;background:#0b1824;margin-top:10px;min-height:45px;line-height:1.5}.good{border-color:#2c8059;background:#0f2a21}.bad{border-color:#803a44;background:#2b1519}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.spacer{flex:1}.preset{display:flex;gap:8px;flex-wrap:wrap}.choiceBox{border:1px solid #2d526c;border-radius:11px;padding:12px;background:#0f2231}
+.pbqBoard{display:grid;grid-template-columns:1fr 1fr;gap:12px}.dropzone{min-height:170px;border:2px dashed #365e7b;border-radius:12px;padding:10px}.item{padding:9px 10px;border:1px solid #3b617c;border-radius:8px;background:#163149;margin:7px 0;cursor:pointer}.item:hover{filter:brightness(1.15)}
+.console{background:#02070c;color:#b7ffca;border:1px solid #315042;border-radius:10px;padding:12px;font:13px Consolas,monospace;min-height:245px;white-space:pre-wrap}
+.resultBig{font-size:54px;font-weight:1000}.reviewQ{padding:12px;border-radius:10px;border:1px solid #294b65;background:#0e1e2d;margin-bottom:9px}.correctTxt{color:#7effb4}.wrongTxt{color:#ff8d98}
+.studyQ{font-size:18px;font-weight:800;margin:10px 0}.studyCard{margin-bottom:12px}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:8px;border-bottom:1px solid #29475e;text-align:left}th{color:#bfeaff}
+label{display:block;font-size:12px;color:#a9c6d7;font-weight:800;margin-top:9px;margin-bottom:4px}input,select{width:100%;padding:10px 11px;border-radius:8px;border:1px solid #375568;background:#09151e;color:white}
+.logrow{padding:9px;border:1px solid #304b5e;border-radius:8px;background:#0c1925;margin:7px 0}.sev{display:inline-block;padding:3px 7px;border-radius:999px;font-size:10px;font-weight:900}.high{background:#68232c}.med{background:#674a14}.low{background:#184b35}
+.creator-footer{position:fixed;bottom:8px;left:50%;transform:translateX(-50%);z-index:9999;padding:6px 12px;border-radius:999px;background:rgba(7,16,25,.88);border:1px solid #365a78;color:#9fb7c9;font-size:11px;font-weight:700;letter-spacing:.5px;backdrop-filter:blur(6px);white-space:nowrap}
+@media(max-width:1050px){.shell{grid-template-columns:1fr}.side{position:static}.grid{grid-template-columns:1fr 1fr}.pbqBoard{grid-template-columns:1fr}}
+@media(max-width:700px){.grid,.grid2{grid-template-columns:1fr}.navgrid{grid-template-columns:repeat(8,1fr)}}
+</style>
+</head>
+<body>
+<div class="creator-footer" id="creatorMark"></div>
+<div class="app">
+<div class="topbar">
+<div class="brand"><div class="logo">ITS<br>CYBER</div><div><h1>Information Technology Specialist - Cybersecurity</h1><p>Security principles • network defense • endpoint security • risk • incident handling</p></div></div>
+<div class="badges"><div class="badge" id="xpBadge">XP 0</div><div class="badge">40-question practice mode</div><div class="badge">50-minute timer</div></div>
+</div>
+
+<div class="shell">
+<aside class="side">
+<button class="nav active" onclick="show('home',this)">🏠 Exam Center<span>Start exam, study, or skills labs</span></button>
+<button class="nav" onclick="showStudy(this)">📘 Study Mode<span>Immediate explanations by domain</span></button>
+<button class="nav" onclick="show('pbq',this)">🧪 Cyber Skills Lab<span>Logs, endpoint, network, risk, IR</span></button>
+<button class="nav" onclick="setupExam(this)">📝 Cybersecurity Exam<span>40 questions • 50 minutes</span></button>
+<button class="nav" onclick="show('objectives',this)">📊 Objective Map<span>Current five Certiport domains</span></button>
+</aside>
+
+<main class="main">
+<section id="home" class="screen active">
+<div class="hero"><h2>Cybersecurity Technician Challenge</h2><p>This simulator is built around the current Information Technology Specialist Cybersecurity objectives. It covers security principles and frameworks, network security, endpoint protection, vulnerability and risk management, and incident handling. Questions are original and the skills labs are safe defensive simulations.</p><div class="heroActions"><button class="primary" onclick="setupExam()">START FULL PRACTICE EXAM</button><button class="success" onclick="document.querySelectorAll('.nav')[2].click()">OPEN CYBER SKILLS LAB</button></div></div>
+<div class="grid">
+<div class="card"><h3>1. Security Principles</h3><p class="small">Hardening, defense-in-depth, CIA, ethics, zero trust, frameworks, threats, social engineering, AAA, MFA, encryption, PKI.</p></div>
+<div class="card"><h3>2. Securing the Network</h3><p class="small">Protocol risks, segmentation, NAT, DMZ/VLAN, firewalls, ACLs, IDS/IPS, VPN, NAC, wireless security and security logs.</p></div>
+<div class="card"><h3>3. Protecting Endpoints</h3><p class="small">OS hardening, permissions, Defender, endpoint tools, packet capture, patching, compliance, system logs and malware removal.</p></div>
+<div class="card"><h3>4. Vulnerability & Risk Management</h3><p class="small">Threat intelligence, CVEs, severity, risk, mitigations, assessments, reconnaissance, scanning and penetration-test process.</p></div>
+<div class="card"><h3>5. Incident Handling</h3><p class="small">SIEM/SOAR, true/false positives, digital forensics, chain of custody, MITRE ATT&CK, incident response, compliance, DR/BCP and recovery.</p></div>
+<div class="card"><h3>Practice Format</h3><div class="resultBig" style="font-size:30px">40 Q / 50 min</div><p class="small">Original practice questions plus interactive defensive cybersecurity tasks.</p></div>
+</div>
+</section>
+
+<section id="study" class="screen"><div class="hero"><h2>Cybersecurity Study Mode</h2><p>Choose a domain and receive immediate explanations.</p></div><div class="toolbar"><select id="studyDomain" onchange="renderStudy()"></select><button class="secondary" onclick="renderStudy()">NEW QUESTION</button></div><div id="studyArea"></div></section>
+
+<section id="examSetup" class="screen"><div class="hero"><h2>ITS Cybersecurity Exam Simulator</h2><p>Full mode provides a 40-question, 50-minute certification-style session. Shorter modes are included for classroom practice.</p></div>
+<div class="grid">
+<div class="card"><h3>Full Simulation</h3><div class="resultBig" style="font-size:32px">40 Q</div><p class="small">50 minutes. All five domains.</p><button class="primary" onclick="startExam(40,3000)">START FULL EXAM</button></div>
+<div class="card"><h3>Class Practice</h3><div class="resultBig" style="font-size:32px">25 Q</div><p class="small">35 minutes. Balanced domain coverage.</p><button class="primary" onclick="startExam(25,2100)">START 25 QUESTIONS</button></div>
+<div class="card"><h3>Quick Check</h3><div class="resultBig" style="font-size:32px">15 Q</div><p class="small">20 minutes. Fast review.</p><button class="primary" onclick="startExam(15,1200)">START 15 QUESTIONS</button></div>
+</div></section>
+
+<section id="exam" class="screen">
+<div class="examHeader"><div><div class="examName">ITS Cybersecurity Practice Exam</div><div class="small">Question <span id="qNum"></span> of <span id="qTotal"></span></div></div><div class="timer" id="timer">50:00</div></div>
+<div class="domainBar"><span id="examProgress"></span></div><div id="qNav" class="navgrid"></div>
+<div class="questionCard"><div class="qmeta"><span class="tag" id="qDomain"></span><span class="tag" id="qType"></span></div><div id="qText" class="question"></div><div id="answers" class="answers"></div>
+<div class="toolbar"><button class="secondary" onclick="prevQ()">← PREVIOUS</button><button class="warning" onclick="toggleFlag()">⚑ FLAG FOR REVIEW</button><div class="spacer"></div><button class="secondary" onclick="nextQ()">NEXT →</button><button class="danger" onclick="submitExam()">SUBMIT EXAM</button></div></div>
+</section>
+
+<section id="results" class="screen"><div id="resultsArea"></div></section>
+
+<section id="pbq" class="screen">
+<div class="hero"><h2>Cybersecurity Skills Lab</h2><p>Practice defensive tasks that reinforce the exam objectives: identify suspicious logs, harden endpoints, choose network controls, assess risk, preserve evidence, and sequence incident response.</p></div>
+<div class="preset">
+<button class="primary" onclick="loadPBQ('logs')">Security Log Triage</button>
+<button class="primary" onclick="loadPBQ('network')">Network Defense</button>
+<button class="primary" onclick="loadPBQ('endpoint')">Endpoint Hardening</button>
+<button class="primary" onclick="loadPBQ('risk')">Risk Assessment</button>
+<button class="primary" onclick="loadPBQ('forensics')">Digital Evidence</button>
+<button class="primary" onclick="loadPBQ('ir')">Incident Response</button>
+<button class="primary" onclick="loadPBQ('recovery')">Backup / Recovery</button>
+</div><div id="pbqArea" style="margin-top:14px"></div>
+</section>
+
+<section id="objectives" class="screen">
+<div class="hero"><h2>Current ITS Cybersecurity Objective Map</h2><p>The simulator follows the current five-domain structure.</p></div>
+<div class="card"><table><tr><th>Domain</th><th>Skills Practiced</th></tr>
+<tr><td>1. Security Principles</td><td>CIA, hardening, defense-in-depth, zero trust, NIST/ISO/CIS, threats, social engineering, AAA/RADIUS/MFA, encryption/PKI</td></tr>
+<tr><td>2. Securing the Network</td><td>TCP/IP protocol risks, segmentation, DMZ/VLAN/NAT, IDS/IPS, proxy, honeypot, firewall/ACL, VPN/NAC, wireless, network logs</td></tr>
+<tr><td>3. Protecting Endpoint Devices</td><td>Windows/macOS/Linux hardening, permissions, Defender, netstat/nslookup/nmap/ss, Wireshark/tcpdump, patching, endpoint logs, malware removal</td></tr>
+<tr><td>4. Vulnerability Assessment & Risk Management</td><td>Threat intelligence, CVEs, severity/likelihood, risk mitigation, IT security assessments, reconnaissance, scanning and reporting</td></tr>
+<tr><td>5. Incident Handling</td><td>SIEM/SOAR, escalation, forensic evidence, chain of custody, Kill Chain/MITRE ATT&CK/Diamond Model, IR lifecycle, compliance, DR/BCP and restore</td></tr>
+</table></div>
+</section>
+</main></div></div>
+
+<script>
+let XP=0,examItems=[],responses=[],flags=[],qi=0,timerHandle=null,timeLeft=3000,studyItem=null;
+
+const Q=[
+["1. Security Principles","Which part of the CIA triad protects information from unauthorized disclosure?",["Confidentiality","Integrity","Availability","Accounting"],[0],"Confidentiality limits unauthorized disclosure.","Single answer"],
+["1. Security Principles","Which principle focuses on preventing unauthorized modification of data?",["Integrity","Availability","Confidentiality only","Nonrepudiation only"],[0],"Integrity protects accuracy and guards against unauthorized modification.","Single answer"],
+["1. Security Principles","Which TWO are examples of defense-in-depth?",["Firewall plus endpoint protection","MFA plus least privilege","One shared password","A single security control only"],[0,1],"Defense-in-depth uses multiple overlapping controls.","Select TWO"],
+["1. Security Principles","Which approach assumes no user or device should be trusted solely because it is inside the network?",["Zero trust","Implicit trust","Open access","Flat trust"],[0],"Zero trust requires verification based on identity, device, context and policy.","Single answer"],
+["1. Security Principles","Which framework is published by NIST to help organizations manage cybersecurity risk?",["NIST Cybersecurity Framework","SMTP","RAID","DHCP"],[0],"The NIST CSF is a cybersecurity risk framework.","Single answer"],
+["1. Security Principles","Which attack uses fraudulent email to trick a user into revealing credentials?",["Phishing","Tailgating","Shoulder surfing","Port scanning"],[0],"Phishing uses deceptive electronic messages.","Single answer"],
+["1. Security Principles","Which attack targets a high-value executive with a highly tailored phishing message?",["Whaling","Smishing","Vishing only","Tailgating"],[0],"Whaling targets senior or high-value individuals.","Single answer"],
+["1. Security Principles","Which TWO are different authentication factor categories?",["Password","Fingerprint","PIN and password","Two passwords"],[0,1],"Password is something you know; fingerprint is something you are.","Select TWO"],
+["1. Security Principles","Which protocol is commonly used for centralized AAA in network access environments?",["RADIUS","HTTP","ARP","ICMP"],[0],"RADIUS commonly provides centralized authentication, authorization and accounting.","Single answer"],
+["1. Security Principles","Which cryptographic method uses the same secret key to encrypt and decrypt data?",["Symmetric encryption","Asymmetric encryption","Hashing","Digital signature only"],[0],"Symmetric encryption uses a shared secret key.","Single answer"],
+["1. Security Principles","What is the main purpose of hashing?",["Integrity verification","Reversible confidentiality","Network segmentation","IP assignment"],[0],"Hashes are commonly used to verify integrity.","Single answer"],
+["1. Security Principles","Which technology binds a public key to an identity?",["Digital certificate","DHCP lease","VLAN","ACL"],[0],"Certificates associate public keys with identities.","Single answer"],
+
+["2. Securing the Network","Which design places public-facing services in a network separated from the internal LAN?",["DMZ","Flat LAN","Loopback","Host-only network"],[0],"A DMZ separates exposed services from internal systems.","Single answer"],
+["2. Securing the Network","Which technology logically separates users on the same physical switching infrastructure?",["VLAN","NAT only","DNS","NTP"],[0],"VLANs create logical Layer 2 segmentation.","Single answer"],
+["2. Securing the Network","Which TWO technologies can directly enforce network traffic policy?",["Firewall","ACL","DNS cache","Patch panel"],[0,1],"Firewalls and ACLs permit or deny traffic based on policy.","Select TWO"],
+["2. Securing the Network","Which security technology can detect suspicious network traffic but is normally passive?",["IDS","IPS","Firewall state table only","NAC"],[0],"An IDS detects and alerts rather than blocking inline by default.","Single answer"],
+["2. Securing the Network","Which technology can block malicious network traffic inline?",["IPS","Passive IDS","Packet capture only","Syslog"],[0],"An IPS can take preventive action inline.","Single answer"],
+["2. Securing the Network","What is the purpose of a VPN?",["Provide an encrypted tunnel across an untrusted network","Assign VLAN IDs","Replace DNS","Create hashes"],[0],"VPNs protect communications over untrusted networks.","Single answer"],
+["2. Securing the Network","Which protocol should be preferred over Telnet for remote administration?",["SSH","FTP","TFTP","HTTP"],[0],"SSH encrypts remote terminal sessions.","Single answer"],
+["2. Securing the Network","Which protocol should be preferred over FTP when secure file transfer is required?",["SFTP","Telnet","SNMPv1","TFTP"],[0],"SFTP uses SSH for protected file transfer.","Single answer"],
+["2. Securing the Network","Which wireless security standard is generally preferred on modern supported networks?",["WPA3","WEP","Open authentication","WPA with TKIP"],[0],"WPA3 is the modern preferred choice where supported.","Single answer"],
+["2. Securing the Network","Which TWO log sources are directly useful for detecting suspicious network activity?",["Firewall logs","IDS/IPS logs","Printer toner logs","Battery report"],[0,1],"Firewall and IDS/IPS logs contain network security events.","Select TWO"],
+["2. Securing the Network","What does NAT commonly do?",["Translate private and public network addresses","Encrypt all traffic automatically","Create user accounts","Detect malware"],[0],"NAT translates address spaces, commonly private to public.","Single answer"],
+["2. Securing the Network","Which device intentionally attracts attackers for observation?",["Honeypot","Patch panel","UPS","Access point only"],[0],"A honeypot is a decoy designed to attract and observe suspicious activity.","Single answer"],
+
+["3. Protecting Endpoint Devices","Which Windows feature provides built-in antimalware protection?",["Microsoft Defender","Disk Management","Task Manager only","File Explorer"],[0],"Microsoft Defender provides endpoint antimalware protection.","Single answer"],
+["3. Protecting Endpoint Devices","Which principle should be applied to file and directory permissions?",["Least privilege","Everyone Full Control","Anonymous write access","Permanent admin rights"],[0],"Permissions should grant only the access required.","Single answer"],
+["3. Protecting Endpoint Devices","Which command can display active network connections on many systems?",["netstat","format","mkdir","shutdown only"],[0],"netstat can display active network connections and listening ports.","Single answer"],
+["3. Protecting Endpoint Devices","Which tool is commonly used to query DNS?",["nslookup","format","gpupdate","diskpart"],[0],"nslookup queries DNS servers.","Single answer"],
+["3. Protecting Endpoint Devices","Which TWO tools are used for packet capture or analysis?",["Wireshark","tcpdump","Task Manager","Disk Cleanup"],[0,1],"Wireshark and tcpdump capture/analyze network packets.","Select TWO"],
+["3. Protecting Endpoint Devices","What is the purpose of patch management?",["Reduce exposure to known vulnerabilities","Increase monitor brightness","Assign IP addresses","Create hashes"],[0],"Patching corrects software/firmware issues including known security vulnerabilities.","Single answer"],
+["3. Protecting Endpoint Devices","Which Windows tool contains system, security and application events useful for investigation?",["Event Viewer","Paint","Calculator","Magnifier"],[0],"Event Viewer exposes Windows logs.","Single answer"],
+["3. Protecting Endpoint Devices","A malware scan finds an infected file. What is a safe next action?",["Quarantine/remediate according to approved procedure","Email it to coworkers","Disable endpoint protection","Ignore it"],[0],"Malware should be contained and remediated using approved procedures.","Single answer"],
+["3. Protecting Endpoint Devices","Why can infected restore points be a concern during malware recovery?",["Restoring them can reintroduce malware","They change DNS records","They create VLANs","They disable encryption"],[0],"Malware may persist in restore points or backups if those copies are infected.","Single answer"],
+["3. Protecting Endpoint Devices","Which TWO are device-maintenance items that should be kept current for security?",["Firmware","Device drivers","Wallpaper","Keyboard color"],[0,1],"Firmware and drivers may contain security fixes.","Select TWO"],
+
+["4. Vulnerability Assessment & Risk Management","What is a CVE?",["A standardized identifier for a publicly known vulnerability","A password policy","A firewall rule","A backup type"],[0],"CVE identifiers track publicly disclosed vulnerabilities.","Single answer"],
+["4. Vulnerability Assessment & Risk Management","What is the difference between a vulnerability and risk?",["A vulnerability is a weakness; risk considers likelihood and impact","They are identical","Risk is always malware","Vulnerability means financial loss only"],[0],"Risk considers how likely a weakness is to be exploited and the resulting impact.","Single answer"],
+["4. Vulnerability Assessment & Risk Management","Which TWO are threat-intelligence sources?",["Cybersecurity advisories","Vulnerability databases","Monitor EDID data","Printer page counts"],[0,1],"Advisories and vulnerability databases are common threat-intelligence sources.","Select TWO"],
+["4. Vulnerability Assessment & Risk Management","Which activity gathers information about a target without directly interacting with it?",["Passive reconnaissance","Active port scan","Credential attack","Packet flooding"],[0],"Passive reconnaissance minimizes direct interaction with the target.","Single answer"],
+["4. Vulnerability Assessment & Risk Management","What is the primary purpose of a vulnerability scan?",["Identify potential weaknesses for validation and remediation","Guarantee a system is secure","Destroy evidence","Disable logging"],[0],"Scanning identifies potential weaknesses that need review.","Single answer"],
+["4. Vulnerability Assessment & Risk Management","What should happen after vulnerabilities are identified in an authorized assessment?",["Report findings and recommend mitigations","Hide the findings","Exploit every system without permission","Delete logs"],[0],"Authorized assessments should result in documented findings and remediation guidance.","Single answer"],
+["4. Vulnerability Assessment & Risk Management","Which risk level normally requires the most urgent attention?",["Extremely high","Low","Informational","None"],[0],"Extremely high risk combines serious impact and/or likelihood and deserves priority.","Single answer"],
+["4. Vulnerability Assessment & Risk Management","Why does data classification matter to risk management?",["Different data types have different sensitivity and protection needs","It increases CPU speed","It changes IP addressing","It creates firewalls"],[0],"Classification helps determine appropriate controls and impact.","Single answer"],
+
+["5. Incident Handling","Which system centralizes and correlates security logs?",["SIEM","RAID","DHCP","UPS"],[0],"A SIEM aggregates and correlates security events.","Single answer"],
+["5. Incident Handling","Which platform can automate repeatable security-response workflows?",["SOAR","DNS","NTP","VLAN"],[0],"SOAR platforms automate and orchestrate security processes.","Single answer"],
+["5. Incident Handling","What is a false positive?",["An alert reports malicious activity when the event is actually benign","A real attack that produces no alert","A successful backup","A blocked user"],[0],"A false positive is an incorrect alert on benign activity.","Single answer"],
+["5. Incident Handling","What is a false negative?",["A real malicious event is missed or classified as benign","A benign event triggers an alert","A log is archived","A patch succeeds"],[0],"A false negative means a real issue was not detected.","Single answer"],
+["5. Incident Handling","Which TWO practices help preserve digital evidence?",["Maintain chain of custody","Document evidence handling","Modify original evidence freely","Share evidence publicly"],[0,1],"Evidence handling should be documented and controlled.","Select TWO"],
+["5. Incident Handling","Which framework organizes adversary behavior into tactics and techniques?",["MITRE ATT&CK","DHCP","RAID","STP"],[0],"MITRE ATT&CK catalogs adversary tactics and techniques.","Single answer"],
+["5. Incident Handling","After detecting active malware communication, what should happen early in incident response?",["Contain the affected host","Delete all logs","Publish evidence online","Disable every security control"],[0],"Containment limits spread and continuing malicious communication.","Single answer"],
+["5. Incident Handling","Which compliance framework is associated with payment-card data?",["PCI DSS","HIPAA","FERPA","FISMA only"],[0],"PCI DSS applies to payment-card data environments.","Single answer"],
+["5. Incident Handling","Which framework is associated with protected health information in the United States?",["HIPAA","PCI DSS","FERPA","CIS only"],[0],"HIPAA includes protections for health information.","Single answer"],
+["5. Incident Handling","What is the purpose of a business continuity plan?",["Keep essential business functions operating during disruption","Replace all firewalls","Assign IP addresses","Create certificates"],[0],"BCP focuses on continuity of critical operations.","Single answer"],
+["5. Incident Handling","What is the purpose of a disaster recovery plan?",["Restore technology and services after a disruptive event","Set password length only","Provide DNS resolution","Manage VLANs"],[0],"DRP focuses on restoring systems and services.","Single answer"],
+["5. Incident Handling","Which backup/recovery practice helps verify that data can actually be recovered?",["Test restores regularly","Assume backups work","Store one unverified copy","Disable backup logs"],[0],"Restore testing validates backup usability.","Single answer"]
+];
+
+const DOMAINS=[...new Set(Q.map(q=>q[0]))];
+const EXTRA_Q=[];
+const BANK=[...Q,...EXTRA_Q];
+
+// Randomize answer positions while preserving the correct answer index(es).
+function shuffleQuestion(q){
+ const choices=q[2].map((answer,index)=>({answer,correct:q[3].includes(index)}));
+ for(let i=choices.length-1;i>0;i--){
+   const j=Math.floor(Math.random()*(i+1));
+   [choices[i],choices[j]]=[choices[j],choices[i]];
+ }
+ return [
+   q[0],
+   q[1],
+   choices.map(x=>x.answer),
+   choices.map((x,i)=>x.correct?i:null).filter(x=>x!==null),
+   q[4],
+   q[5]
+ ];
+}
+
+function show(id,btn){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll(".nav").forEach(n=>n.classList.remove("active"));if(btn)btn.classList.add("active")}
+function setupExam(btn){show("examSetup",btn)}
+function balancedSet(n){
+ const result=[];let remaining=n;
+ DOMAINS.forEach((dom,idx)=>{
+   const count=idx===DOMAINS.length-1?remaining:Math.round(n/DOMAINS.length);
+   remaining-=count;
+   const subset=BANK.filter(q=>q[0]===dom).sort(()=>Math.random()-.5);
+   if(count>subset.length)throw new Error("Not enough unique questions in "+dom);
+   for(let i=0;i<count;i++)result.push(shuffleQuestion(subset[i]));
+ });
+ return result.sort(()=>Math.random()-.5);
+}
+function setFB(ok,a,b){const e=document.getElementById("pbqFeedback");e.className="feedback "+(ok?"good":"bad");e.textContent=ok?a:b;if(ok){XP+=10;document.getElementById("xpBadge").textContent="XP "+XP}}
+function pickLog(i){setFB(i===2,"✅ Escalate the privileged-login anomaly with suspicious follow-on actions.","❌ Another event carries much stronger compromise indicators.")}
+function netDefense(i){setFB(i===0,"✅ DMZ segmentation plus restrictive firewall/ACL policy is appropriate.","❌ That design increases exposure.")}
+function toggleEP(i,b){if(pbqState.ep.includes(i))pbqState.ep=pbqState.ep.filter(x=>x!==i);else if(pbqState.ep.length<2)pbqState.ep.push(i);document.querySelectorAll("#pbqArea .answer").forEach((x,j)=>x.classList.toggle("selected",pbqState.ep.includes(j)))}
+function checkEP(){setFB(pbqState.ep.length===2&&pbqState.ep.includes(0)&&pbqState.ep.includes(1),"✅ Patching and antimalware directly improve endpoint security.","❌ Choose patching and endpoint antimalware.")}
+function checkRisk(){setFB(document.getElementById("riskLevel").value==="Extremely high","✅ Internet exposure + sensitive data + known exploitation makes this extremely high priority.","❌ Consider both likelihood and impact.")}
+function forensicPick(i){setFB(i===0,"✅ Evidence preserved with documentation and chain of custody.","❌ That would weaken evidence integrity.")}
+function addIR(x,el){pbqState.order.push(x);el.style.display="none";document.getElementById("irBuild").innerHTML=pbqState.order.map((s,i)=>`<div class="item">${i+1}. ${s}</div>`).join("")}
+function checkIR(){const target=["Preparation","Detection/analysis","Containment","Eradication","Recovery","Lessons learned"];setFB(JSON.stringify(pbqState.order)===JSON.stringify(target),"✅ Incident-response lifecycle ordered correctly.","❌ Review the response lifecycle order.")}
+function recoveryPick(i){setFB(i===0,"✅ Regular test restores verify that backups can actually be recovered.","❌ Backup-job success alone does not prove recoverability.")}
+
+/* Creator mark assembled from hex values. */
+const _creatorHex=["43","72","65","61","74","65","64","20","62","79","20","44","65","72","72","69","63","6b","20","42","65","61","69","72","64"];
+document.getElementById("creatorMark").textContent=_creatorHex.map(x=>String.fromCharCode(parseInt(x,16))).join("");
+</script>
+</body>
+</html>

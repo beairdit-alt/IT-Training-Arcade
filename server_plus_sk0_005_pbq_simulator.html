@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CompTIA Server+ SK0-005 PBQ Practice Simulator</title>
+<style>
+:root{
+  --bg:#070817; --panel:#10152a; --panel2:#151d38; --ink:#eef7ff; --muted:#9fb0c7;
+  --cyan:#46e8ff; --mag:#ff4fd8; --violet:#8b5cff; --green:#67ffb2; --red:#ff647c;
+  --amber:#ffd166; --line:#2b3b65;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:
+radial-gradient(circle at 50% 0%,#26164d 0,#0a0d21 35%,#05060f 100%);
+color:var(--ink);min-height:100vh}
+body:before{content:"";position:fixed;left:0;right:0;bottom:0;height:34vh;pointer-events:none;
+background:linear-gradient(transparent 0 14%,rgba(70,232,255,.17) 15% 16%,transparent 17%),
+repeating-linear-gradient(90deg,transparent 0 8vw,rgba(255,79,216,.12) 8.1vw 8.25vw),
+repeating-linear-gradient(0deg,transparent 0 3.6vh,rgba(70,232,255,.10) 3.7vh 3.8vh);
+transform:perspective(260px) rotateX(52deg);transform-origin:bottom;opacity:.55}
+header{position:sticky;top:0;z-index:50;background:rgba(5,6,15,.92);backdrop-filter:blur(12px);
+border-bottom:1px solid var(--line);box-shadow:0 0 26px rgba(70,232,255,.12)}
+.topbar{max-width:1500px;margin:auto;padding:14px 20px;display:grid;grid-template-columns:1fr auto auto;gap:14px;align-items:center}
+.brand h1{margin:0;font-size:clamp(20px,2.3vw,34px);letter-spacing:.6px;text-shadow:0 0 14px var(--cyan)}
+.brand small{color:var(--muted)}
+.pill{padding:9px 13px;border:1px solid var(--line);border-radius:999px;background:#0c1124}
+#timer{font-variant-numeric:tabular-nums;color:var(--amber);font-weight:800}
+button,.btn{font:inherit;color:var(--ink);background:linear-gradient(180deg,#202b50,#131a34);border:1px solid #40558b;
+border-radius:10px;padding:10px 14px;cursor:pointer;box-shadow:0 0 12px rgba(70,232,255,.08)}
+button:hover{border-color:var(--cyan);box-shadow:0 0 16px rgba(70,232,255,.22)}
+button.primary{background:linear-gradient(135deg,#1f77a1,#7a2e95);border-color:var(--cyan);font-weight:800}
+button.danger{border-color:#8a3044}
+main{max-width:1500px;margin:auto;padding:20px;position:relative;z-index:2}
+.hero{display:grid;grid-template-columns:1.4fr .8fr;gap:18px;margin-bottom:18px}
+.card{background:linear-gradient(180deg,rgba(18,24,48,.96),rgba(10,14,29,.96));border:1px solid var(--line);
+border-radius:16px;padding:18px;box-shadow:0 16px 45px rgba(0,0,0,.28)}
+.hero h2{margin:0 0 8px;color:var(--cyan);font-size:26px}
+.note{color:var(--muted);line-height:1.5}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.stat{background:#0a1023;border:1px solid #273762;border-radius:12px;padding:12px;text-align:center}
+.stat b{display:block;font-size:23px;color:var(--cyan)}
+.progress{height:10px;background:#050915;border:1px solid #26345a;border-radius:20px;overflow:hidden}
+.progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--mag));transition:.25s}
+.nav{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}
+.nav button{padding:8px 11px}
+.nav button.current{border-color:var(--mag);box-shadow:0 0 13px rgba(255,79,216,.24)}
+.nav button.done{border-color:var(--green);color:var(--green)}
+.pbq{display:none}
+.pbq.active{display:block}
+.pbq h3{font-size:24px;margin:0 0 6px;color:#fff}
+.tag{display:inline-block;color:var(--cyan);border:1px solid #275c6a;background:#071b23;border-radius:999px;padding:4px 9px;font-size:12px;margin-right:6px}
+.scenario{background:#0a0f22;border-left:4px solid var(--mag);padding:13px 15px;margin:14px 0;border-radius:8px;line-height:1.45}
+.task{background:#0b1328;border:1px solid #2a3a65;border-radius:12px;padding:14px;margin:12px 0}
+.task h4{margin:0 0 10px;color:var(--amber)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+label{display:block;margin:8px 0;color:#dfefff}
+select,input[type=text],input[type=number],textarea{width:100%;background:#060b18;color:var(--ink);border:1px solid #33456f;
+border-radius:9px;padding:10px;outline:none}
+select:focus,input:focus,textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 2px rgba(70,232,255,.1)}
+textarea{min-height:92px;resize:vertical}
+.choice{display:flex;align-items:flex-start;gap:8px;padding:9px;background:#0b1124;border:1px solid #26365e;border-radius:9px;margin:7px 0}
+.choice input{margin-top:3px}
+.rack{display:grid;grid-template-columns:70px 1fr;gap:7px;max-width:720px}
+.ru{background:#090d19;border:1px solid #33415f;border-radius:6px;padding:8px;text-align:center;color:var(--muted)}
+.slot{background:#111932;border:1px dashed #3b4b75;border-radius:6px;padding:8px}
+.slot select{padding:7px}
+.diskrow{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.disk{padding:16px 8px;background:#0c142a;border:1px solid #314473;border-radius:10px;text-align:center}
+.disk.bad{border-color:var(--red);box-shadow:inset 0 0 12px rgba(255,100,124,.14)}
+.terminal{background:#020506;color:#a6ffbe;border:1px solid #28523a;border-radius:10px;padding:13px;font-family:Consolas,monospace;white-space:pre-wrap}
+.log{font-family:Consolas,monospace;background:#050813;border:1px solid #303b59;padding:12px;border-radius:9px;color:#c7d4e8;font-size:13px;overflow:auto}
+.orderlist{display:grid;gap:8px}
+.orderrow{display:grid;grid-template-columns:45px 1fr;gap:8px;align-items:center}
+.orderrow input{width:100%;text-align:center}
+.firewall{display:grid;grid-template-columns:1.3fr .65fr .65fr .8fr;gap:8px;align-items:end}
+.feedback{display:none;margin-top:12px;padding:12px;border-radius:10px}
+.feedback.good{display:block;background:rgba(103,255,178,.08);border:1px solid #2f7d5d;color:#bfffe0}
+.feedback.bad{display:block;background:rgba(255,100,124,.08);border:1px solid #7b3441;color:#ffd1d8}
+.controls{display:flex;justify-content:space-between;gap:10px;margin-top:16px;flex-wrap:wrap}
+.scorebox{font-size:42px;font-weight:900;color:var(--cyan);text-shadow:0 0 15px rgba(70,232,255,.45)}
+table{width:100%;border-collapse:collapse;margin-top:10px}
+th,td{border-bottom:1px solid #253453;padding:9px;text-align:left}
+th{color:var(--cyan)}
+footer{text-align:center;color:#7f91ad;padding:28px 20px 45px;position:relative;z-index:2}
+kbd{background:#090c13;border:1px solid #44506a;border-bottom-width:3px;padding:1px 5px;border-radius:5px}
+@media(max-width:900px){.hero,.grid2,.grid3{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.topbar{grid-template-columns:1fr}.diskrow{grid-template-columns:repeat(3,1fr)}.firewall{grid-template-columns:1fr 1fr}.rack{grid-template-columns:52px 1fr}}
+</style>
+</head>
+<body>
+<header>
+  <div class="topbar">
+    <div class="brand">
+      <h1>SERVER+ // PBQ SIMULATOR</h1>
+      <small>CompTIA Server+ SK0-005 objective-aligned practice • original training content</small>
+    </div>
+    <div class="pill">TIME <span id="timer">90:00</span></div>
+    <button class="primary" onclick="finishExam()">Submit Exam</button>
+  </div>
+</header>
+
+<main>
+<section class="hero">
+  <div class="card">
+    <h2>Performance-Based Practice Environment</h2>
+    <p class="note">Work each ticket like you are the server administrator. Configure, prioritize, diagnose, and recover systems. This simulator does <b>not</b> reproduce live CompTIA questions; it trains the same objective areas and hands-on reasoning.</p>
+    <div class="progress"><div id="progressBar"></div></div>
+    <p class="note"><span id="answered">0</span> of <span id="totalCount">14</span> PBQs checked</p>
+  </div>
+  <div class="card">
+    <div class="stats">
+      <div class="stat"><b>14</b>PBQs</div>
+      <div class="stat"><b>90</b>Minutes</div>
+      <div class="stat"><b>4</b>Domains</div>
+      <div class="stat"><b>100</b>Points</div>
+    </div>
+    <p class="note">Suggested mode: first attempt without notes. Use <b>Check PBQ</b> for training mode or submit everything at the end for exam mode.</p>
+  </div>
+</section>
+
+<div class="nav" id="nav"></div>
+<div id="pbqs">
+
+<!-- 1 -->
+<section class="pbq card active" data-id="1" data-points="7">
+<span class="tag">Hardware</span><span class="tag">Rack / Power / Cooling</span>
+<h3>PBQ 1 — Rack the New Server</h3>
+<div class="scenario">A 2U database server weighs 62 lb and has dual 1100 W power supplies. The rack has redundant A/B PDUs. The top of the rack is already heavy. You must install the server safely and preserve power redundancy.</div>
+<div class="grid2">
+<div class="task"><h4>Rack location</h4>
+<label>Best placement<select id="q1a"><option value="">Select</option><option>Top 2U</option><option>Middle 2U</option><option value="low">Lowest available 2U position</option></select></label>
+<label>Safe lifting method<select id="q1b"><option value="">Select</option><option>One technician lifts from front</option><option value="team">Two-person/team lift or approved lift device</option><option>Install while rails are unsupported</option></select></label></div>
+<div class="task"><h4>Power design</h4>
+<label>PSU 1<select id="q1c"><option value="">Select</option><option value="a">PDU A</option><option>PDU B</option><option>Same power strip as PSU 2</option></select></label>
+<label>PSU 2<select id="q1d"><option value="">Select</option><option>PDU A</option><option value="b">PDU B</option><option>Same power strip as PSU 1</option></select></label>
+<label>Airflow<select id="q1e"><option value="">Select</option><option value="ftb">Front-to-back; keep intake/exhaust unobstructed</option><option>Back-to-front regardless of chassis design</option><option>Block unused rear space with cardboard</option></select></label></div>
+</div>
+<div class="feedback" id="fb1"></div>
+<div class="controls"><span></span><button onclick="check(1)">Check PBQ</button></div>
+</section>
+
+<!-- 2 -->
+<section class="pbq card" data-id="2" data-points="8">
+<span class="tag">Storage</span><span class="tag">RAID</span>
+<h3>PBQ 2 — Build the Storage Array</h3>
+<div class="scenario">A virtualization host needs high random I/O, fault tolerance, and fast rebuilds. Six identical 2 TB SSDs are available. Capacity is less important than resiliency and performance.</div>
+<div class="diskrow">
+<div class="disk">SSD 1<br>2 TB</div><div class="disk">SSD 2<br>2 TB</div><div class="disk">SSD 3<br>2 TB</div>
+<div class="disk">SSD 4<br>2 TB</div><div class="disk">SSD 5<br>2 TB</div><div class="disk">SSD 6<br>2 TB</div>
+</div>
+<div class="grid2">
+<div class="task"><h4>Array configuration</h4>
+<label>RAID level<select id="q2a"><option value="">Select</option><option>RAID 0</option><option>RAID 5</option><option>RAID 6</option><option value="r10">RAID 10</option></select></label>
+<label>Usable capacity<input id="q2b" type="text" placeholder="Example: 6 TB"></label></div>
+<div class="task"><h4>Controller settings</h4>
+<label>Write cache protection<select id="q2c"><option value="">Select</option><option>Disable all cache</option><option value="protected">Protected write-back cache / BBU or flash-backed cache</option><option>Unprotected write-back only</option></select></label>
+<label>Hot spare for maximum usable performance?<select id="q2d"><option value="">Select</option><option value="no">No dedicated hot spare; monitor and keep replacement available</option><option>Use three hot spares</option></select></label></div>
+</div>
+<div class="feedback" id="fb2"></div>
+<div class="controls"><button onclick="go(-1)">Previous</button><button onclick="check(2)">Check PBQ</button></div>
+</section>
+
+<!-- 3 -->
+<section class="pbq card" data-id="3" data-points="8">
+<span class="tag">Troubleshooting</span><span class="tag">Disk Failure</span>
+<h3>PBQ 3 — RAID Degraded Alert</h3>
+<div class="scenario">A RAID 5 array reports <b>DEGRADED</b>. Bay 4 shows an amber fault LED. The server is still online. A verified current backup exists.</div>
+<div class="task"><h4>Put the actions in the safest order (1–5)</h4>
+<div class="orderlist">
+<div class="orderrow"><input id="q3a" type="number" min="1" max="5"><span>Verify the failed member and controller/array status.</span></div>
+<div class="orderrow"><input id="q3b" type="number" min="1" max="5"><span>Confirm backup/recovery readiness and document the maintenance.</span></div>
+<div class="orderrow"><input id="q3c" type="number" min="1" max="5"><span>Replace the confirmed failed hot-swappable drive with a compatible drive.</span></div>
+<div class="orderrow"><input id="q3d" type="number" min="1" max="5"><span>Monitor rebuild progress and system health.</span></div>
+<div class="orderrow"><input id="q3e" type="number" min="1" max="5"><span>Verify the array returns to optimal state and document results.</span></div>
+</div></div>
+<div class="feedback" id="fb3"></div>
+<div class="controls"><button onclick="go(-1)">Previous</button><button onclick="check(3)">Check PBQ</button></div>
+</section>
+
+<!-- 4 -->
+<section class="pbq card" data-id="4" data-points="7">
+<span class="tag">Administration</span><span class="tag">Networking</span>
+<h3>PBQ 4 — Repair the Management Network</h3>
+<div class="scenario">A server should be on VLAN 22, subnet 10.10.22.0/27. Gateway is 10.10.22.1 and DNS is 10.10.20.16. The server must use a static address and cannot duplicate the gateway.</div>
+<div class="grid3">
+<label>IP address<input id="q4a" type="text" value="10.10.22.10"></label>
+<label>Subnet mask<input id="q4b" type="text" placeholder="255.255.255.???"></label>
+<label>Gateway<input id="q4c" type="text" placeholder="10.10.22.1"></label>
+<label>DNS<input id="q4d" type="text" placeholder="10.10.20.16"></label>
+<label>VLAN ID<input id="q4e" type="number" min="1" max="4094"></label>
+<label>First troubleshooting test<select id="q4f"><option value="">Select</option><option>Ping a public website by name first</option><option value="gw">Test local configuration/link, then ping the default gateway</option><option>Replace the server motherboard</option></select></label>
+</div>
+<div class="feedback" id="fb4"></div>
+<div class="controls"><button onclick="go(-1)">Previous</button><button onclick="check(4)">Check PBQ</button></div>
+</section>
+
+<!-- 5 -->
+<section class="pbq card" data-id="5" data-points="7">
+<span class="tag">Administration</span><span class="tag">OS Installation</span>
+<h3>PBQ 5 — Install a Server OS</h3>
+<div class="scenario">You are deploying a modern server OS on UEFI hardware to a newly created hardware RAID logical volume. Secure Boot is supported. The organization requires remote administration and minimal attack surface.</div>
+<div class="grid2">
+<div>
+<label>Boot mode<select id="q5a"><option value="">Select</option><option>Legacy BIOS only</option><option value="uefi">UEFI</option></select></label>
+<label>Partition style<select id="q5b"><option value="">Select</option><option>MBR</option><option value="gpt">GPT</option></select></label>
+</div><div>
+<label>Installation type<select id="q5c"><option value="">Select</option><option>Full GUI with all optional roles</option><option value="minimal">Minimal/core installation when requirements permit</option></select></label>
+<label>After install<select id="q5d"><option value="">Select</option><option value="patch">Patch OS/firmware/drivers, harden, configure monitoring, then validate</option><option>Disable updates permanently</option></select></label>
+</div></div>
+<div class="feedback" id="fb5"></div>
+<div class="controls"><button onclick="go(-1)">Previous</button><button onclick="check(5)">Check PBQ</button></div>
+</section>
+
+<!-- 6 -->
+<section class="pbq card" data-id="6" data-points="7">
+<span class="tag">Administration</span><span class="tag">Infrastructure Services</span>
+<h3>PBQ 6 — Match the Infrastructure Service</h3>
+<div class="scenario">Configure the correct service for each requirement.</div>
+<div class="grid2">
+<label>Automatic IP configuration<select id="q6a"><option value="">Select</option><option value="dhcp">DHCP</option><option>DNS</option><option>NTP</option><option>LDAP</option></select></label>
+<label>Name-to-IP resolution<select id="q6b"><option value="">Select</option><option>DHCP</option><option value="dns">DNS</option><option>NTP</option><option>LDAP</option></select></label>
+<label>Consistent time for logs/authentication<select id="q6c"><option value="">Select</option><option>DHCP</option><option>DNS</option><option value="ntp">NTP</option><option>LDAP</option></select></label>
+<label>Centralized directory queries<select id="q6d"><option value="">Select</option><option>DHCP</option><option>DNS</option><option>NTP</option><option value="ldap">LDAP</option></select></label>
+</div>
+<div class="feedback" id="fb6"></div>
+<div class="controls"><button onclick="go(-1)">Previous</button><button onclick="check(6)">Check PBQ</button></div>
+</section>
+
+<!-- 7 -->
+<section class="pbq card" data-id="7" data-points="7">
+<span class="tag">Administration</span><span class="tag">Virtualization</span>
+<h3>PBQ 7 — Fix an Overcommitted Hypervisor</h3>
+<div class="scenario">A host has 64 GB RAM. The hypervisor needs 8 GB reserved. Four production VMs each need a guaranteed 12 GB. A test VM currently has 16 GB guaranteed. Users report swapping and latency.</div class="scenario">
+Host: 64 GB &nbsp;|&nbsp; Hypervisor reserve: 8 GB &nbsp;|&nbsp; Production guarantees: 48 GB &nbsp;|&nbsp; Test VM: 16 GB
+</div>
+<div class="grid2">
+<label>Immediate correction<select id="q7a"><option value="">Select</option><option>Increase every VM reservation</option><option value="reduce">Reduce/remove the test VM guarantee or shut down the test VM</option><option>Disable host monitoring</option></select></label>
+<label>Snapshot statement<select id="q7b"><option value="">Select</option><option value="notbackup">A snapshot is useful for short rollback but is not a substitute for backup</option><option>A snapshot is always an independent off-host backup</option></select></label>
+<label>Availability improvement<select id="q7c"><option value="">Select</option><option value="cluster">Cluster/HA with shared or replicated storage and redundant networking</option><option>Place all VMs on one physical disk</option></select></label>
+<label>Resource to watch<select id="q7d"><option value="">Select</option><option value="balloon">Memory pressure/swapping/ballooning metrics</option><option>Monitor wallpaper resolution</option></select></label>
+</div>
+<div class="feedback" id="fb7"></div>
+<div class="controls"><button onclick="go(-1)">Previous</button><button onclick="check(7)">Check PBQ</button></div>
+</section>
+
+<!-- 8 -->
+<section class="pbq card" data-id="8" data-points="7">
+<span class="tag">Security</span><span class="tag">Hardening</span>
+<h3>PBQ 8 — Harden the Server</h3>
+<div class="scenario">A new Internet-facing Linux application server has SSH enabled. The application uses HTTPS. Administrators connect from 10.10.21.0/27. Apply least privilege and reduce attack surface.</div class="task"><h4>Select ALL appropriate actions</h4>
+<label class="choice"><input type="checkbox" id="q8a">Disable unused services and remove unnecessary packages.</label>
+<label class="choice"><input type="checkbox" id="q8b">Allow direct root SSH login from the entire Internet.</label>
+<label class="choice"><input type="checkbox" id="q8c">Use host/network firewall rules to allow HTTPS as required and restrict SSH to the admin subnet.</label>
+<label class="choice"><input type="checkbox" id="q8d">Apply current security patches and establish a patch process.</label>
+<label class="choice"><input type="checkbox" id="q8e">Use individual administrative accounts, MFA where supported, and least privilege/sudo.</label>
+<label class="choice"><input type="checkbox" id="q8f">Share one generic admin password among the team.</label>
+</div>
+<div class="feedback" id="fb8"></div>
+<div class="controls"><button onclick="go(-1)">Previous</button><button onclick="check(8)">Check PBQ</button></div>
+</section>
+
+<!-- 9 -->
+<section class="pbq card" data-id="9" data-points="8">
+<span class="tag">Security</span><span class="tag">Firewall</span>
+<h3>PBQ 9 — Build the Minimum Firewall Rules</h3>
+<div class="scenario">The web server is 10.10.20.50. Public clients require HTTPS. Administrators on 10.10.21.0/27 require SSH. No other inbound traffic should be accepted.</div>
+<div class="task">
+<div class="firewall"><b>Source</b><b>Port</b><b>Protocol</b><b>Action</b></div>
+<div class="firewall"><input id="q9a" type="text" placeholder="Any / subnet"><input id="q9b" type="number"><select id="q9c"><option>TCP</option><option>UDP</option></select><select id="q9d"><option>ALLOW</option><option>DENY</option></select></div>
+<div class="firewall"><input id="q9e" type="text" placeholder="Admin subnet"><input id="q9f" type="number"><select id="q9g"><option>TCP</option><option>UDP</option></select><select id="q9h"><option>ALLOW</option><option>DENY</option></select></div>
+<label>Default inbound policy<select id="q9i"><option value="">Select</option><option>ALLOW</option><option value="deny">DENY</option></select></label>
+</div>
+<div class="feedback" id="fb9"></div>
+<div class="controls"><button onclick="go(-1)">Previous</button><button onclick="check(9)">Check PBQ</button></div>
+</section>
+
+<!-- 10 -->
+<section class="pbq card" data-id="10" data-points="8">
+<span class="tag">Disaster Recovery</span><span class="tag">Backup</span>
+<h3>PBQ 10 — Meet the RPO/RTO</h3>
+<div class="scenario">Accounting requires no more than 15 minutes of data loss and service must be restored within 2 hours after a server failure. Nightly backups alone cannot meet the data-loss requirement.</div class="grid2">
+<label>RPO<select id="q10a"><option value="">Select</option><option>2 hours</option><option value="15">15 minutes</option><option>24 hours</option></select></label>
+<label>RTO<select id="q10b"><option value="">Select</option><option>15 minutes</option><option value="2h">2 hours</option><option>7 days</option></select></label>
+<label>Better protection<select id="q10c"><option value="">Select</option><option>Nightly full backup only</option><option value="rep">Frequent replication/log shipping or backup intervals at or below the RPO, plus tested backups</option></select></label>
+<label>Best validation<select id="q10d"><option value="">Select</option><option value="test">Perform scheduled restore/failover tests and document results</option><option>Assume successful backup jobs guarantee recovery</option></select></label>
+</div>
+<div class="feedback" id="fb10"></div>
+<div class="controls"><button onclick="go(-1)">Previous</button><button onclick="check(10)">Check PBQ</button></div>
+</section>
+
+<!-- 11 -->
+<section class="pbq card" data-id="11" data-points="7">
+<span class="tag">Troubleshooting</span><span class="tag">Logs</span>
+<h3>PBQ 11 — Read the Evidence</h3>
+<div class="scenario">Users report intermittent storage errors after a maintenance window.</div>
+<div class="log">10:14:02 kernel: sd 2:0:3:0: [sdd] tag#18 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_SENSE
+10:14:02 kernel: blk_update_request: I/O error, dev sdd, sector 9843328
+10:14:03 smartd: Device: /dev/sdd, ATA error count increased from 7 to 12
+10:14:05 storcli: VD 0 state=Degraded PD 03 state=Failed
+10:14:06 systemd: application.service active (running)</div>
+<div class="grid2">
+<label>Most likely failing component<select id="q11a"><option value="">Select</option><option>CPU</option><option value="disk">Physical disk /dev/sdd (PD 03)</option><option>Application service</option><option>DNS server</option></select></label>
+<label>Best next action<select id="q11b"><option value="">Select</option><option value="verify">Verify controller/SMART data, backup status, then replace the confirmed failed member</option><option>Reinstall every application</option><option>Clear all logs and wait</option></select></label>
+</div>
+<div class="feedback" id="fb11"></div>
+<div class="controls"><button onclick="go(-1)">Previous</button><button onclick="check(11)">Check PBQ</button></div>
+</section>
+
+<!-- 12 -->
+<section class="pbq card" data-id="12" data-points="7">
+<span class="tag">Troubleshooting</span><span class="tag">Network</span>
+<h3>PBQ 12 — Diagnose “Server Has No Internet”</h3>
+<div class="terminal">C:\> ipconfig
+IPv4 Address . . . . . . : 169.254.44.18
+Subnet Mask  . . . . . . : 255.255.0.0
+Default Gateway . . . . .:
+
+C:\> ping 10.10.21.1
+Destination host unreachable.</div>
+<div class="grid2">
+<label>What does 169.254.x.x indicate?<select id="q12a"><option value="">Select</option><option value="apipa">APIPA/link-local address after DHCP failure</option><option>Valid public address</option><option>Loopback address</option></select></label>
+<label>First area to check<select id="q12b"><option value="">Select</option><option value="path">NIC/link/VLAN path and DHCP availability or scope</option><option>Database indexes</option><option>CPU thermal paste only</option></select></label>
+<label>Useful Windows command<select id="q12c"><option value="">Select</option><option value="renew">ipconfig /release then ipconfig /renew</option><option>format c:</option><option>shutdown /s /t 0</option></select></label>
+<label>If static IP is required<select id="q12d"><option value="">Select</option><option value="static">Configure valid IP/mask/gateway/DNS for the assigned subnet and VLAN</option><option>Keep the 169.254 address</option></select></label>
+</div>
+<div class="feedback" id="fb12"></div>
+<div class="controls"><button onclick="go(-1)">Previous</button><button onclick="check(12)">Check PBQ</button></div>
+</section>
+
+<!-- 13 -->
+<section class="pbq card" data-id="13" data-points="6">
+<span class="tag">Administration</span><span class="tag">CLI</span>
+<h3>PBQ 13 — Server Command Line</h3>
+<div class="scenario">Enter the command you would use. Common equivalent syntax is accepted.</div>
+<div class="grid2">
+<label>Windows: show IP configuration including DNS/DHCP details<input id="q13a" type="text" placeholder="command"></label>
+<label>Linux: show block devices/input storage layout<input id="q13b" type="text" placeholder="command"></label>
+<label>Linux: show listening TCP/UDP sockets/processes<input id="q13c" type="text" placeholder="command"></label>
+<label>Windows PowerShell: show running services<input id="q13d" type="text" placeholder="command"></label>
+</div>
+<div class="feedback" id="fb13"></div>
+<div class="controls"><button onclick="go(-1)">Previous</button><button onclick="check(13)">Check PBQ</button></div>
+</section>
+
+<!-- 14 -->
+<section class="pbq card" data-id="14" data-points="6">
+<span class="tag">Security</span><span class="tag">Decommissioning</span>
+<h3>PBQ 14 — Decommission a Server Correctly</h3>
+<div class="scenario">A physical server containing sensitive business data has reached end of life and will leave organizational control.</div class="task"><h4>Put the actions in logical order (1–5)</h4>
+<div class="orderlist">
+<div class="orderrow"><input id="q14a" type="number" min="1" max="5"><span>Confirm retention requirements, backups/migration, ownership, and authorization.</span></div>
+<div class="orderrow"><input id="q14b" type="number" min="1" max="5"><span>Remove server from production services, monitoring, DNS/load balancers, and access systems.</span></div>
+<div class="orderrow"><input id="q14c" type="number" min="1" max="5"><span>Sanitize or physically destroy storage according to policy and data sensitivity.</span></div>
+<div class="orderrow"><input id="q14d" type="number" min="1" max="5"><span>Update asset inventory, licenses, rack diagrams, and disposal/chain-of-custody records.</span></div>
+<div class="orderrow"><input id="q14e" type="number" min="1" max="5"><span>Release/recycle/dispose of hardware using the approved process.</span></div>
+</div></div>
+<div class="feedback" id="fb14"></div>
+<div class="controls"><button onclick="go(-1)">Previous</button><button class="primary" onclick="check(14);finishExam()">Check & Submit</button></div>
+</section>
+
+<section class="card" id="results" style="display:none;margin-top:18px">
+<h2 style="color:var(--cyan)">Exam Report</h2>
+<div class="scorebox"><span id="scorePct">0</span>%</div>
+<p id="scoreText" class="note"></p>
+<table><thead><tr><th>PBQ</th><th>Result</th><th>Points</th><th>Focus</th></tr></thead><tbody id="resultRows"></tbody></table>
+<div class="controls"><button onclick="reviewMissed()">Review First Missed</button><button onclick="resetExam()">Reset Exam</button></div>
+</section>
+</div>
+</main>
+
+<footer>CompTIA Server+ SK0-005 PBQ Practice Simulator • Original instructional content • Created for classroom practice</footer>
+
+<script>
+const total=14;
+let current=1, checked=new Set(), earned={};
+const focuses=[
+"Rack / power / cooling","RAID design","Storage troubleshooting","Static IP / VLAN","OS deployment",
+"Infrastructure services","Virtualization","Security hardening","Firewall rules","RPO / RTO",
+"Log analysis","Network troubleshooting","Command line","Secure decommissioning"
+];
+function norm(s){return (s||"").trim().toLowerCase().replace(/\s+/g," ")}
+function setfb(n,ok,msg,pts){
+  const el=document.getElementById("fb"+n); el.className="feedback "+(ok?"good":"bad");
+  el.innerHTML="<b>"+(ok?"PBQ COMPLETE":"REVIEW NEEDED")+"</b><br>"+msg;
+  earned[n]=pts; checked.add(n); updateNav();
+}
+function val(id){return document.getElementById(id).value}
+function isChecked(id){return document.getElementById(id).checked}
+function check(n){
+ let p=0,max=Number(document.querySelector('.pbq[data-id="'+n+'"]').dataset.points), msg="";
+ if(n===1){
+   p += val("q1a")==="low"?1.4:0; p += val("q1b")==="team"?1.4:0; p += val("q1c")==="a"?1.4:0; p += val("q1d")==="b"?1.4:0; p += val("q1e")==="ftb"?1.4:0;
+   msg="Place heavy equipment low for rack stability, use proper lifting support, split redundant PSUs across A/B power, and preserve designed airflow.";
+ }
+ if(n===2){
+   p += val("q2a")==="r10"?3:0; p += /(^|\s)6(\s*tb)?$/i.test(norm(val("q2b")))?2:0; p += val("q2c")==="protected"?2:0; p += val("q2d")==="no"?1:0;
+   msg="Six 2 TB drives in RAID 10 provide about 6 TB usable. RAID 10 favors random I/O and fast rebuilds. Protected write-back cache improves performance without accepting unsafe cache risk.";
+ }
+ if(n===3){
+   const ans=[1,2,3,4,5], ids=["q3a","q3b","q3c","q3d","q3e"]; ids.forEach((id,i)=>{if(Number(val(id))===ans[i])p+=1.6});
+   msg="Verify the exact failed member first, confirm recoverability, replace only the failed hot-swap drive, monitor rebuild, then verify optimal state and document.";
+ }
+ if(n===4){
+   p += norm(val("q4a"))==="10.10.22.10"?1:0; p += norm(val("q4b"))==="255.255.255.224"?1.5:0; p += norm(val("q4c"))==="10.10.22.1"?1:0;
+   p += norm(val("q4d"))==="10.10.20.16"?1:0; p += Number(val("q4e"))===22?1.5:0; p += val("q4f")==="gw"?1:0;
+   msg="/27 = 255.255.255.224. The host, mask, gateway, DNS, and VLAN must all match the intended network. Test the local path/default gateway before jumping to external DNS.";
+ }
+ if(n===5){
+   p += val("q5a")==="uefi"?2:0; p += val("q5b")==="gpt"?2:0; p += val("q5c")==="minimal"?1.5:0; p += val("q5d")==="patch"?1.5:0;
+   msg="Modern UEFI deployments generally use GPT. A minimal installation reduces attack surface when it supports the workload; patch, harden, monitor, and validate before production.";
+ }
+ if(n===6){
+   ["q6a","q6b","q6c","q6d"].forEach((id,i)=>{const a=["dhcp","dns","ntp","ldap"][i]; if(val(id)===a)p+=1.75});
+   msg="DHCP = address configuration, DNS = name resolution, NTP = time synchronization, LDAP = directory queries/authentication integration.";
+ }
+ if(n===7){
+   p += val("q7a")==="reduce"?2:0; p += val("q7b")==="notbackup"?2:0; p += val("q7c")==="cluster"?1.5:0; p += val("q7d")==="balloon"?1.5:0;
+   msg="64 GB minus 8 GB host reserve leaves 56 GB. The four production guarantees consume 48 GB, leaving only 8 GB. The 16 GB test guarantee overcommits guaranteed memory. Snapshots are not independent backups.";
+ }
+ if(n===8){
+   const good=isChecked("q8a")&&isChecked("q8c")&&isChecked("q8d")&&isChecked("q8e");
+   const bad=isChecked("q8b")||isChecked("q8f");
+   p=(good&&!bad)?7:Math.max(0,[["q8a",1.25],["q8c",2],["q8d",1.25],["q8e",1.5]].reduce((s,x)=>s+(isChecked(x[0])?x[1]:0),0)-(bad?2:0));
+   msg="Reduce attack surface, patch, restrict management access, and use accountable least-privilege identities. Avoid Internet-wide root SSH and shared administrative credentials.";
+ }
+ if(n===9){
+   let src1=norm(val("q9a")),src2=norm(val("q9e"));
+   p += (src1==="any"||src1==="0.0.0.0/0"||src1==="*")?1.5:0; p += Number(val("q9b"))===443?1.5:0; p += val("q9c")==="TCP"?0.5:0; p += val("q9d")==="ALLOW"?0.5:0;
+   p += src2==="10.10.21.0/27"?1.5:0; p += Number(val("q9f"))===22?1:0; p += val("q9g")==="TCP"?0.5:0; p += val("q9h")==="ALLOW"?0.5:0; p += val("q9i")==="deny"?0.5:0;
+   msg="Allow TCP/443 from clients that need the site, allow TCP/22 only from 10.10.21.0/27, and deny other unsolicited inbound traffic by default.";
+ }
+ if(n===10){
+   p += val("q10a")==="15"?2:0; p += val("q10b")==="2h"?2:0; p += val("q10c")==="rep"?2:0; p += val("q10d")==="test"?2:0;
+   msg="RPO is acceptable data loss (15 min); RTO is acceptable restoration time (2 hr). Backup/replication frequency must support the RPO, and only restore/failover testing proves recoverability.";
+ }
+ if(n===11){
+   p += val("q11a")==="disk"?3.5:0; p += val("q11b")==="verify"?3.5:0;
+   msg="The log directly identifies I/O errors, increasing SMART ATA errors, and a degraded virtual disk with PD 03 failed. Verify and replace the confirmed failed member after confirming recovery readiness.";
+ }
+ if(n===12){
+   p += val("q12a")==="apipa"?2:0; p += val("q12b")==="path"?2:0; p += val("q12c")==="renew"?1.5:0; p += val("q12d")==="static"?1.5:0;
+   msg="169.254.0.0/16 is APIPA/link-local addressing on Windows when normal DHCP configuration is unavailable. Check the link/VLAN/DHCP path before higher-layer services.";
+ }
+ if(n===13){
+   const a=norm(val("q13a")),b=norm(val("q13b")),c=norm(val("q13c")),d=norm(val("q13d"));
+   p += (a==="ipconfig /all")?1.5:0; p += (b==="lsblk"||b==="sudo lsblk")?1.5:0;
+   p += (c.includes("ss -")||c.includes("netstat -"))?1.5:0; p += (d==="get-service"||d==="get-service | where-object {$_.status -eq 'running'}"||d.startsWith("get-service"))?1.5:0;
+   msg="Typical answers: ipconfig /all, lsblk, ss -tulpn (or netstat equivalent), and Get-Service. Exact switches can vary by OS/tool version.";
+ }
+ if(n===14){
+   const ans=[1,2,3,4,5], ids=["q14a","q14b","q14c","q14d","q14e"]; ids.forEach((id,i)=>{if(Number(val(id))===ans[i])p+=1.2});
+   msg="Verify retention/migration and authorization, remove dependencies/access, sanitize media, update records, then dispose through the approved process. Exact organizational workflows can vary.";
+ }
+ p=Math.round(p*10)/10;
+ const ok=p>=max*.8;
+ setfb(n,ok,msg+`<br><b>Score: ${p} / ${max}</b>`,p);
+}
+function updateNav(){
+  document.getElementById("answered").textContent=checked.size;
+  document.getElementById("progressBar").style.width=(checked.size/total*100)+"%";
+  for(let i=1;i<=total;i++){const b=document.getElementById("nav"+i); b.classList.toggle("current",i===current); b.classList.toggle("done",checked.has(i))}
+}
+function show(n){current=Math.min(total,Math.max(1,n));document.querySelectorAll(".pbq").forEach(x=>x.classList.remove("active"));document.querySelector('.pbq[data-id="'+current+'"]').classList.add("active");updateNav();window.scrollTo({top:145,behavior:"smooth"})}
+function go(d){show(current+d)}
+function buildNav(){const nav=document.getElementById("nav");for(let i=1;i<=total;i++){let b=document.createElement("button");b.id="nav"+i;b.textContent="PBQ "+i;b.onclick=()=>show(i);nav.appendChild(b)}updateNav()}
+function finishExam(){
+  for(let i=1;i<=total;i++) if(!checked.has(i)) check(i);
+  let score=0,max=0; document.querySelectorAll(".pbq").forEach(s=>max+=Number(s.dataset.points)); Object.values(earned).forEach(x=>score+=x);
+  const pct=Math.round(score/max*100);
+  document.getElementById("scorePct").textContent=pct;
+  document.getElementById("scoreText").innerHTML=`You earned <b>${score.toFixed(1)} / ${max}</b> simulator points. This percentage is a classroom practice metric, not a conversion to CompTIA's scaled score.`;
+  const rows=document.getElementById("resultRows");rows.innerHTML="";
+  for(let i=1;i<=total;i++){let m=Number(document.querySelector('.pbq[data-id="'+i+'"]').dataset.points),e=earned[i]||0,tr=document.createElement("tr");tr.innerHTML=`<td>PBQ ${i}</td><td>${e>=m*.8?"✓ Strong":"△ Review"}</td><td>${e} / ${m}</td><td>${focuses[i-1]}</td>`;rows.appendChild(tr)}
+  document.getElementById("results").style.display="block";document.getElementById("results").scrollIntoView({behavior:"smooth"});
+}
+function reviewMissed(){for(let i=1;i<=total;i++){let m=Number(document.querySelector('.pbq[data-id="'+i+'"]').dataset.points);if((earned[i]||0)<m*.8){show(i);return}}alert("No PBQ is below the simulator's 80% review threshold.");}
+function resetExam(){location.reload()}
+buildNav();
+
+let seconds=90*60;
+setInterval(()=>{if(seconds<=0)return;seconds--;let m=Math.floor(seconds/60),s=seconds%60;document.getElementById("timer").textContent=String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");if(seconds===0)finishExam()},1000);
+</script>
+</body>
+</html>

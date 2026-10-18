@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Information Technology Specialist Python Exam Lab Simulator</title>
+<style>
+:root{
+  --bg:#071019;--panel:#0d1926;--line:#294760;--text:#eef7ff;--muted:#9fb7c9;
+  --blue:#2aa7ff;--green:#43dc8e;--yellow:#ffd166;--red:#ff6b78;--purple:#a887ff
+}
+*{box-sizing:border-box}
+body{margin:0;background:
+radial-gradient(circle at 10% -8%,#163b62 0,transparent 25%),
+radial-gradient(circle at 95% 0,#25194a 0,transparent 24%),
+linear-gradient(#06101a,#09121b);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif;min-height:100vh}
+button,input,select,textarea{font:inherit}button{cursor:pointer}
+.app{max-width:1500px;margin:auto;padding:16px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;padding:14px 18px;background:#0b1825e8;border:1px solid var(--line);border-radius:16px;position:sticky;top:8px;z-index:30;box-shadow:0 10px 35px #0006}
+.brand{display:flex;gap:13px;align-items:center}.logo{width:64px;height:64px;border-radius:11px;background:linear-gradient(135deg,#3776ab,#ffd343);color:white;display:grid;place-items:center;font-weight:1000;font-size:18px;text-align:center}.brand h1{margin:0;font-size:clamp(20px,3vw,34px)}.brand p{margin:2px 0 0;color:var(--muted);font-size:12px}
+.badges{display:flex;gap:8px;flex-wrap:wrap}.badge{padding:7px 10px;border-radius:999px;border:1px solid #365a78;background:#122a3d;color:#c9ecff;font-size:12px;font-weight:800}
+.shell{display:grid;grid-template-columns:285px 1fr;gap:14px;margin-top:14px}.side,.main{background:#0b1723e8;border:1px solid #243f59;border-radius:16px}.side{padding:12px;align-self:start;position:sticky;top:100px}
+.nav{width:100%;border:0;background:transparent;color:#dceeff;text-align:left;padding:11px;border-radius:9px;font-weight:800;margin:2px 0}.nav:hover,.nav.active{background:#153650}.nav span{display:block;font-size:10px;color:#7fa3bd;font-weight:500;margin-top:2px}
+.main{padding:18px;min-height:820px}.screen{display:none}.screen.active{display:block}
+.hero{padding:22px;border-radius:17px;border:1px solid #315270;background:linear-gradient(135deg,#102c47,#171d37);margin-bottom:14px}.hero h2{font-size:clamp(28px,4vw,44px);margin:0 0 7px}.hero p{line-height:1.55;color:#c0d6e7;max-width:1050px}.heroActions{display:flex;gap:9px;flex-wrap:wrap}
+.primary,.secondary,.danger,.warning,.success{border:0;border-radius:9px;padding:10px 14px;font-weight:900}.primary{background:var(--blue);color:#041727}.secondary{background:#1b344b;color:white;border:1px solid #3b607d}.danger{background:#a53a46;color:white}.warning{background:#a97113;color:white}.success{background:#198d58;color:white}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.card{background:#101f30;border:1px solid #294a65;border-radius:13px;padding:15px}.card h3{margin:0 0 8px}.small{font-size:12px;color:var(--muted)}.mono{font-family:Consolas,monospace}
+.domainBar{height:8px;border-radius:99px;background:#07101a;overflow:hidden;margin:8px 0}.domainBar span{height:100%;display:block;background:linear-gradient(90deg,var(--blue),var(--green))}
+.examHeader{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.timer{font:900 28px Consolas,monospace;color:var(--yellow)}.examName{font-size:18px;font-weight:900}
+.navgrid{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin:10px 0}.qnav{border:1px solid #36536a;background:#102638;color:white;border-radius:6px;padding:6px 2px;font-size:11px}.qnav.done{background:#176642}.qnav.flag{outline:2px solid var(--yellow)}.qnav.current{border-color:#50cfff}
+.questionCard{background:#101f30;border:1px solid #2d4d68;border-radius:14px;padding:20px}.qmeta{display:flex;gap:7px;flex-wrap:wrap}.tag{padding:4px 7px;border-radius:999px;background:#17364c;color:#c7eaff;font-size:10px;font-weight:900}.selectTag{background:#4e3d13;color:#ffe59b}.labTag{background:#422b59;color:#e7caff}
+.question{font-size:21px;font-weight:800;line-height:1.45;margin:12px 0}.answers{display:grid;gap:8px}.answer{border:1px solid #355b78;background:#153149;color:white;border-radius:10px;padding:12px;text-align:left}.answer.selected{outline:2px solid var(--green);background:#153d31}
+.feedback{padding:11px;border-radius:9px;border:1px dashed #3b607c;background:#0b1824;margin-top:10px;min-height:45px}.good{border-color:#2c8059;background:#0f2a21}.bad{border-color:#803a44;background:#2b1519}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.spacer{flex:1}.preset{display:flex;gap:8px;flex-wrap:wrap}
+.console{background:#02070c;color:#b7ffca;border:1px solid #315042;border-radius:10px;padding:12px;font:13px Consolas,monospace;white-space:pre-wrap}
+.resultBig{font-size:52px;font-weight:1000}.reviewQ{padding:12px;border-radius:10px;border:1px solid #294b65;background:#0e1e2d;margin-bottom:9px}.correctTxt{color:#7effb4}.wrongTxt{color:#ff8d98}.studyQ{font-size:18px;font-weight:800;margin:10px 0}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:8px;border-bottom:1px solid #29475e;text-align:left}th{color:#bfeaff}
+textarea{width:100%;min-height:300px;background:#071019;color:#d9f7e6;border:1px solid #36536a;border-radius:10px;padding:12px;font:14px Consolas,monospace;resize:vertical}
+.output{min-height:130px;background:#02070c;border:1px solid #2f4b5f;border-radius:10px;padding:12px;font:13px Consolas,monospace;color:#b7ffca;white-space:pre-wrap}.exampleCode{background:#050b12;border:1px solid #3c5f78;border-radius:10px;padding:12px;color:#ffd76a;font:13px Consolas,monospace;white-space:pre-wrap;overflow:auto;min-height:150px}.practiceNote{padding:10px;border-left:4px solid #ffd343;background:#18202a;border-radius:8px;margin:10px 0;color:#e9f4ff}
+.ide{display:grid;grid-template-columns:1.4fr .9fr;gap:12px}.tasklist{display:grid;gap:8px}.task{padding:10px;border:1px solid #31516a;border-radius:9px;background:#0d1d29}.task.done{border-color:#2c8059;background:#0f2a21}
+.creator-footer{position:fixed;bottom:8px;left:50%;transform:translateX(-50%);z-index:9999;padding:6px 12px;border-radius:999px;background:rgba(7,16,25,.88);border:1px solid #365a78;color:#9fb7c9;font-size:11px;font-weight:700;letter-spacing:.5px;white-space:nowrap}
+@media(max-width:1050px){.shell{grid-template-columns:1fr}.side{position:static}.grid{grid-template-columns:1fr 1fr}.ide{grid-template-columns:1fr}}
+@media(max-width:700px){.grid,.grid2{grid-template-columns:1fr}.navgrid{grid-template-columns:repeat(8,1fr)}}
+</style>
+</head>
+<body>
+<div class="creator-footer" id="creatorMark"></div>
+<div class="app">
+<div class="topbar">
+<div class="brand"><div class="logo">PY<br>ITS</div><div><h1>Information Technology Specialist - Python</h1><p>Python 3 • data types • flow control • I/O • functions • errors • modules</p></div></div>
+<div class="badges"><div class="badge" id="xpBadge">XP 0</div><div class="badge">Python 3</div><div class="badge">50-minute exam</div></div>
+</div>
+
+<div class="shell">
+<aside class="side">
+<button class="nav active" onclick="show('home',this)">🏠 Exam Center<span>Selective response + Next Generation</span></button>
+<button class="nav" onclick="showStudy(this)">📘 Study Mode<span>Immediate explanations by objective</span></button>
+<button class="nav" onclick="show('coding',this);loadCodingTask(0)">💻 Python PBQ Practice<span>Examples first → type the code yourself</span></button>
+<button class="nav" onclick="show('setup',this)">📝 Practice Exams<span>35Q or Next Generation format</span></button>
+<button class="nav" onclick="show('objectives',this)">📊 Objective Map<span>Six current Pearson domains</span></button>
+</aside>
+
+<main class="main">
+<section id="home" class="screen active">
+<div class="hero"><h2>Python Certification Challenge</h2><p>This simulator follows Pearson's current ITS Python objective sheet. Students practice Python 3 syntax, data types, operators, decisions, loops, files, console I/O, documentation, functions, troubleshooting, exceptions, unit tests and built-in modules.</p><div class="heroActions"><button class="primary" onclick="show('setup')">CHOOSE EXAM MODE</button><button class="success" onclick="show('coding');loadCodingTask(0)">OPEN PYTHON PBQ PRACTICE</button></div></div>
+<div class="grid">
+<div class="card"><h3>1. Data Types & Operators</h3><p class="small">str, int, float, bool, conversion, indexing, slicing, lists, precedence, arithmetic, comparison, logical, identity and containment.</p></div>
+<div class="card"><h3>2. Decisions & Loops</h3><p class="small">if, elif, else, compound conditions, for, while, break, continue, pass and nested loops.</p></div>
+<div class="card"><h3>3. Input & Output</h3><p class="small">Files, open/read/write/append, with, existence/deletion, input(), print(), format(), f-strings and command-line arguments.</p></div>
+<div class="card"><h3>4. Documentation & Structure</h3><p class="small">Indentation, whitespace, comments, docstrings, pydoc, functions, parameters/defaults, return and pass.</p></div>
+<div class="card"><h3>5. Troubleshooting & Errors</h3><p class="small">Syntax, logic, runtime errors, try/except/else/finally/raise and unittest assertions.</p></div>
+<div class="card"><h3>6. Modules & Tools</h3><p class="small">io, os, os.path, sys, math, datetime and random.</p></div>
+</div>
+</section>
+
+<section id="study" class="screen"><div class="hero"><h2>Python Study Mode</h2><p>Choose an objective area and receive immediate explanations.</p></div><div class="toolbar"><select id="studyDomain" onchange="renderStudy()"></select><button class="secondary" onclick="renderStudy()">NEW QUESTION</button></div><div id="studyArea"></div></section>
+
+<section id="setup" class="screen">
+<div class="hero"><h2>Choose the Current Python Exam Experience</h2><p>Practice either the selective-response version or the newer performance-based format.</p></div>
+<div class="grid">
+<div class="card"><h3>Selective Response</h3><div class="resultBig" style="font-size:32px">35 Q</div><p class="small">Single-section practice with multiple-choice and Select TWO style items.</p><button class="primary" onclick="startExam(35,3000,'Selective Response')">START 35 QUESTIONS</button></div>
+<div class="card"><h3>Python Next Generation</h3><div class="resultBig" style="font-size:32px">16 + 7 + 8</div><p class="small">Question Section 1 → seven coding tasks → Question Section 2.</p><button class="success" onclick="startNextGen()">START NEXT GENERATION</button></div>
+<div class="card"><h3>Quick Classroom Check</h3><div class="resultBig" style="font-size:32px">15 Q</div><p class="small">20-minute warm-up/review.</p><button class="primary" onclick="startExam(15,1200,'Quick Check')">START 15 QUESTIONS</button></div>
+</div>
+</section>
+
+<section id="exam" class="screen">
+<div class="examHeader"><div><div class="examName" id="examTitle">ITS Python Practice Exam</div><div class="small">Question <span id="qNum"></span> of <span id="qTotal"></span></div></div><div class="timer" id="timer">50:00</div></div><div class="domainBar"><span id="examProgress"></span></div><div id="qNav" class="navgrid"></div>
+<div class="questionCard"><div class="qmeta"><span class="tag" id="qDomain"></span><span class="tag" id="qType"></span></div><div id="qText" class="question"></div><div id="answers" class="answers"></div><div class="toolbar"><button class="secondary" onclick="prevQ()">← PREVIOUS</button><button class="warning" onclick="toggleFlag()">⚑ FLAG</button><div class="spacer"></div><button class="secondary" onclick="nextQ()">NEXT →</button><button class="danger" onclick="submitExam()">FINISH SECTION</button></div></div>
+</section>
+
+<section id="coding" class="screen">
+<div class="hero"><h2>Python PBQ Code Practice Lab</h2><p>Each PBQ gives you a complete working example first. Study the example, then type the code yourself in the editor and use CHECK MY CODE. This is guided practice before testing without the example.</p></div>
+<div class="ide">
+<div class="card">
+  <div class="qmeta"><span class="tag labTag">PBQ PRACTICE <span id="labNum">1</span>/7</span><span class="tag" id="labDomain"></span></div>
+  <h3 id="labTitle"></h3>
+  <p id="labPrompt"></p>
+  <div class="practiceNote"><b>Your job:</b> Read the example on the right, then type it yourself below. Do not copy/paste if you want the best practice.</div>
+  <textarea id="codeEditor" spellcheck="false" placeholder="Type the Python code here..."></textarea>
+  <div class="toolbar">
+    <button class="primary" onclick="runCodeCheck()">CHECK MY CODE</button>
+    <button class="secondary" onclick="clearEditor()">CLEAR EDITOR</button>
+    <button class="secondary" onclick="resetLab()">RESET TASK</button>
+    <button class="success" onclick="nextLab()">NEXT PBQ →</button>
+  </div>
+  <div id="labFeedback" class="feedback">Study the example, type the code, then choose CHECK MY CODE.</div>
+</div>
+<div>
+  <div class="card">
+    <h3>Example Code</h3>
+    <p class="small">This is the code pattern you are practicing. Type it into the editor yourself.</p>
+    <div id="labExample" class="exampleCode"></div>
+  </div>
+  <div class="card" style="margin-top:12px"><h3>What This Code Does</h3><div id="labHint" class="small"></div></div>
+  <div class="card" style="margin-top:12px"><h3>Expected Output</h3><div id="labOutput" class="output">Ready.</div></div>
+  <div class="card" style="margin-top:12px"><h3>Lab Progress</h3><div id="labProgress" class="tasklist"></div></div>
+</div>
+</div>
+</section>
+
+<section id="results" class="screen"><div id="resultsArea"></div></section>
+
+<section id="objectives" class="screen"><div class="hero"><h2>Current ITS Python Objective Map</h2><p>Pearson's current Python objectives contain six domains.</p></div><div class="card"><table>
+<tr><th>Domain</th><th>Coverage</th></tr>
+<tr><td>1. Operations using Data Types and Operators</td><td>str/int/float/bool, conversion, indexing, slicing, list operations, precedence and operators</td></tr>
+<tr><td>2. Flow Control with Decisions and Loops</td><td>if/elif/else, nested conditions, while/for, break, continue, pass and nested loops</td></tr>
+<tr><td>3. Input and Output Operations</td><td>File I/O, with statement, existence/deletion, console input/output, formatting, sys.argv concepts</td></tr>
+<tr><td>4. Code Documentation and Structure</td><td>Indentation, comments, docstrings, pydoc, function definitions/defaults/return/pass</td></tr>
+<tr><td>5. Troubleshooting and Error Handling</td><td>Syntax/logic/runtime errors, exceptions, raise and unittest assertions</td></tr>
+<tr><td>6. Operations using Modules and Tools</td><td>io, os, os.path, sys, math, datetime and random</td></tr>
+</table></div></section>
+</main></div></div>
+
+<script>
+let XP=0,examItems=[],responses=[],flags=[],qi=0,timerHandle=null,timeLeft=3000,studyItem=null,nextGen=false,nextGenStage=0;
+const Q=[
+["1. Data Types and Operators","What data type does Python assign to x = 10?",["int","float","str","bool"],[0],"10 is an integer literal, so x is int.","Single answer"],
+["1. Data Types and Operators","What is the result of int('25')?",["25 as an integer","'25' as a string","25.0 only","True"],[0],"int() converts a numeric string to an integer.","Single answer"],
+["1. Data Types and Operators","What does the expression 7 // 2 return?",["3","3.5","4","1"],[0],"// performs floor division.","Single answer"],
+["1. Data Types and Operators","What does 7 % 2 return?",["1","3","3.5","0"],[0],"% returns the remainder.","Single answer"],
+["1. Data Types and Operators","What does 2 ** 3 evaluate to?",["8","6","5","9"],[0],"** is exponentiation.","Single answer"],
+["1. Data Types and Operators","Which TWO are comparison operators?",["==","!=","and","in"],[0,1],"== and != compare values.","Select TWO"],
+["1. Data Types and Operators","Given name='Python', what does name[0] return?",["P","y","Python","0"],[0],"Index 0 selects the first character.","Single answer"],
+["1. Data Types and Operators","Given nums=[10,20,30,40], what does nums[1:3] return?",["[20,30]","[10,20,30]","[20,30,40]","[10,40]"],[0],"Slicing includes the start index and excludes the stop index.","Single answer"],
+["1. Data Types and Operators","Which list method adds one item to the end?",["append()","remove()","sort()","reverse()"],[0],"append() adds one object to the end of a list.","Single answer"],
+["1. Data Types and Operators","Which operator tests whether a value is contained in a sequence?",["in","is","== only","//"],[0],"in performs membership testing.","Single answer"],
+
+["2. Flow Control with Decisions and Loops","Which keyword checks an additional condition after if?",["elif","else if","elseif","case"],[0],"Python uses elif.","Single answer"],
+["2. Flow Control with Decisions and Loops","Which loop is commonly used to iterate over each element in a list?",["for","switch","do-until","case"],[0],"for iterates across iterable objects.","Single answer"],
+["2. Flow Control with Decisions and Loops","Which statement exits the nearest loop immediately?",["break","continue","pass","return only"],[0],"break terminates the loop.","Single answer"],
+["2. Flow Control with Decisions and Loops","Which statement skips the remainder of the current iteration and continues with the next?",["continue","break","pass","raise"],[0],"continue advances to the next iteration.","Single answer"],
+["2. Flow Control with Decisions and Loops","What does pass do?",["Acts as a no-operation placeholder","Stops the program","Exits a loop","Prints output"],[0],"pass does nothing and is useful as a placeholder.","Single answer"],
+["2. Flow Control with Decisions and Loops","Which TWO can create repetition?",["for","while","elif","import"],[0,1],"for and while are loop constructs.","Select TWO"],
+
+["3. Input and Output Operations","Which function reads text from the console?",["input()","print()","read() only","scan()"],[0],"input() reads user input as a string.","Single answer"],
+["3. Input and Output Operations","Which function sends output to the console?",["print()","input()","open()","close()"],[0],"print() writes formatted output to the console.","Single answer"],
+["3. Input and Output Operations","Which file mode appends without overwriting existing content?",["a","w","r","x only"],[0],"Mode a appends to a file.","Single answer"],
+["3. Input and Output Operations","Why is the with statement useful for file operations?",["It can automatically close the file resource","It converts every file to JSON","It deletes files automatically","It disables exceptions"],[0],"with manages the file context and closes it on exit.","Single answer"],
+["3. Input and Output Operations","Which syntax is an f-string?",["f'Hello {name}'","'Hello' + {name}","format f(name)","$'Hello name'"],[0],"Prefixing a string with f enables expression interpolation.","Single answer"],
+["3. Input and Output Operations","Which module exposes command-line arguments through argv?",["sys","math","random","datetime"],[0],"sys.argv contains command-line argument strings.","Single answer"],
+
+["4. Code Documentation and Structure","Which character begins a single-line Python comment?",["#","//","<!--","*"],[0],"# begins a comment in Python.","Single answer"],
+["4. Code Documentation and Structure","What is a docstring primarily used for?",["Documenting modules, classes, and functions","Encrypting code","Loop control","File deletion"],[0],"Docstrings provide programmatic documentation.","Single answer"],
+["4. Code Documentation and Structure","Which keyword defines a function?",["def","function","func","define"],[0],"Functions are defined with def.","Single answer"],
+["4. Code Documentation and Structure","What does return do inside a function?",["Sends a result back to the caller and ends that function call","Creates a loop","Imports a module","Raises every error"],[0],"return supplies a result to the caller.","Single answer"],
+["4. Code Documentation and Structure","What is a default parameter value?",["A value used when the caller omits that argument","A syntax error","A global variable only","A file mode"],[0],"Default values make some arguments optional.","Single answer"],
+
+["5. Troubleshooting and Error Handling","Which error occurs when Python grammar is invalid?",["Syntax error","Logic error","Network error","Permission group"],[0],"Invalid Python grammar produces a SyntaxError.","Single answer"],
+["5. Troubleshooting and Error Handling","A program runs but returns the wrong answer. What kind of error is this most likely?",["Logic error","Syntax error","Import syntax only","Indentation always"],[0],"Logic errors produce incorrect behavior despite valid execution.","Single answer"],
+["5. Troubleshooting and Error Handling","Which construct handles exceptions?",["try / except","if / elif only","for / while","import / as"],[0],"try/except handles exceptions.","Single answer"],
+["5. Troubleshooting and Error Handling","Which block runs whether or not an exception occurs?",["finally","except only","raise","assert"],[0],"finally runs after the try sequence regardless of exception outcome.","Single answer"],
+["5. Troubleshooting and Error Handling","Which keyword deliberately triggers an exception?",["raise","break","continue","yield only"],[0],"raise explicitly raises an exception.","Single answer"],
+["5. Troubleshooting and Error Handling","Which unittest assertion checks two values for equality?",["assertEqual","assertTrue only","assertIn only","assertIsInstance only"],[0],"assertEqual compares expected and actual values for equality.","Single answer"],
+
+["6. Modules and Tools","Which module provides sqrt() and pi?",["math","random","datetime","sys only"],[0],"The math module contains mathematical functions/constants.","Single answer"],
+["6. Modules and Tools","Which function can generate a random integer within a range including both endpoints?",["random.randint()","math.floor()","datetime.now()","os.path.exists()"],[0],"random.randint(a,b) returns an integer from a through b inclusive.","Single answer"],
+["6. Modules and Tools","Which function checks whether a path exists?",["os.path.exists()","math.exists()","sys.exists()","datetime.exists()"],[0],"os.path.exists() checks filesystem existence.","Single answer"],
+["6. Modules and Tools","Which function returns the current local date and time?",["datetime.datetime.now()","math.now()","random.now()","sys.now()"],[0],"datetime.datetime.now() returns the current local date/time.","Single answer"],
+["6. Modules and Tools","Which TWO modules are directly related to filesystem or process/runtime interaction?",["os","sys","math","random"],[0,1],"os and sys expose operating-system/runtime capabilities.","Select TWO"]
+];
+const DOMAINS=[...new Set(Q.map(q=>q[0]))];
+const EXTRA_Q=[["4. Code Documentation and Structure", "Which Python feature is commonly used to document the purpose of a function immediately inside its definition?", ["Docstring", "Decorator only", "Lambda", "Tuple"], [0], "A docstring documents modules, classes, and functions using a string literal placed at the start of the block.", "Single answer"], ["6. Modules and Tools", "Which statement imports only the sqrt function from Python's math module?", ["from math import sqrt", "import sqrt from math", "include math.sqrt", "using math sqrt"], [0], "from math import sqrt imports the named function directly.", "Single answer"]];
+const BANK=[...Q,...EXTRA_Q];
+
+// Randomize answer positions while preserving the correct answer index(es).
+function shuffleQuestion(q){
+ const choices=q[2].map((answer,index)=>({answer,correct:q[3].includes(index)}));
+ for(let i=choices.length-1;i>0;i--){
+   const j=Math.floor(Math.random()*(i+1));
+   [choices[i],choices[j]]=[choices[j],choices[i]];
+ }
+ return [
+   q[0],
+   q[1],
+   choices.map(x=>x.answer),
+   choices.map((x,i)=>x.correct?i:null).filter(x=>x!==null),
+   q[4],
+   q[5]
+ ];
+}
+
+const LABS=[
+ {
+  domain:"1. Data Types and Operators",
+  title:"List Operations",
+  prompt:"Create a list named nums containing 5, 2, 9, and 1. Sort it, append 7, and print the list.",
+  solution:`nums = [5, 2, 9, 1]
+nums.sort()
+nums.append(7)
+print(nums)`,
+  check:c=>/\bnums\s*=\s*\[\s*5\s*,\s*2\s*,\s*9\s*,\s*1\s*\]/.test(c)&&/\bnums\.sort\(\s*\)/.test(c)&&/\bnums\.append\(\s*7\s*\)/.test(c)&&/\bprint\(\s*nums\s*\)/.test(c),
+  out:"[1, 2, 5, 7, 9]",
+  hint:"The list is created first. sort() changes it into ascending order. append(7) adds 7. print(nums) displays the final list."
+ },
+ {
+  domain:"2. Flow Control with Decisions and Loops",
+  title:"Decision Logic",
+  prompt:"Set score to 85. Print Pass when score is 70 or higher; otherwise print Fail.",
+  solution:`score = 85
+if score >= 70:
+    print("Pass")
+else:
+    print("Fail")`,
+  check:c=>/\bscore\s*=\s*85\b/.test(c)&&/\bif\s+score\s*>=\s*70\s*:/.test(c)&&/\bprint\(\s*["']Pass["']\s*\)/.test(c)&&/\belse\s*:/.test(c)&&/\bprint\(\s*["']Fail["']\s*\)/.test(c),
+  out:"Pass",
+  hint:"if tests the condition. The indented code runs when the condition is True. else runs when it is False."
+ },
+ {
+  domain:"2. Flow Control with Decisions and Loops",
+  title:"For Loop",
+  prompt:"Use range(1, 6) in a for loop to print 1 through 5.",
+  solution:`for number in range(1, 6):
+    print(number)`,
+  check:c=>/\bfor\s+[A-Za-z_]\w*\s+in\s+range\(\s*1\s*,\s*6\s*\)\s*:/.test(c)&&/\bprint\(\s*[A-Za-z_]\w*\s*\)/.test(c),
+  out:"1\n2\n3\n4\n5",
+  hint:"range(1, 6) starts at 1 and stops before 6. The loop variable changes on each pass."
+ },
+ {
+  domain:"3. Input and Output Operations",
+  title:"File Output",
+  prompt:"Open notes.txt in write mode with a with statement and write Python Rocks to the file.",
+  solution:`with open("notes.txt", "w") as file:
+    file.write("Python Rocks")`,
+  check:c=>/\bwith\s+open\(\s*["']notes\.txt["']\s*,\s*["']w["']\s*\)\s+as\s+[A-Za-z_]\w*\s*:/.test(c)&&/[A-Za-z_]\w*\.write\(\s*["']Python Rocks["']\s*\)/.test(c),
+  out:"notes.txt created\nContents: Python Rocks",
+  hint:"with manages the file resource. w opens in write mode. write() sends text into the file."
+ },
+ {
+  domain:"4. Code Documentation and Structure",
+  title:"Function Definition",
+  prompt:"Define add(a, b=5), return a + b, then print add(10).",
+  solution:`def add(a, b=5):
+    return a + b
+
+print(add(10))`,
+  check:c=>/\bdef\s+add\(\s*a\s*,\s*b\s*=\s*5\s*\)\s*:/.test(c)&&/\breturn\s+a\s*\+\s*b/.test(c)&&/\bprint\(\s*add\(\s*10\s*\)\s*\)/.test(c),
+  out:"15",
+  hint:"def creates the function. b=5 is a default parameter. return sends the result back. add(10) uses 5 for b."
+ },
+ {
+  domain:"5. Troubleshooting and Error Handling",
+  title:"Exception Handling",
+  prompt:"Attempt 10 / 0 inside try and catch ZeroDivisionError. Print Cannot divide by zero.",
+  solution:`try:
+    result = 10 / 0
+except ZeroDivisionError:
+    print("Cannot divide by zero")`,
+  check:c=>/\btry\s*:/.test(c)&&/\bresult\s*=\s*10\s*\/\s*0/.test(c)&&/\bexcept\s+ZeroDivisionError\s*:/.test(c)&&/\bprint\(\s*["']Cannot divide by zero["']\s*\)/.test(c),
+  out:"Cannot divide by zero",
+  hint:"The risky statement goes inside try. except ZeroDivisionError catches that specific exception."
+ },
+ {
+  domain:"6. Modules and Tools",
+  title:"Math Module",
+  prompt:"Import math, calculate the square root of 81, save it as result, and print it.",
+  solution:`import math
+
+result = math.sqrt(81)
+print(result)`,
+  check:c=>/\bimport\s+math\b/.test(c)&&/\bresult\s*=\s*math\.sqrt\(\s*81\s*\)/.test(c)&&/\bprint\(\s*result\s*\)/.test(c),
+  out:"9.0",
+  hint:"import math loads the module. math.sqrt(81) calls the square-root function. The result is stored and printed."
+ }
+];
+
+let labIndex=0,labDone=Array(7).fill(false),nextGenLabCompleted=false;
+
+function show(id,btn){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll(".nav").forEach(n=>n.classList.remove("active"));if(btn)btn.classList.add("active")}
+function balancedSet(n){
+ const result=[];let remaining=n;
+ DOMAINS.forEach((dom,idx)=>{
+   const count=idx===DOMAINS.length-1?remaining:Math.round(n/DOMAINS.length);
+   remaining-=count;
+   const subset=BANK.filter(q=>q[0]===dom).sort(()=>Math.random()-.5);
+   if(count>subset.length)throw new Error("Not enough unique questions in "+dom);
+   for(let i=0;i<count;i++)result.push(shuffleQuestion(subset[i]));
+ });
+ return result.sort(()=>Math.random()-.5);
+}
+function renderResults(correct,pct){let html=`<div class="hero"><div class="resultBig">${pct>=85?"STRONG READINESS ✅":pct>=70?"KEEP PRACTICING — CLOSE":"REVIEW NEEDED 🛠️"}</div><h2>${correct}/${examItems.length} • ${pct}%</h2><p>Practice percentage only; not an official Certiport score.</p></div><h2>Answer Review</h2>`;examItems.forEach((q,i)=>{const ok=sameSet(responses[i]||[],q[3]);html+=`<div class="reviewQ"><b>${i+1}. ${q[1]}</b><div class="${ok?'correctTxt':'wrongTxt'}">${ok?'Correct':'Incorrect'}</div><div class="small">Correct: ${q[3].map(x=>q[2][x]).join(" + ")}</div><div class="small">${q[4]}</div></div>`});document.getElementById("resultsArea").innerHTML=html}
+function showNextGenResults(){const labScore=labDone.filter(Boolean).length;const total=16+7+8,correct=nextGenScore1+labScore+nextGenScore2,pct=Math.round(correct/total*100);show("results");document.getElementById("resultsArea").innerHTML=`<div class="hero"><div class="resultBig">${pct>=85?"STRONG NEXT-GEN READINESS ✅":"NEXT-GEN PRACTICE COMPLETE"}</div><h2>${correct}/${total} practice points • ${pct}%</h2><p>Section 1: ${nextGenScore1}/16 &nbsp; • &nbsp; PBQ Code Practice: ${labScore}/7 &nbsp; • &nbsp; Section 2: ${nextGenScore2}/8</p><p>This is an original simulator score, not Pearson's official scoring model.</p></div>`}
+function showStudy(btn){show("study",btn);document.getElementById("studyDomain").innerHTML=`<option value="ALL">All Domains</option>`+DOMAINS.map(d=>`<option>${d}</option>`).join("");renderStudy()}
+function renderStudy(){const d=document.getElementById("studyDomain").value||"ALL";let p=BANK.filter(q=>d==="ALL"||q[0]===d);studyItem=p[Math.floor(Math.random()*p.length)];window.studyChosen=[];document.getElementById("studyArea").innerHTML=`<div class="card"><span class="tag">${studyItem[0]}</span><div class="studyQ">${studyItem[1]}</div><div class="answers">${studyItem[2].map((a,i)=>`<button class="answer" onclick="answerStudy(${i},this)">${a}</button>`).join("")}</div><div id="studyFeedback" class="feedback">Choose an answer.</div></div>`}
+function answerStudy(i,b){const max=studyItem[3].length;if(max===1){const ok=studyItem[3].includes(i);document.querySelectorAll("#studyArea .answer").forEach(x=>x.classList.remove("selected"));b.classList.add("selected");const f=document.getElementById("studyFeedback");f.className="feedback "+(ok?"good":"bad");f.textContent=(ok?"✅ Correct. ":"❌ Incorrect. ")+studyItem[4]}else{if(window.studyChosen.includes(i))window.studyChosen=window.studyChosen.filter(x=>x!==i);else if(window.studyChosen.length<max)window.studyChosen.push(i);document.querySelectorAll("#studyArea .answer").forEach((x,j)=>x.classList.toggle("selected",window.studyChosen.includes(j)));if(window.studyChosen.length===max){const ok=sameSet(window.studyChosen,studyItem[3]);const f=document.getElementById("studyFeedback");f.className="feedback "+(ok?"good":"bad");f.textContent=(ok?"✅ Correct. ":"❌ Incorrect. ")+studyItem[4]}}}
+
+function normalizeCode(s){
+ return s.replace(/\r/g,"").replace(/[ \t]+$/gm,"").trim();
+}
+function loadCodingTask(i){
+ labIndex=i;
+ const l=LABS[i];
+ document.getElementById("labNum").textContent=i+1;
+ document.getElementById("labDomain").textContent=l.domain;
+ document.getElementById("labTitle").textContent=l.title;
+ document.getElementById("labPrompt").textContent=l.prompt;
+ document.getElementById("codeEditor").value="";
+ document.getElementById("labExample").textContent=l.solution;
+ document.getElementById("labHint").textContent=l.hint;
+ document.getElementById("labOutput").textContent="Expected output:\n"+l.out;
+ document.getElementById("labFeedback").className="feedback";
+ document.getElementById("labFeedback").textContent="Study the example, type the code yourself, then choose CHECK MY CODE.";
+ renderLabProgress();
+}
+function runCodeCheck(){
+ const l=LABS[labIndex];
+ const code=normalizeCode(document.getElementById("codeEditor").value);
+ const exact=code===normalizeCode(l.solution);
+ const semantic=l.check(code);
+ const ok=exact||semantic;
+ const f=document.getElementById("labFeedback");
+ f.className="feedback "+(ok?"good":"bad");
+ if(ok){
+   f.textContent=exact?"✅ Passed — your typed code matches the example.":"✅ Passed — your code uses the required Python structures and should accomplish the task.";
+   document.getElementById("labOutput").textContent="Simulated run:\n"+l.out;
+   if(!labDone[labIndex]){
+     labDone[labIndex]=true;
+     XP+=10;
+     document.getElementById("xpBadge").textContent="XP "+XP;
+   }
+   renderLabProgress();
+ }else{
+   f.textContent="❌ Not passed yet. Compare your typing with the example. Check spelling, parentheses, colons, quotes, indentation, and the required statements.";
+   document.getElementById("labOutput").textContent="Expected output:\n"+l.out;
+ }
+}
+function clearEditor(){
+ document.getElementById("codeEditor").value="";
+ document.getElementById("codeEditor").focus();
+}
+function resetLab(){loadCodingTask(labIndex)}
+function nextLab(){
+ if(labIndex<LABS.length-1){
+   loadCodingTask(labIndex+1);
+ }else if(nextGen&&nextGenStage===2){
+   nextGenStage=3;
+   examItems=balancedSet(8);
+   responses=Array(8).fill(null).map(()=>[]);
+   flags=Array(8).fill(false);
+   qi=0;
+   document.getElementById("examTitle").textContent="Python Next Generation - Question Section 2";
+   document.getElementById("qTotal").textContent=8;
+   show("exam");
+   timerHandle=setInterval(tick,1000);
+   renderQ();
+ }else{
+   document.getElementById("labFeedback").className="feedback good";
+   document.getElementById("labFeedback").textContent="✅ You reached all seven PBQ practice tasks. Reopen any task marked Not passed yet and type the example again.";
+ }
+}
+function renderLabProgress(){
+ document.getElementById("labProgress").innerHTML=LABS.map((l,i)=>`<div class="task ${labDone[i]?'done':''}" onclick="loadCodingTask(${i})"><b>${i+1}. ${l.title}</b><span class="small">${labDone[i]?'Passed':'Not passed yet'}</span></div>`).join("");
+}
+
+const _creatorHex=["43","72","65","61","74","65","64","20","62","79","20","44","65","72","72","69","63","6b","20","42","65","61","69","72","64"];
+document.getElementById("creatorMark").textContent=_creatorHex.map(x=>String.fromCharCode(parseInt(x,16))).join("");
+</script>
+</body>
+</html>

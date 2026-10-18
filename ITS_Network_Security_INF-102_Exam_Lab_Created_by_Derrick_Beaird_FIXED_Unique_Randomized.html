@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Information Technology Specialist Network Security Exam Lab Simulator</title>
+<style>
+:root{
+  --bg:#071019;--panel:#0d1926;--line:#294760;--text:#eef7ff;--muted:#9fb7c9;
+  --blue:#2aa7ff;--green:#43dc8e;--yellow:#ffd166;--red:#ff6b78;--purple:#a887ff
+}
+*{box-sizing:border-box}body{margin:0;background:
+radial-gradient(circle at 10% -8%,#163b62 0,transparent 25%),
+radial-gradient(circle at 95% 0,#25194a 0,transparent 24%),
+linear-gradient(#06101a,#09121b);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif;min-height:100vh}
+button,input,select{font:inherit}button{cursor:pointer}.app{max-width:1500px;margin:auto;padding:16px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;padding:14px 18px;background:#0b1825e8;border:1px solid var(--line);border-radius:16px;position:sticky;top:8px;z-index:30;box-shadow:0 10px 35px #0006}
+.brand{display:flex;gap:13px;align-items:center}.logo{width:64px;height:64px;border-radius:11px;background:#107c41;color:white;display:grid;place-items:center;font-weight:1000;font-size:15px;text-align:center;line-height:1.05}.brand h1{margin:0;font-size:clamp(20px,3vw,34px)}.brand p{margin:2px 0 0;color:var(--muted);font-size:12px}
+.badges{display:flex;gap:8px;flex-wrap:wrap}.badge{padding:7px 10px;border-radius:999px;border:1px solid #365a78;background:#122a3d;color:#c9ecff;font-size:12px;font-weight:800}
+.shell{display:grid;grid-template-columns:285px 1fr;gap:14px;margin-top:14px}.side,.main{background:#0b1723e8;border:1px solid #243f59;border-radius:16px}.side{padding:12px;align-self:start;position:sticky;top:100px}
+.nav{width:100%;border:0;background:transparent;color:#dceeff;text-align:left;padding:11px;border-radius:9px;font-weight:800;margin:2px 0}.nav:hover,.nav.active{background:#153650}.nav span{display:block;font-size:10px;color:#7fa3bd;font-weight:500;margin-top:2px}
+.main{padding:18px;min-height:820px}.screen{display:none}.screen.active{display:block}
+.hero{padding:22px;border-radius:17px;border:1px solid #315270;background:linear-gradient(135deg,#102c47,#171d37);margin-bottom:14px}.hero h2{font-size:clamp(28px,4vw,44px);margin:0 0 7px}.hero p{line-height:1.55;color:#c0d6e7;max-width:1050px}.heroActions{display:flex;gap:9px;flex-wrap:wrap}
+.primary,.secondary,.danger,.warning,.success{border:0;border-radius:9px;padding:10px 14px;font-weight:900}.primary{background:var(--blue);color:#041727}.secondary{background:#1b344b;color:white;border:1px solid #3b607d}.danger{background:#a53a46;color:white}.warning{background:#a97113;color:white}.success{background:#198d58;color:white}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.card{background:#101f30;border:1px solid #294a65;border-radius:13px;padding:15px}.card h3{margin:0 0 8px}.small{font-size:12px;color:var(--muted)}.mono{font-family:Consolas,monospace}
+.domainBar{height:8px;border-radius:99px;background:#07101a;overflow:hidden;margin:8px 0}.domainBar span{height:100%;display:block;background:linear-gradient(90deg,var(--blue),var(--green))}
+.examHeader{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.timer{font:900 28px Consolas,monospace;color:var(--yellow)}.examName{font-size:18px;font-weight:900}
+.navgrid{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin:10px 0}.qnav{border:1px solid #36536a;background:#102638;color:white;border-radius:6px;padding:6px 2px;font-size:11px}.qnav.done{background:#176642}.qnav.flag{outline:2px solid var(--yellow)}.qnav.current{border-color:#50cfff}
+.questionCard{background:#101f30;border:1px solid #2d4d68;border-radius:14px;padding:20px}.qmeta{display:flex;gap:7px;flex-wrap:wrap}.tag{padding:4px 7px;border-radius:999px;background:#17364c;color:#c7eaff;font-size:10px;font-weight:900}.selectTag{background:#4e3d13;color:#ffe59b}.pbqTag{background:#422b59;color:#e7caff}
+.question{font-size:21px;font-weight:800;line-height:1.45;margin:12px 0}.answers{display:grid;gap:8px}.answer{border:1px solid #355b78;background:#153149;color:white;border-radius:10px;padding:12px;text-align:left}.answer.selected{outline:2px solid var(--green);background:#153d31}
+.feedback{padding:11px;border-radius:9px;border:1px dashed #3b607c;background:#0b1824;margin-top:10px;min-height:45px}.good{border-color:#2c8059;background:#0f2a21}.bad{border-color:#803a44;background:#2b1519}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.spacer{flex:1}.preset{display:flex;gap:8px;flex-wrap:wrap}
+.console{background:#02070c;color:#b7ffca;border:1px solid #315042;border-radius:10px;padding:12px;font:13px Consolas,monospace;min-height:220px;white-space:pre-wrap}
+.resultBig{font-size:52px;font-weight:1000}.reviewQ{padding:12px;border-radius:10px;border:1px solid #294b65;background:#0e1e2d;margin-bottom:9px}.correctTxt{color:#7effb4}.wrongTxt{color:#ff8d98}.studyQ{font-size:18px;font-weight:800;margin:10px 0}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:8px;border-bottom:1px solid #29475e;text-align:left}th{color:#bfeaff}
+label{display:block;font-size:12px;color:#a9c6d7;font-weight:800;margin:9px 0 4px}input,select{width:100%;padding:10px;border-radius:8px;border:1px solid #375568;background:#09151e;color:white}
+.creator-footer{position:fixed;bottom:8px;left:50%;transform:translateX(-50%);z-index:9999;padding:6px 12px;border-radius:999px;background:rgba(7,16,25,.88);border:1px solid #365a78;color:#9fb7c9;font-size:11px;font-weight:700;letter-spacing:.5px;white-space:nowrap}
+@media(max-width:1050px){.shell{grid-template-columns:1fr}.side{position:static}.grid,.grid3{grid-template-columns:1fr}}
+@media(max-width:700px){.grid2{grid-template-columns:1fr}.navgrid{grid-template-columns:repeat(8,1fr)}}
+</style>
+</head>
+<body>
+<div class="creator-footer" id="creatorMark"></div>
+<div class="app">
+<div class="topbar"><div class="brand"><div class="logo">ITS<br>NET<br>SEC</div><div><h1>Information Technology Specialist - Network Security</h1><p>Defense in depth • operating systems • network devices • secure computing</p></div></div><div class="badges"><div class="badge" id="xpBadge">XP 0</div><div class="badge">INF-102 objective set</div><div class="badge">40 Q / 50 min practice</div></div></div>
+
+<div class="shell">
+<aside class="side">
+<button class="nav active" onclick="show('home',this)">🏠 Exam Center<span>Start exam, study, or security labs</span></button>
+<button class="nav" onclick="showStudy(this)">📘 Study Mode<span>Immediate explanations by domain</span></button>
+<button class="nav" onclick="show('pbq',this)">🧪 Security Skills Lab<span>Permissions, firewall, VPN, logs, malware</span></button>
+<button class="nav" onclick="setupExam(this)">📝 Network Security Exam<span>40-question practice simulation</span></button>
+<button class="nav" onclick="show('objectives',this)">📊 Objective Map<span>Four current INF-102 domains</span></button>
+</aside>
+
+<main class="main">
+<section id="home" class="screen active">
+<div class="hero"><h2>Network Security Technician Challenge</h2><p>This simulator targets the Information Technology Specialist Network Security exam, INF-102. It emphasizes hands-on foundational security with client/server operating systems, firewalls, devices, ports, permissions, authentication, encryption, wireless security, auditing, malware protection and secure networking.</p><div class="heroActions"><button class="primary" onclick="setupExam()">START FULL PRACTICE EXAM</button><button class="success" onclick="document.querySelectorAll('.nav')[2].click()">OPEN SECURITY SKILLS LAB</button></div></div>
+<div class="grid">
+<div class="card"><h3>1. Defense in Depth</h3><p class="small">CIA, non-repudiation, threats/risk/vulnerabilities, least privilege, physical security, policies, malware and attacks, backup types.</p></div>
+<div class="card"><h3>2. Operating System Security</h3><p class="small">Hardening, patching, GPO, DNS updates, UAC, MFA, passwords, Run As/sudo, users/groups, Kerberos, permissions, auditing, encryption, TPM and BitLocker.</p></div>
+<div class="card"><h3>3. Network Device Security</h3><p class="small">Wireless security, SSIDs/MAC filtering, firewalls, IDS/IPS, SIEM, filtering, DMZ, NAT/PAT, VPN, IPsec, VLANs, DNSSEC and secure ports.</p></div>
+<div class="card"><h3>4. Secure Computing</h3><p class="small">Email protection, spoofing/phishing/pharming, browser security, cache/private browsing, anti-malware installation, updates, scans, remediation and alerts.</p></div>
+</div>
+</section>
+
+<section id="study" class="screen"><div class="hero"><h2>Study Mode</h2><p>Choose a domain and receive immediate explanations.</p></div><div class="toolbar"><select id="studyDomain" onchange="renderStudy()"></select><button class="secondary" onclick="renderStudy()">NEW QUESTION</button></div><div id="studyArea"></div></section>
+
+<section id="examSetup" class="screen"><div class="hero"><h2>ITS Network Security Exam Simulator</h2><p>Use the full mode for endurance or shorter modes for classroom review.</p></div><div class="grid3">
+<div class="card"><h3>Full Simulation</h3><div class="resultBig" style="font-size:32px">40 Q</div><p class="small">50 minutes.</p><button class="primary" onclick="startExam(40,3000)">START FULL EXAM</button></div>
+<div class="card"><h3>Class Practice</h3><div class="resultBig" style="font-size:32px">25 Q</div><p class="small">35 minutes.</p><button class="primary" onclick="startExam(25,2100)">START 25 QUESTIONS</button></div>
+<div class="card"><h3>Quick Check</h3><div class="resultBig" style="font-size:32px">15 Q</div><p class="small">20 minutes.</p><button class="primary" onclick="startExam(15,1200)">START 15 QUESTIONS</button></div>
+</div></section>
+
+<section id="exam" class="screen">
+<div class="examHeader"><div><div class="examName">ITS Network Security Practice Exam</div><div class="small">Question <span id="qNum"></span> of <span id="qTotal"></span></div></div><div class="timer" id="timer">50:00</div></div><div class="domainBar"><span id="examProgress"></span></div><div id="qNav" class="navgrid"></div>
+<div class="questionCard"><div class="qmeta"><span class="tag" id="qDomain"></span><span class="tag" id="qType"></span></div><div id="qText" class="question"></div><div id="answers" class="answers"></div><div class="toolbar"><button class="secondary" onclick="prevQ()">← PREVIOUS</button><button class="warning" onclick="toggleFlag()">⚑ FLAG</button><div class="spacer"></div><button class="secondary" onclick="nextQ()">NEXT →</button><button class="danger" onclick="submitExam()">SUBMIT</button></div></div>
+</section>
+<section id="results" class="screen"><div id="resultsArea"></div></section>
+
+<section id="pbq" class="screen">
+<div class="hero"><h2>Network Security Skills Lab</h2><p>Practice defensive configuration and analysis aligned to the INF-102 objectives.</p></div>
+<div class="preset">
+<button class="primary" onclick="loadPBQ('permissions')">Windows Permissions</button>
+<button class="primary" onclick="loadPBQ('firewall')">Firewall / DMZ</button>
+<button class="primary" onclick="loadPBQ('vpn')">VPN / IPsec</button>
+<button class="primary" onclick="loadPBQ('wireless')">Wireless Security</button>
+<button class="primary" onclick="loadPBQ('logs')">Audit Logs</button>
+<button class="primary" onclick="loadPBQ('encryption')">BitLocker / TPM</button>
+<button class="primary" onclick="loadPBQ('malware')">Malware Response</button>
+</div><div id="pbqArea" style="margin-top:14px"></div>
+</section>
+
+<section id="objectives" class="screen">
+<div class="hero"><h2>INF-102 Objective Map</h2><p>The current Pearson objective document lists four domains.</p></div>
+<div class="card"><table><tr><th>Domain</th><th>Coverage</th></tr>
+<tr><td>1. Defense in Depth</td><td>CIA, least privilege, physical security, controls/policies, malware and attack types, full/incremental/differential backups</td></tr>
+<tr><td>2. Operating System Security</td><td>Hardening, patching, GPO, UAC, MFA, Kerberos, Windows/Linux permissions, auditing, encryption, TPM, BitLocker, VPN crypto</td></tr>
+<tr><td>3. Network Device Security</td><td>Wireless security, firewalls, IDS/IPS/SIEM, filtering, DMZ, NAT/PAT, VPN, IPsec, air gaps, VLANs, DNSSEC, ports/protocol security</td></tr>
+<tr><td>4. Secure Computing</td><td>Email protection, phishing/spoofing/pharming, browser settings/cache/private browsing, antivirus/anti-malware install/update/scan/remediation</td></tr>
+</table></div>
+</section>
+</main></div></div>
+
+<script>
+let XP=0,examItems=[],responses=[],flags=[],qi=0,timerHandle=null,timeLeft=3000,studyItem=null;
+const Q=[
+["1. Defense in Depth","Which security principle prevents unauthorized disclosure of information?",["Confidentiality","Integrity","Availability","Routing"],[0],"Confidentiality protects data from unauthorized disclosure.","Single answer"],
+["1. Defense in Depth","Which principle protects data from unauthorized modification?",["Integrity","Availability","Confidentiality only","NAT"],[0],"Integrity protects accuracy and completeness.","Single answer"],
+["1. Defense in Depth","Which principle ensures systems and data are accessible when needed?",["Availability","Confidentiality","Hashing","Segmentation"],[0],"Availability concerns reliable access to systems and information.","Single answer"],
+["1. Defense in Depth","Which TWO controls demonstrate least privilege?",["Standard user for daily work","Grant only required folder access","Give everyone administrator","Share one root account"],[0,1],"Least privilege grants only the access needed.","Select TWO"],
+["1. Defense in Depth","Which physical control can prevent one person from following another directly into a secure area?",["Mantrap/access vestibule","VLAN","DNSSEC","Antivirus"],[0],"A mantrap or access-control vestibule strengthens physical entry control.","Single answer"],
+["1. Defense in Depth","Which malware encrypts files and demands payment?",["Ransomware","Adware","Worm only","Root certificate"],[0],"Ransomware commonly encrypts data and demands payment.","Single answer"],
+["1. Defense in Depth","Which attack attempts large numbers of passwords until one succeeds?",["Brute force","Pharming","NAT","DNSSEC"],[0],"Brute force repeatedly guesses credentials.","Single answer"],
+["1. Defense in Depth","Which application flaw allows untrusted script content to execute in a user's browser?",["Cross-site scripting","DHCP starvation only","NAT exhaustion","STP loop"],[0],"XSS involves untrusted script execution in the browser.","Single answer"],
+["1. Defense in Depth","Which attack inserts malicious database query content into application input?",["SQL injection","ARP only","RDP","SFTP"],[0],"SQL injection manipulates database queries through unsafe input handling.","Single answer"],
+["1. Defense in Depth","Which backup contains changes since the most recent backup of any type?",["Incremental","Differential","Full only","Snapshot only"],[0],"Incremental backups capture changes since the last backup.","Single answer"],
+["1. Defense in Depth","Which backup contains changes since the most recent full backup?",["Differential","Incremental","Full","Mirror only"],[0],"Differential backups accumulate changes since the last full backup.","Single answer"],
+
+["2. Operating System Security","Which action reduces attack surface on a server?",["Disable unnecessary services","Install unnecessary software","Enable unused ports","Share administrator credentials"],[0],"Removing unnecessary services reduces exposed functionality.","Single answer"],
+["2. Operating System Security","Which TWO are components of OS hardening?",["Patch management","Disable unnecessary services","Allow default passwords","Turn off logging"],[0,1],"Patching and reducing exposed services are core hardening practices.","Select TWO"],
+["2. Operating System Security","Which Windows command forces Group Policy to refresh?",["gpupdate","ipconfig","netstat","nslookup"],[0],"gpupdate refreshes Group Policy.","Single answer"],
+["2. Operating System Security","Which Windows command can report Resultant Set of Policy information?",["gpresult","ping","format","tracert"],[0],"gpresult reports applied Group Policy information.","Single answer"],
+["2. Operating System Security","What is the purpose of UAC?",["Prompt for elevation when administrative privileges are required","Assign DHCP addresses","Encrypt all emails","Create VLANs"],[0],"UAC controls privilege elevation.","Single answer"],
+["2. Operating System Security","Which TWO constitute different authentication factors?",["Password","Fingerprint","Two passwords","PIN plus password"],[0,1],"Password and fingerprint represent knowledge and inherence factors.","Select TWO"],
+["2. Operating System Security","Which Linux command commonly runs one command with elevated privilege?",["sudo","ping","grep only","dig"],[0],"sudo allows authorized users to run commands with elevated privilege.","Single answer"],
+["2. Operating System Security","Which protocol is commonly used for Windows domain authentication?",["Kerberos","FTP","SNMP","NAT"],[0],"Kerberos is central to Active Directory domain authentication.","Single answer"],
+["2. Operating System Security","A user belongs to two groups with different file permissions. What should be evaluated?",["Combined effective permissions","Only the first group","Only share name","Only file extension"],[0],"Effective permissions result from applicable user/group permissions and deny rules.","Single answer"],
+["2. Operating System Security","What is the purpose of audit policies?",["Record selected security-relevant events","Increase CPU performance","Assign IP addresses","Compress backups"],[0],"Auditing records configured events for accountability and investigation.","Single answer"],
+["2. Operating System Security","Which hardware component can protect cryptographic keys used by drive encryption?",["TPM","NIC","GPU","PSU"],[0],"A TPM securely supports cryptographic key operations.","Single answer"],
+["2. Operating System Security","Which Windows technology provides full-volume encryption?",["BitLocker","UAC","Group Policy only","Windows Update"],[0],"BitLocker provides Windows drive encryption.","Single answer"],
+["2. Operating System Security","Which security property helps prove that an action or message came from a specific party?",["Non-repudiation","Availability","NAT","QoS"],[0],"Non-repudiation supports proof that an action cannot credibly be denied.","Single answer"],
+
+["3. Network Device Security","Which wireless security standard is the strongest choice among these?",["WPA3","WEP","Open network","WPA/TKIP"],[0],"WPA3 is the preferred modern standard where supported.","Single answer"],
+["3. Network Device Security","Why should default wireless/router settings be changed during initial setup?",["Defaults may be known or insecure","They improve signal strength automatically","They create backups","They enable DNSSEC"],[0],"Out-of-box credentials/settings may be predictable or unsafe.","Single answer"],
+["3. Network Device Security","Which device filters traffic using permit/deny rules?",["Firewall","Patch panel","Hub","UPS"],[0],"Firewalls enforce network traffic policy.","Single answer"],
+["3. Network Device Security","Which firewall type tracks the state of active connections?",["Stateful firewall","Stateless firewall","Patch panel","Hub"],[0],"Stateful inspection tracks established session state.","Single answer"],
+["3. Network Device Security","Which TWO security technologies detect or prevent suspicious network traffic?",["IDS","IPS","DHCP","NTP"],[0,1],"IDS detects; IPS can detect and prevent inline.","Select TWO"],
+["3. Network Device Security","Which system centralizes and correlates security event data?",["SIEM","NAT","STP","DNS cache"],[0],"SIEM centralizes and correlates security logs.","Single answer"],
+["3. Network Device Security","Which design separates public servers from the internal network?",["DMZ","Flat LAN","Hub network","Loopback"],[0],"A DMZ provides perimeter isolation.","Single answer"],
+["3. Network Device Security","Which technology translates private addresses to public addresses?",["NAT/PAT","DNSSEC","VLAN only","SSH"],[0],"NAT/PAT translates private/internal addressing.","Single answer"],
+["3. Network Device Security","Which technology creates logical Layer 2 separation on a switch?",["VLAN","NAT","DNS","RDP"],[0],"VLANs create logical Layer 2 segmentation.","Single answer"],
+["3. Network Device Security","Which network is physically/logically isolated from other networks for maximum separation?",["Air-gapped network","Flat network","Guest VLAN only","DMZ only"],[0],"An air gap prevents normal network connectivity to other environments.","Single answer"],
+["3. Network Device Security","Which protocol protects IP traffic at the network layer and is commonly used with VPNs?",["IPsec","HTTP","FTP","Telnet"],[0],"IPsec authenticates/encrypts IP traffic.","Single answer"],
+["3. Network Device Security","Which protocol provides secure remote command-line access?",["SSH","Telnet","FTP","HTTP"],[0],"SSH encrypts remote terminal traffic.","Single answer"],
+["3. Network Device Security","Which protocol secures LDAP directory communications with TLS?",["LDAPS","LDAP plain","SNMPv1","Telnet"],[0],"LDAPS uses TLS-protected directory communication.","Single answer"],
+["3. Network Device Security","Which protocol protects DNS authenticity with signed records?",["DNSSEC","DHCP","NAT","ARP"],[0],"DNSSEC provides authenticity/integrity validation for DNS data.","Single answer"],
+["3. Network Device Security","Which port is commonly used by HTTPS?",["443","80","23","21"],[0],"HTTPS commonly uses TCP 443.","Single answer"],
+["3. Network Device Security","Which port is commonly used by SSH?",["22","23","25","53"],[0],"SSH commonly uses TCP 22.","Single answer"],
+["3. Network Device Security","Which port is commonly used by RDP?",["3389","443","22","110"],[0],"RDP commonly uses 3389.","Single answer"],
+
+["4. Secure Computing","A fraudulent email asks a user to click a fake login link. What is this?",["Phishing","Pharming only","Patch management","BitLocker"],[0],"Phishing uses deceptive communications to steal data or influence users.","Single answer"],
+["4. Secure Computing","Which attack falsifies the sender identity of an email?",["Email spoofing","Defragmentation","NAT","VLAN"],[0],"Spoofing forges sender identity information.","Single answer"],
+["4. Secure Computing","Which attack redirects users toward a fraudulent site even when they believe they used the correct address?",["Pharming","Patching","Auditing","Encryption"],[0],"Pharming redirects traffic to fraudulent sites.","Single answer"],
+["4. Secure Computing","Which TWO actions improve browser security?",["Manage/clear cache when appropriate","Use private browsing for temporary sessions","Disable all updates","Install unknown extensions"],[0,1],"Secure browser hygiene includes managing local data and using private browsing when appropriate.","Select TWO"],
+["4. Secure Computing","What should be done after installing antivirus software?",["Keep signatures/engine updated","Disable scanning","Ignore alerts","Allow exclusions for everything"],[0],"Antimalware protection depends on current engines/signatures and configuration.","Single answer"],
+["4. Secure Computing","Which feature allows recurring malware scans without manual intervention?",["Scheduled scans","VLAN tagging","NAT","DNSSEC"],[0],"Scheduled scans automate routine malware checks.","Single answer"],
+["4. Secure Computing","An antivirus alert identifies malicious software. What is an appropriate next step?",["Investigate and remediate/quarantine according to policy","Ignore it","Send it to coworkers","Disable antivirus"],[0],"Alerts should be investigated and remediated through approved processes.","Single answer"]
+];
+const DOMAINS=[...new Set(Q.map(q=>q[0]))];
+const EXTRA_Q=[["4. Secure Computing", "Which browser practice reduces risk from known security vulnerabilities?", ["Keep the browser updated", "Disable all security updates", "Install unknown extensions", "Save every password in plain text"], [0], "Applying browser updates fixes known vulnerabilities and improves security.", "Single answer"], ["4. Secure Computing", "Which TWO actions reduce the risk of malicious browser extensions?", ["Install extensions only from trusted sources", "Review extension permissions", "Disable antivirus", "Accept every permission request"], [0, 1], "Trusted sources and permission review reduce extension-related risk.", "Select TWO"], ["4. Secure Computing", "A user receives a certificate warning when visiting a banking site. What is the safest response?", ["Do not proceed until the certificate/site identity is verified", "Ignore the warning", "Disable TLS", "Send the password by email"], [0], "Certificate warnings can indicate identity or interception problems and should be investigated before proceeding.", "Single answer"]];
+const BANK=[...Q,...EXTRA_Q];
+
+// Randomize answer positions while preserving the correct answer index(es).
+function shuffleQuestion(q){
+ const choices=q[2].map((answer,index)=>({answer,correct:q[3].includes(index)}));
+ for(let i=choices.length-1;i>0;i--){
+   const j=Math.floor(Math.random()*(i+1));
+   [choices[i],choices[j]]=[choices[j],choices[i]];
+ }
+ return [
+   q[0],
+   q[1],
+   choices.map(x=>x.answer),
+   choices.map((x,i)=>x.correct?i:null).filter(x=>x!==null),
+   q[4],
+   q[5]
+ ];
+}
+function show(id,btn){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll(".nav").forEach(n=>n.classList.remove("active"));if(btn)btn.classList.add("active")}
+function setupExam(btn){show("examSetup",btn)}
+function balancedSet(n){
+ const result=[];let remaining=n;
+ DOMAINS.forEach((dom,idx)=>{
+   const count=idx===DOMAINS.length-1?remaining:Math.round(n/DOMAINS.length);
+   remaining-=count;
+   const subset=BANK.filter(q=>q[0]===dom).sort(()=>Math.random()-.5);
+   if(count>subset.length)throw new Error("Not enough unique questions in "+dom);
+   for(let i=0;i<count;i++)result.push(shuffleQuestion(subset[i]));
+ });
+ return result.sort(()=>Math.random()-.5);
+}
+function fb(ok,a,b){const e=document.getElementById("pbqFeedback");e.className="feedback "+(ok?"good":"bad");e.textContent=ok?a:b;if(ok){XP+=10;document.getElementById("xpBadge").textContent="XP "+XP}}
+const _creatorHex=["43","72","65","61","74","65","64","20","62","79","20","44","65","72","72","69","63","6b","20","42","65","61","69","72","64"];
+document.getElementById("creatorMark").textContent=_creatorHex.map(x=>String.fromCharCode(parseInt(x,16))).join("");
+</script>
+</body>
+</html>

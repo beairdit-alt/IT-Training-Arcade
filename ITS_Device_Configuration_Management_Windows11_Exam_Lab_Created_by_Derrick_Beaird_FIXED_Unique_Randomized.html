@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Information Technology Specialist - Device Configuration & Management Exam Lab</title>
+<style>
+:root{
+  --bg:#071019;--panel:#0d1926;--panel2:#13243a;--line:#294760;--text:#eef7ff;--muted:#9fb7c9;
+  --blue:#2aa7ff;--green:#43dc8e;--yellow:#ffd166;--red:#ff6b78;--purple:#a887ff;--orange:#ff9f43
+}
+*{box-sizing:border-box}
+body{margin:0;background:
+radial-gradient(circle at 10% -8%,#163b62 0,transparent 25%),
+radial-gradient(circle at 95% 0,#25194a 0,transparent 24%),
+linear-gradient(#06101a,#09121b);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif;min-height:100vh}
+button,input,select{font:inherit}button{cursor:pointer}
+.app{max-width:1500px;margin:auto;padding:16px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;padding:14px 18px;background:#0b1825e8;border:1px solid var(--line);border-radius:16px;position:sticky;top:8px;z-index:30;box-shadow:0 10px 35px #0006}
+.brand{display:flex;gap:13px;align-items:center}.logo{width:62px;height:62px;border-radius:11px;background:#107c41;color:white;display:grid;place-items:center;font-weight:1000;font-size:17px;text-align:center;line-height:1}.brand h1{margin:0;font-size:clamp(20px,3vw,34px)}.brand p{margin:2px 0 0;color:var(--muted);font-size:12px}
+.badges{display:flex;gap:8px;flex-wrap:wrap}.badge{padding:7px 10px;border-radius:999px;border:1px solid #365a78;background:#122a3d;color:#c9ecff;font-size:12px;font-weight:800}
+.shell{display:grid;grid-template-columns:285px 1fr;gap:14px;margin-top:14px}.side,.main{background:#0b1723e8;border:1px solid #243f59;border-radius:16px}.side{padding:12px;align-self:start;position:sticky;top:100px}
+.nav{width:100%;border:0;background:transparent;color:#dceeff;text-align:left;padding:11px;border-radius:9px;font-weight:800;margin:2px 0}.nav:hover,.nav.active{background:#153650}.nav span{display:block;font-size:10px;color:#7fa3bd;font-weight:500;margin-top:2px}
+.main{padding:18px;min-height:820px}.screen{display:none}.screen.active{display:block}
+.hero{padding:22px;border-radius:17px;border:1px solid #315270;background:linear-gradient(135deg,#102c47,#171d37);margin-bottom:14px}.hero h2{font-size:clamp(28px,4vw,44px);margin:0 0 7px}.hero p{line-height:1.55;color:#c0d6e7;max-width:1050px}.heroActions{display:flex;gap:9px;flex-wrap:wrap}
+.primary,.secondary,.danger,.warning,.success{border:0;border-radius:9px;padding:10px 14px;font-weight:900}.primary{background:var(--blue);color:#041727}.secondary{background:#1b344b;color:white;border:1px solid #3b607d}.danger{background:#a53a46;color:white}.warning{background:#a97113;color:white}.success{background:#198d58;color:white}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.card{background:#101f30;border:1px solid #294a65;border-radius:13px;padding:15px}.card h3{margin:0 0 8px}.small{font-size:12px;color:var(--muted)}.muted{color:var(--muted)}.mono{font-family:Consolas,monospace}
+.domainBar{height:8px;border-radius:99px;background:#07101a;overflow:hidden;margin:8px 0}.domainBar span{height:100%;display:block;background:linear-gradient(90deg,var(--blue),var(--green))}
+.examHeader{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.timer{font:900 28px Consolas,monospace;color:var(--yellow)}.examName{font-size:18px;font-weight:900}
+.navgrid{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin:10px 0}.qnav{border:1px solid #36536a;background:#102638;color:white;border-radius:6px;padding:6px 2px;font-size:11px}.qnav.done{background:#176642}.qnav.flag{outline:2px solid var(--yellow)}.qnav.current{border-color:#50cfff;box-shadow:0 0 0 1px #50cfff}
+.questionCard{background:#101f30;border:1px solid #2d4d68;border-radius:14px;padding:20px}.qmeta{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}.tag{padding:4px 7px;border-radius:999px;background:#17364c;color:#c7eaff;font-size:10px;font-weight:900}.selectTag{background:#4e3d13;color:#ffe59b}.pbqTag{background:#422b59;color:#e7caff}
+.question{font-size:21px;font-weight:800;line-height:1.45;margin:10px 0 14px}.answers{display:grid;gap:8px}.answer{border:1px solid #355b78;background:#153149;color:#f0f8ff;border-radius:10px;padding:12px;text-align:left}.answer:hover{filter:brightness(1.13)}.answer.selected{outline:2px solid var(--green);background:#153d31}
+.feedback{padding:11px;border-radius:9px;border:1px dashed #3b607c;background:#0b1824;margin-top:10px;min-height:45px;line-height:1.5}.good{border-color:#2c8059;background:#0f2a21}.bad{border-color:#803a44;background:#2b1519}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.spacer{flex:1}.preset{display:flex;gap:8px;flex-wrap:wrap}.choiceBox{border:1px solid #2d526c;border-radius:11px;padding:12px;background:#0f2231}
+.pbqBoard{display:grid;grid-template-columns:1fr 1fr;gap:12px}.dropzone{min-height:170px;border:2px dashed #365e7b;border-radius:12px;padding:10px}.item{padding:9px 10px;border:1px solid #3b617c;border-radius:8px;background:#163149;margin:7px 0;cursor:pointer}.item:hover{filter:brightness(1.15)}
+.slot{padding:10px;border:1px solid #304d63;border-radius:9px;background:#0b1a26;margin:7px 0}.slot b{display:block}.slot .placed{margin-top:6px;color:#bfffe0}
+.console{background:#02070c;color:#b7ffca;border:1px solid #315042;border-radius:10px;padding:12px;font:13px Consolas,monospace;min-height:245px;white-space:pre-wrap}
+.resultBig{font-size:54px;font-weight:1000}.reviewQ{padding:12px;border-radius:10px;border:1px solid #294b65;background:#0e1e2d;margin-bottom:9px}.correctTxt{color:#7effb4}.wrongTxt{color:#ff8d98}
+.studyQ{font-size:18px;font-weight:800;margin:10px 0}.studyCard{margin-bottom:12px}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:8px;border-bottom:1px solid #29475e;text-align:left}th{color:#bfeaff}
+label{display:block;font-size:12px;color:#a9c6d7;font-weight:800;margin-top:9px;margin-bottom:4px}input,select{width:100%;padding:10px 11px;border-radius:8px;border:1px solid #375568;background:#09151e;color:white}
+.winpanel{background:#e9eef3;color:#17202a;border-radius:12px;overflow:hidden;border:1px solid #768898}.winbar{background:#d6dde5;padding:9px 12px;font-weight:800}.winbody{padding:14px}.winbody label{color:#334}.winbody input,.winbody select{background:white;color:#111;border-color:#9aa7b0}
+.setting{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:11px;border-bottom:1px solid #ccd4da}.setting:last-child{border-bottom:0}
+.toggle{width:45px;height:24px;border-radius:99px;background:#8d9aa4;padding:3px;cursor:pointer}.toggle i{display:block;width:18px;height:18px;border-radius:50%;background:white}.toggle.on{background:#1673d1}.toggle.on i{transform:translateX(21px)}
+.creator-footer{position:fixed;bottom:8px;left:50%;transform:translateX(-50%);z-index:9999;padding:6px 12px;border-radius:999px;background:rgba(7,16,25,.88);border:1px solid #365a78;color:#9fb7c9;font-size:11px;font-weight:700;letter-spacing:.5px;backdrop-filter:blur(6px);white-space:nowrap}
+@media(max-width:1050px){.shell{grid-template-columns:1fr}.side{position:static}.grid{grid-template-columns:1fr 1fr}.pbqBoard{grid-template-columns:1fr}}
+@media(max-width:700px){.grid,.grid2{grid-template-columns:1fr}.navgrid{grid-template-columns:repeat(8,1fr)}}
+</style>
+</head>
+<body>
+<div class="creator-footer" id="creatorMark"></div>
+
+<div class="app">
+<div class="topbar">
+  <div class="brand"><div class="logo">ITS<br>DCM</div><div><h1>IT Specialist - Device Configuration & Management</h1><p>Windows 11 focused • hardware • apps/peripherals • data • security • troubleshooting</p></div></div>
+  <div class="badges"><div class="badge" id="xpBadge">XP 0</div><div class="badge">50-minute exam mode</div><div class="badge">Windows 11 objectives included</div></div>
+</div>
+
+<div class="shell">
+<aside class="side">
+  <button class="nav active" onclick="show('home',this)">🏠 Exam Center<span>Start exam, study, or hands-on labs</span></button>
+  <button class="nav" onclick="showStudy(this)">📘 Study Mode<span>Immediate explanations by objective domain</span></button>
+  <button class="nav" onclick="show('pbq',this)">🧪 Skills Lab<span>Windows settings, disks, security, network, troubleshooting</span></button>
+  <button class="nav" onclick="setupExam(this)">📝 Exam Simulator<span>40 questions • 50 minutes</span></button>
+  <button class="nav" onclick="show('objectives',this)">📊 Objective Map<span>All five current Certiport domains</span></button>
+</aside>
+
+<main class="main">
+<section id="home" class="screen active">
+<div class="hero">
+  <h2>Windows Device Technician Challenge</h2>
+  <p>This simulator teaches and tests the current Information Technology Specialist Device Configuration and Management objectives with a Windows 11 emphasis. It covers computer components, Windows installation/configuration, Active Directory concepts, applications and peripherals, storage and file permissions, Windows security, and troubleshooting.</p>
+  <div class="heroActions"><button class="primary" onclick="setupExam()">START FULL PRACTICE EXAM</button><button class="success" onclick="document.querySelectorAll('.nav')[2].click()">OPEN SKILLS LAB</button></div>
+</div>
+
+<div class="grid">
+  <div class="card"><h3>1. Windows Installation & Configuration</h3><p class="small">Hardware, Windows setup, local/Microsoft/domain accounts, Active Directory, desktop, accessibility and Windows Update.</p></div>
+  <div class="card"><h3>2. Features, Applications & Peripherals</h3><p class="small">Apps, Windows features, Copilot, Registry, USB/video/audio connections, projection and display settings.</p></div>
+  <div class="card"><h3>3. Data Access & Management</h3><p class="small">Cloud services, partitions, GPT/MBR, NTFS/FAT32/exFAT, shares, permissions, mapped drives, backup and restore.</p></div>
+  <div class="card"><h3>4. Device Security</h3><p class="small">Defender Firewall, MFA, biometrics, Windows Hello, malware/social engineering, antimalware and UAC.</p></div>
+  <div class="card"><h3>5. Management & Troubleshooting</h3><p class="small">Event Viewer, Task Manager, Safe Mode, services, Device Manager, drivers, networks, domains and command-line tools.</p></div>
+  <div class="card"><h3>Practice Format</h3><div class="resultBig" style="font-size:30px">40 Q / 50 min</div><p class="small">Original practice questions plus interactive skills tasks. This simulator does not reproduce Certiport exam items.</p></div>
+</div>
+</section>
+
+<section id="study" class="screen">
+<div class="hero"><h2>Study Mode</h2><p>Choose an objective domain and receive immediate explanations after each answer.</p></div>
+<div class="toolbar"><select id="studyDomain" onchange="renderStudy()"></select><button class="secondary" onclick="renderStudy()">NEW QUESTION</button></div>
+<div id="studyArea"></div>
+</section>
+
+<section id="examSetup" class="screen">
+<div class="hero"><h2>ITS Device Configuration & Management Exam Simulator</h2><p>Full mode uses 40 questions and a 50-minute timer. Shorter modes are useful for classroom review.</p></div>
+<div class="grid">
+  <div class="card"><h3>Full Simulation</h3><div class="resultBig" style="font-size:32px">40 Q</div><p class="small">50 minutes. Balanced coverage across all five objective domains.</p><button class="primary" onclick="startExam(40,3000)">START FULL EXAM</button></div>
+  <div class="card"><h3>Class Practice</h3><div class="resultBig" style="font-size:32px">25 Q</div><p class="small">35 minutes. Faster classroom session.</p><button class="primary" onclick="startExam(25,2100)">START 25 QUESTIONS</button></div>
+  <div class="card"><h3>Quick Check</h3><div class="resultBig" style="font-size:32px">15 Q</div><p class="small">20 minutes. Good for warm-ups and review.</p><button class="primary" onclick="startExam(15,1200)">START 15 QUESTIONS</button></div>
+</div>
+</section>
+
+<section id="exam" class="screen">
+<div class="examHeader"><div><div class="examName">ITS Device Configuration & Management Practice Exam</div><div class="small">Question <span id="qNum"></span> of <span id="qTotal"></span></div></div><div class="timer" id="timer">50:00</div></div>
+<div class="domainBar"><span id="examProgress"></span></div><div id="qNav" class="navgrid"></div>
+<div class="questionCard"><div class="qmeta"><span class="tag" id="qDomain"></span><span class="tag" id="qType"></span></div><div id="qText" class="question"></div><div id="answers" class="answers"></div>
+<div class="toolbar"><button class="secondary" onclick="prevQ()">← PREVIOUS</button><button class="warning" onclick="toggleFlag()">⚑ FLAG FOR REVIEW</button><div class="spacer"></div><button class="secondary" onclick="nextQ()">NEXT →</button><button class="danger" onclick="submitExam()">SUBMIT EXAM</button></div></div>
+</section>
+
+<section id="results" class="screen"><div id="resultsArea"></div></section>
+
+<section id="pbq" class="screen">
+<div class="hero"><h2>Windows Device Skills Lab</h2><p>These activities simulate the practical skills students are expected to understand: Windows configuration, disks, file systems, permissions, firewall/UAC, network troubleshooting and device management.</p></div>
+<div class="preset">
+  <button class="primary" onclick="loadPBQ('install')">Windows Setup</button>
+  <button class="primary" onclick="loadPBQ('display')">Display & Accessibility</button>
+  <button class="primary" onclick="loadPBQ('disk')">Disk Management</button>
+  <button class="primary" onclick="loadPBQ('permissions')">File Permissions</button>
+  <button class="primary" onclick="loadPBQ('security')">Firewall / UAC</button>
+  <button class="primary" onclick="loadPBQ('network')">Network Repair</button>
+  <button class="primary" onclick="loadPBQ('device')">Device Manager</button>
+</div>
+<div id="pbqArea" style="margin-top:14px"></div>
+</section>
+
+<section id="objectives" class="screen">
+<div class="hero"><h2>Current Objective Map</h2><p>This simulator covers the five current Device Configuration and Management domains, including Windows 11 concepts such as Windows Copilot and Windows Hello.</p></div>
+<div class="card"><table>
+<tr><th>Domain</th><th>Topics Practiced</th></tr>
+<tr><td>1. Windows Installation and Configuration</td><td>Hardware, Active Directory, Windows setup, accounts, desktop, accessibility, updates</td></tr>
+<tr><td>2. Windows Feature, Application and Peripheral Management</td><td>Apps/features, Copilot, Registry, HDMI/DP/DVI/VGA/USB/Thunderbolt/audio, projection/display</td></tr>
+<tr><td>3. Data Access and Management</td><td>Cloud services, partitions, GPT/MBR, NTFS/FAT32/exFAT, file/share permissions, backup/restore</td></tr>
+<tr><td>4. Device Security</td><td>Defender Firewall, network profiles, MFA, Windows Hello, threats, antimalware, UAC</td></tr>
+<tr><td>5. Windows Management and Troubleshooting</td><td>Event Viewer, Task Manager, Safe Mode, services, Device Manager, drivers, ipconfig, ping, traceroute, domain join</td></tr>
+</table></div>
+</section>
+</main>
+</div>
+</div>
+
+<script>
+let XP=0,examItems=[],responses=[],flags=[],qi=0,timerHandle=null,timeLeft=3000,studyItem=null;
+
+const Q=[
+["1. Windows Installation and Configuration","Which component provides temporary working memory used by active applications?",["RAM","SSD","Motherboard firmware","Power supply"],[0],"RAM temporarily stores data and instructions the CPU is actively using.","Single answer"],
+["1. Windows Installation and Configuration","Which component executes program instructions?",["CPU/APU","Monitor","SSD cable","Printer"],[0],"The CPU/APU executes instructions and performs calculations.","Single answer"],
+["1. Windows Installation and Configuration","Which Windows account type should normally be used for everyday work when administrative changes are not required?",["Standard user","Domain administrator","Built-in Administrator for everything","Guest with no password"],[0],"Standard-user operation follows least privilege.","Single answer"],
+["1. Windows Installation and Configuration","What is a primary purpose of Active Directory Domain Services?",["Centralized management of users, computers, and groups","Defragment SSDs","Replace Windows Update","Create local-only accounts"],[0],"AD DS centralizes identity and computer management in a domain.","Single answer"],
+["1. Windows Installation and Configuration","Which TWO are commonly managed through Group Policy in a Windows domain?",["Security settings","Computer/user configuration settings","Physical RAM capacity","Monitor panel type"],[0,1],"Group Policy centrally configures many user, computer and security settings.","Select TWO"],
+["1. Windows Installation and Configuration","Which installation choice is normally used for a clean Windows installation rather than preserving the existing installation?",["Custom install","Upgrade install","Repair shortcut","Microsoft Store install"],[0],"Custom installation is used for a clean install scenario.","Single answer"],
+["1. Windows Installation and Configuration","Which account can synchronize certain Windows settings and services across devices through Microsoft cloud services?",["Microsoft account","Local account only","BIOS account","Printer account"],[0],"A Microsoft account can integrate with Microsoft cloud services and synchronization.","Single answer"],
+["1. Windows Installation and Configuration","Which Windows accessibility feature reads on-screen text aloud?",["Narrator","Magnifier","Sticky Keys","Color filters"],[0],"Narrator is the built-in screen reader.","Single answer"],
+["1. Windows Installation and Configuration","Which accessibility feature enlarges portions of the screen?",["Magnifier","Narrator","Voice Access only","Sticky Keys"],[0],"Magnifier enlarges the screen or selected content.","Single answer"],
+["1. Windows Installation and Configuration","Which TWO update sources may provide device drivers?",["Windows Update","Hardware manufacturer","Taskbar","Recycle Bin"],[0,1],"Drivers can come through Microsoft or directly from the device manufacturer.","Select TWO"],
+
+["2. Windows Feature, Application and Peripheral Management","Which Windows location is designed for installing many curated applications?",["Microsoft Store","Disk Management","Event Viewer","Registry Editor only"],[0],"The Microsoft Store distributes supported apps.","Single answer"],
+["2. Windows Feature, Application and Peripheral Management","What is the Windows Registry?",["A hierarchical database of Windows and application settings","A cloud backup drive","A firewall appliance","A partition format"],[0],"The Registry stores many Windows, user and application configuration values.","Single answer"],
+["2. Windows Feature, Application and Peripheral Management","Which connector can carry digital video and audio and is common on TVs and monitors?",["HDMI","RJ11","PS/2 only","SATA power"],[0],"HDMI carries digital video and audio.","Single answer"],
+["2. Windows Feature, Application and Peripheral Management","Which modern reversible connector can carry data, power, and sometimes video depending on device support?",["USB-C","VGA","DVI-A only","RJ11"],[0],"USB-C is reversible and can support multiple capabilities depending on implementation.","Single answer"],
+["2. Windows Feature, Application and Peripheral Management","Which display mode shows the same content on two displays?",["Duplicate","Extend","Snap","Rotate"],[0],"Duplicate mirrors the desktop to another display.","Single answer"],
+["2. Windows Feature, Application and Peripheral Management","Which display mode expands the Windows desktop across multiple screens?",["Extend","Duplicate","Mirror-only firmware","Safe Mode"],[0],"Extend creates a larger desktop across displays.","Single answer"],
+["2. Windows Feature, Application and Peripheral Management","Which Windows 11 feature can assist users with information, content generation, some settings and application-related tasks?",["Windows Copilot","Disk Cleanup only","BitLocker only","Device Manager only"],[0],"Windows Copilot is included in the Windows 11 objective set and can assist with a range of tasks.","Single answer"],
+["2. Windows Feature, Application and Peripheral Management","Which TWO are digital display connection families?",["HDMI","DisplayPort","VGA analog","RJ45 Ethernet"],[0,1],"HDMI and DisplayPort are digital display interfaces.","Select TWO"],
+["2. Windows Feature, Application and Peripheral Management","A user wants to present wirelessly to a compatible display. Which capability should be configured?",["Wireless casting","Disk partitioning","Registry export only","Safe Mode"],[0],"Wireless casting can project to compatible wireless displays.","Single answer"],
+
+["3. Data Access and Management","Which file system is commonly used for Windows system drives and supports advanced permissions?",["NTFS","FAT12","ISO 9660","ext2"],[0],"NTFS supports Windows ACL permissions and other advanced features.","Single answer"],
+["3. Data Access and Management","Which file system is widely compatible across many operating systems and supports files larger than FAT32's 4 GB limit?",["exFAT","FAT12","NTFS only on every device","ReFS only"],[0],"exFAT is commonly used for cross-platform removable storage and supports large files.","Single answer"],
+["3. Data Access and Management","Which partition style supports modern UEFI systems and large disks more flexibly than MBR?",["GPT","MBR only","FAT32","NTFS"],[0],"GPT is the modern partition-table standard used with UEFI.","Single answer"],
+["3. Data Access and Management","Which TWO are Microsoft cloud collaboration/storage services in the exam objectives?",["OneDrive","SharePoint","BIOS Setup","Device Manager"],[0,1],"OneDrive and SharePoint are Microsoft cloud storage/collaboration services.","Select TWO"],
+["3. Data Access and Management","What is the purpose of mapping a network drive?",["Assign a drive letter/path to a network share","Encrypt RAM","Create a local account","Update a GPU driver"],[0],"Mapped drives provide convenient access to shared network storage.","Single answer"],
+["3. Data Access and Management","If a user has Read NTFS permission and Change share permission, which effective access normally applies over the network?",["The more restrictive combined result","Always Full Control","Always Change","No permissions matter"],[0],"Effective network access is constrained by both share and NTFS permissions.","Single answer"],
+["3. Data Access and Management","What allows a user to restore an earlier copy of a file after accidental editing or deletion?",["File History/previous versions","Device Manager","Windows Firewall","Task Manager"],[0],"File History and previous versions support file recovery.","Single answer"],
+["3. Data Access and Management","Why partition a physical disk?",["Create separate logical storage areas","Increase CPU cores","Change monitor resolution","Add a domain user"],[0],"Partitioning divides a disk into logical regions.","Single answer"],
+["3. Data Access and Management","Which action prepares a newly created partition to store files?",["Format it with a file system","Join a domain","Run gpupdate","Enable Narrator"],[0],"Formatting creates the file-system structures used to store data.","Single answer"],
+
+["4. Device Security","Which Windows feature filters network traffic based on firewall rules?",["Windows Defender Firewall","Task Manager","Disk Management","File Explorer"],[0],"Windows Defender Firewall controls permitted inbound/outbound network traffic.","Single answer"],
+["4. Device Security","Which network profile is normally most restrictive for an untrusted coffee-shop network?",["Public","Private","Domain","Trusted administrator"],[0],"The Public profile is intended for untrusted networks and uses stricter discovery/sharing defaults.","Single answer"],
+["4. Device Security","Which TWO represent different authentication factor categories?",["Password","Fingerprint","PIN plus another password","Two passwords"],[0,1],"Password is something you know; fingerprint is something you are.","Select TWO"],
+["4. Device Security","Which Windows 11 technology supports biometric or PIN-based sign-in tied to the device?",["Windows Hello","Windows Update","Task Scheduler","Disk Cleanup"],[0],"Windows Hello supports modern device sign-in methods.","Single answer"],
+["4. Device Security","An email message attempts to trick a user into entering credentials on a fake website. What is this?",["Phishing","Defragmentation","Partitioning","Driver rollback"],[0],"Phishing uses deceptive messages to steal information or influence users.","Single answer"],
+["4. Device Security","A phone-text message contains a fake account-reset link. What social engineering technique is this?",["Smishing","Vishing","Shoulder surfing","Dumpster diving"],[0],"SMS-based phishing is smishing.","Single answer"],
+["4. Device Security","A caller pretends to be technical support and asks for a password. What technique is this?",["Vishing/social engineering","Ransomware only","Drive mapping","BitLocker recovery"],[0],"Voice-based social engineering is commonly called vishing.","Single answer"],
+["4. Device Security","What is the purpose of User Account Control (UAC)?",["Prompt/elevate when administrative privileges are required","Replace antivirus","Create partitions","Assign IP addresses"],[0],"UAC helps prevent silent administrative elevation.","Single answer"],
+["4. Device Security","A scan identifies malware. What should a student do FIRST according to an approved school/business procedure?",["Follow the organization’s malware-response process and quarantine/remove as directed","Email the malware to friends","Disable all security","Ignore the alert"],[0],"Malware findings should be handled through approved response and remediation procedures.","Single answer"],
+
+["5. Windows Management and Troubleshooting","Which Windows tool is best for reviewing application and system event logs?",["Event Viewer","Paint","Calculator","Notepad"],[0],"Event Viewer exposes Windows logs useful for troubleshooting.","Single answer"],
+["5. Windows Management and Troubleshooting","Which tool can end an unresponsive application and disable startup apps?",["Task Manager","Disk Management","Registry only","Narrator"],[0],"Task Manager manages processes, startup apps and certain services.","Single answer"],
+["5. Windows Management and Troubleshooting","What is Safe Mode used for?",["Start Windows with a limited set of drivers/services for troubleshooting","Install every optional feature","Force full graphics acceleration","Join a domain automatically"],[0],"Safe Mode reduces loaded components to help isolate problems.","Single answer"],
+["5. Windows Management and Troubleshooting","Which tool is used to view hardware devices and update, roll back, disable, or uninstall drivers?",["Device Manager","File Explorer","Microsoft Store","Calculator"],[0],"Device Manager manages Windows hardware devices and drivers.","Single answer"],
+["5. Windows Management and Troubleshooting","Which tool is used to create, delete, extend, shrink, and format Windows volumes?",["Disk Management","Event Viewer","Task Manager","Windows Copilot only"],[0],"Disk Management handles disks, partitions and volumes.","Single answer"],
+["5. Windows Management and Troubleshooting","Which command displays detailed Windows IP configuration including DNS and DHCP information?",["ipconfig /all","gpupdate /force","sfc only","format"],[0],"ipconfig /all displays detailed IP settings.","Single answer"],
+["5. Windows Management and Troubleshooting","Which TWO commands can help refresh a DHCP lease?",["ipconfig /release","ipconfig /renew","gpresult","tracert only"],[0,1],"Release and renew are used to request a fresh DHCP configuration.","Select TWO"],
+["5. Windows Management and Troubleshooting","Which command clears the local DNS resolver cache?",["ipconfig /flushdns","ipconfig /all","gpupdate /force","diskpart clean"],[0],"flushdns clears cached DNS resolver entries.","Single answer"],
+["5. Windows Management and Troubleshooting","Which command tests basic IP reachability to another host?",["ping","format","regedit","gpresult"],[0],"ping sends ICMP echo requests to test reachability.","Single answer"],
+["5. Windows Management and Troubleshooting","Which command forces Group Policy to refresh immediately?",["gpupdate /force","ipconfig /renew","tracert","tasklist only"],[0],"gpupdate /force reapplies Group Policy settings.","Single answer"],
+["5. Windows Management and Troubleshooting","A newly updated device driver causes problems. Which Device Manager action is often appropriate?",["Roll Back Driver","Format the disk","Delete the user profile","Disable Windows Update forever"],[0],"Driver rollback can restore the previous known-good driver.","Single answer"],
+["5. Windows Management and Troubleshooting","A PC can ping 8.8.8.8 but cannot open websites by name. What is the MOST likely issue?",["DNS/name resolution","Power supply","Display resolution","Local user profile only"],[0],"Working IP connectivity with failed names points to DNS.","Single answer"],
+["5. Windows Management and Troubleshooting","A PC has an address beginning with 169.254 and cannot reach the gateway. What service should be investigated?",["DHCP","DNS only","NTP only","Bluetooth"],[0],"APIPA addressing commonly indicates failure to obtain a DHCP lease.","Single answer"]
+];
+
+const DOMAINS=[...new Set(Q.map(q=>q[0]))];
+
+const EXTRA_Q=[];
+const BANK=[...Q,...EXTRA_Q];
+
+// Randomize answer positions while preserving the correct answer index(es).
+function shuffleQuestion(q){
+ const choices=q[2].map((answer,index)=>({answer,correct:q[3].includes(index)}));
+ for(let i=choices.length-1;i>0;i--){
+   const j=Math.floor(Math.random()*(i+1));
+   [choices[i],choices[j]]=[choices[j],choices[i]];
+ }
+ return [
+   q[0],
+   q[1],
+   choices.map(x=>x.answer),
+   choices.map((x,i)=>x.correct?i:null).filter(x=>x!==null),
+   q[4],
+   q[5]
+ ];
+}
+
+function show(id,btn){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll(".nav").forEach(n=>n.classList.remove("active"));if(btn)btn.classList.add("active")}
+function setupExam(btn){show("examSetup",btn)}
+function balancedSet(n){
+ const result=[];let remaining=n;
+ DOMAINS.forEach((dom,idx)=>{
+   const count=idx===DOMAINS.length-1?remaining:Math.round(n/DOMAINS.length);
+   remaining-=count;
+   const subset=BANK.filter(q=>q[0]===dom).sort(()=>Math.random()-.5);
+   if(count>subset.length)throw new Error("Not enough unique questions in "+dom);
+   for(let i=0;i<count;i++)result.push(shuffleQuestion(subset[i]));
+ });
+ return result.sort(()=>Math.random()-.5);
+}
+function startExam(n,seconds){examItems=balancedSet(n);responses=Array(n).fill(null).map(()=>[]);flags=Array(n).fill(false);qi=0;timeLeft=seconds;show("exam");document.getElementById("qTotal").textContent=n;clearInterval(timerHandle);timerHandle=setInterval(tick,1000);renderQ();tick(true)}
+function tick(noDec=false){if(!noDec)timeLeft--;let m=Math.floor(timeLeft/60),s=timeLeft%60;document.getElementById("timer").textContent=String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");if(timeLeft<=0)submitExam()}
+function renderQ(){const q=examItems[qi],selected=responses[qi]||[];document.getElementById("qNum").textContent=qi+1;document.getElementById("qDomain").textContent=q[0];document.getElementById("qType").textContent=q[5];document.getElementById("qType").className="tag "+(q[5].includes("TWO")?"selectTag":"");document.getElementById("qText").textContent=q[1];document.getElementById("answers").innerHTML=q[2].map((a,i)=>`<button class="answer ${selected.includes(i)?'selected':''}" onclick="selectAns(${i})">${String.fromCharCode(65+i)}. ${a}</button>`).join("");document.getElementById("examProgress").style.width=((qi+1)/examItems.length*100)+"%";document.getElementById("qNav").innerHTML=examItems.map((_,i)=>`<button class="qnav ${responses[i]?.length?'done':''} ${flags[i]?'flag':''} ${i===qi?'current':''}" onclick="qi=${i};renderQ()">${i+1}</button>`).join("")}
+function selectAns(i){const q=examItems[qi],max=q[3].length;if(max===1)responses[qi]=[i];else{let a=responses[qi]||[];if(a.includes(i))a=a.filter(x=>x!==i);else if(a.length<max)a=[...a,i];responses[qi]=a}renderQ()}
+function nextQ(){if(qi<examItems.length-1)qi++;renderQ()}function prevQ(){if(qi>0)qi--;renderQ()}function toggleFlag(){flags[qi]=!flags[qi];renderQ()}
+function sameSet(a,b){return a.length===b.length&&a.slice().sort().every((x,i)=>x===b.slice().sort()[i])}
+function submitExam(){if(!examItems.length)return;clearInterval(timerHandle);let correct=0;const domains={};examItems.forEach((q,i)=>{if(!domains[q[0]])domains[q[0]]=[0,0];domains[q[0]][1]++;if(sameSet(responses[i]||[],q[3])){correct++;domains[q[0]][0]++}});const pct=Math.round(correct/examItems.length*100);show("results");
+ let html=`<div class="hero"><div class="resultBig">${pct>=85?"STRONG READINESS ✅":pct>=70?"PASSING PRACTICE RANGE — KEEP DRILLING":"REVIEW NEEDED 🛠️"}</div><h2>${correct}/${examItems.length} • ${pct}%</h2><p>This is an original practice score, not an official Certiport score report. Review weak domains below and repeat the skills labs.</p><div class="heroActions"><button class="primary" onclick="setupExam()">NEW EXAM</button><button class="secondary" onclick="showStudy()">STUDY MODE</button></div></div><div class="grid">`;
+ Object.entries(domains).forEach(([d,v])=>{let p=Math.round(v[0]/v[1]*100);html+=`<div class="card"><h3>${d}</h3><div class="resultBig" style="font-size:30px">${p}%</div><div class="domainBar"><span style="width:${p}%"></span></div><div class="small">${v[0]} correct of ${v[1]}</div></div>`});html+="</div><h2 style='margin-top:18px'>Answer Review</h2>";
+ examItems.forEach((q,i)=>{const ok=sameSet(responses[i]||[],q[3]);html+=`<div class="reviewQ"><b>${i+1}. ${q[1]}</b><div class="${ok?'correctTxt':'wrongTxt'}">${ok?'Correct':'Incorrect'}</div><div class="small">Correct answer: ${q[3].map(x=>q[2][x]).join(" + ")}</div><div class="small">${q[4]}</div></div>`});document.getElementById("resultsArea").innerHTML=html;XP+=correct;document.getElementById("xpBadge").textContent="XP "+XP}
+function showStudy(btn){show("study",btn);document.getElementById("studyDomain").innerHTML=`<option value="ALL">All Domains</option>`+DOMAINS.map(d=>`<option>${d}</option>`).join("");renderStudy()}
+function renderStudy(){const d=document.getElementById("studyDomain").value||"ALL";let pool=BANK.filter(q=>d==="ALL"||q[0]===d);studyItem=shuffleQuestion(shuffleQuestion(pool[Math.floor(Math.random()*pool.length)]));window.studyChosen=[];document.getElementById("studyArea").innerHTML=`<div class="card studyCard"><span class="tag">${studyItem[0]}</span><span class="tag ${studyItem[5].includes("TWO")?'selectTag':''}">${studyItem[5]}</span><div class="studyQ">${studyItem[1]}</div><div class="answers">${studyItem[2].map((a,i)=>`<button class="answer" onclick="answerStudy(${i},this)">${a}</button>`).join("")}</div><div id="studyFeedback" class="feedback">Answer the question. Study mode explains why.</div></div>`}
+function answerStudy(i,btn){const max=studyItem[3].length;if(max===1){const ok=studyItem[3].includes(i);document.querySelectorAll("#studyArea .answer").forEach(b=>b.classList.remove("selected"));btn.classList.add("selected");document.getElementById("studyFeedback").className="feedback "+(ok?"good":"bad");document.getElementById("studyFeedback").innerHTML=(ok?"✅ Correct. ":"❌ Incorrect. ")+studyItem[4];if(ok){XP+=5;document.getElementById("xpBadge").textContent="XP "+XP}}else{if(window.studyChosen.includes(i))window.studyChosen=window.studyChosen.filter(x=>x!==i);else if(window.studyChosen.length<max)window.studyChosen.push(i);document.querySelectorAll("#studyArea .answer").forEach((b,j)=>b.classList.toggle("selected",window.studyChosen.includes(j)));if(window.studyChosen.length===max){const ok=sameSet(window.studyChosen,studyItem[3]);document.getElementById("studyFeedback").className="feedback "+(ok?"good":"bad");document.getElementById("studyFeedback").innerHTML=(ok?"✅ Correct. ":"❌ Incorrect. ")+studyItem[4]}}}
+
+// Skills labs
+function loadPBQ(kind){
+ if(kind==="install"){
+  document.getElementById("pbqArea").innerHTML=`<div class="card"><span class="tag pbqTag">SKILLS LAB • WINDOWS SETUP</span><h3>Configure a Classroom PC</h3><p>Requirements: local account named Student01, Standard user, correct time zone, and automatic Windows updates enabled.</p><div class="winpanel"><div class="winbar">Windows 11 Setup</div><div class="winbody"><label>Account Type</label><select id="acctType"><option>Microsoft account</option><option>Local account</option><option>Domain account</option></select><label>User Name</label><input id="uname"><label>Privilege Type</label><select id="priv"><option>Administrator</option><option>Standard user</option></select><label>Time Zone</label><select id="tz"><option>Eastern Time</option><option>Central Time</option><option>Pacific Time</option></select><div class="setting"><div><b>Windows Update</b><div>Automatic updates</div></div><div id="upd" class="toggle" onclick="this.classList.toggle('on')"><i></i></div></div></div></div><button class="success" style="margin-top:10px" onclick="checkInstall()">VALIDATE SETUP</button><div id="pbqFeedback" class="feedback">Configure the requested Windows setup.</div></div>`;
+ } else if(kind==="display"){
+  document.getElementById("pbqArea").innerHTML=`<div class="card"><span class="tag pbqTag">SKILLS LAB • DISPLAY & ACCESSIBILITY</span><h3>Configure a Presentation PC</h3><p>The instructor needs the projector to show the same image as the laptop, and a low-vision student needs screen magnification.</p><div class="grid2"><div><label>Multiple Displays</label><select id="dmode"><option>Extend</option><option>Duplicate</option><option>Second screen only</option></select></div><div><label>Accessibility Tool</label><select id="access"><option>Narrator</option><option>Magnifier</option><option>Sticky Keys</option><option>Voice Access</option></select></div></div><button class="success" style="margin-top:10px" onclick="checkDisplay()">APPLY SETTINGS</button><div id="pbqFeedback" class="feedback">Choose the display and accessibility settings that match the users' needs.</div></div>`;
+ } else if(kind==="disk"){
+  document.getElementById("pbqArea").innerHTML=`<div class="card"><span class="tag pbqTag">SKILLS LAB • DISK MANAGEMENT</span><h3>Prepare a New 2 TB Internal Data Drive</h3><p>Use a modern partition style and a Windows file system that supports permissions and large files.</p><div class="grid2"><div><label>Partition Style</label><select id="part"><option>MBR</option><option>GPT</option></select></div><div><label>File System</label><select id="fs"><option>FAT32</option><option>exFAT</option><option>NTFS</option></select></div></div><button class="success" style="margin-top:10px" onclick="checkDisk()">INITIALIZE & FORMAT</button><div id="pbqFeedback" class="feedback">Choose the best options for a modern Windows internal data drive.</div></div>`;
+ } else if(kind==="permissions"){
+  document.getElementById("pbqArea").innerHTML=`<div class="card"><span class="tag pbqTag">SKILLS LAB • FILE PERMISSIONS</span><h3>Determine Effective Network Access</h3><p>User Jordan has <b>Read</b> NTFS permission to C:\\Shared. The network share permission grants <b>Change</b>. What access does Jordan effectively have over the network?</p><div class="answers"><button class="answer" onclick="permPick(0)">Read</button><button class="answer" onclick="permPick(1)">Change</button><button class="answer" onclick="permPick(2)">Full Control</button><button class="answer" onclick="permPick(3)">No access</button></div><div id="pbqFeedback" class="feedback">Remember that both share and NTFS permissions apply to network access.</div></div>`;
+ } else if(kind==="security"){
+  document.getElementById("pbqArea").innerHTML=`<div class="card"><span class="tag pbqTag">SKILLS LAB • FIREWALL / UAC</span><h3>Secure a Windows Laptop</h3><p>The laptop is connected to public airport Wi-Fi. Keep the firewall enabled and require elevation before administrative changes.</p><div class="winpanel"><div class="winbar">Windows Security</div><div class="winbody"><label>Network Profile</label><select id="profile"><option>Private</option><option>Public</option></select><div class="setting"><div><b>Microsoft Defender Firewall</b></div><div id="fw" class="toggle on" onclick="this.classList.toggle('on')"><i></i></div></div><label>UAC Behavior</label><select id="uac"><option>Never notify</option><option>Notify/elevate for administrative changes</option></select></div></div><button class="success" style="margin-top:10px" onclick="checkSecurity()">VALIDATE SECURITY</button><div id="pbqFeedback" class="feedback">Use the safest settings for an untrusted network.</div></div>`;
+ } else if(kind==="network"){
+  document.getElementById("pbqArea").innerHTML=`<div class="card"><span class="tag pbqTag">SKILLS LAB • NETWORK TROUBLESHOOTING</span><h3>Repair Name Resolution</h3><div class="console">C:\\> ipconfig /all
+IPv4 Address . . . . . : 192.168.1.55
+Subnet Mask  . . . . . : 255.255.255.0
+Default Gateway . . .  : 192.168.1.1
+DNS Servers . . . . .  : 192.168.1.250
+
+C:\\> ping 8.8.8.8
+Reply from 8.8.8.8
+
+C:\\> ping example.com
+Ping request could not find host example.com.</div><div class="answers"><button class="answer" onclick="netPick(0)">Investigate/fix DNS configuration</button><button class="answer" onclick="netPick(1)">Replace the monitor</button><button class="answer" onclick="netPick(2)">Change the time zone</button><button class="answer" onclick="netPick(3)">Disable the firewall permanently</button></div><div id="pbqFeedback" class="feedback">Use the evidence to identify the failing service.</div></div>`;
+ } else {
+  document.getElementById("pbqArea").innerHTML=`<div class="card"><span class="tag pbqTag">SKILLS LAB • DEVICE MANAGER</span><h3>Recover from a Bad Driver Update</h3><p>A webcam stopped working immediately after a driver update. Device Manager still detects the camera. What is the BEST next action?</p><div class="answers"><button class="answer" onclick="devPick(0)">Roll Back Driver</button><button class="answer" onclick="devPick(1)">Format the system drive</button><button class="answer" onclick="devPick(2)">Delete the user account</button><button class="answer" onclick="devPick(3)">Disable Windows Firewall</button></div><div id="pbqFeedback" class="feedback">Choose the least disruptive action tied directly to the recent change.</div></div>`;
+ }
+}
+function setFB(ok,a,b){const e=document.getElementById("pbqFeedback");e.className="feedback "+(ok?"good":"bad");e.textContent=ok?a:b;if(ok){XP+=10;document.getElementById("xpBadge").textContent="XP "+XP}}
+function checkInstall(){setFB(document.getElementById("acctType").value==="Local account"&&document.getElementById("uname").value.trim()==="Student01"&&document.getElementById("priv").value==="Standard user"&&document.getElementById("tz").value==="Central Time"&&document.getElementById("upd").classList.contains("on"),"✅ Classroom PC setup validated.","❌ Re-check the account, privilege, time zone, and update settings.")}
+function checkDisplay(){setFB(document.getElementById("dmode").value==="Duplicate"&&document.getElementById("access").value==="Magnifier","✅ Display and accessibility requirements are satisfied.","❌ The projector should mirror the screen, and the low-vision user needs magnification.")}
+function checkDisk(){setFB(document.getElementById("part").value==="GPT"&&document.getElementById("fs").value==="NTFS","✅ GPT + NTFS is a strong fit for this modern Windows internal data drive.","❌ Re-check the partition style and Windows file-system requirements.")}
+function permPick(i){setFB(i===0,"✅ Read is the effective access because the more restrictive applicable permission wins.","❌ Share Change cannot override a more restrictive NTFS Read permission.")}
+function checkSecurity(){setFB(document.getElementById("profile").value==="Public"&&document.getElementById("fw").classList.contains("on")&&document.getElementById("uac").value==="Notify/elevate for administrative changes","✅ Public profile, firewall on, and UAC elevation are appropriate.","❌ Re-check the network profile, firewall, and UAC settings.")}
+function netPick(i){setFB(i===0,"✅ DNS/name resolution is the likely issue because IP connectivity works.","❌ The evidence points to a DNS problem.")}
+function devPick(i){setFB(i===0,"✅ Rolling back the driver directly reverses the recent change.","❌ Use the least disruptive action tied to the driver update.")}
+
+/* Creator mark assembled from hex character values. */
+const _creatorHex=["43","72","65","61","74","65","64","20","62","79","20","44","65","72","72","69","63","6b","20","42","65","61","69","72","64"];
+document.getElementById("creatorMark").textContent=_creatorHex.map(x=>String.fromCharCode(parseInt(x,16))).join("");
+</script>
+</body>
+</html>
