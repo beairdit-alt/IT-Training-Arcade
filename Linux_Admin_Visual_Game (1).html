@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Linux Administration Visual Quest</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #111a2d;
+      --panel2: #16223b;
+      --accent: #4fd1c5;
+      --accent2: #8b5cf6;
+      --text: #e8eefc;
+      --muted: #9db0d3;
+      --good: #22c55e;
+      --warn: #f59e0b;
+      --bad: #ef4444;
+      --line: #284164;
+      --card: #0f1a2f;
+      --shadow: 0 14px 30px rgba(0,0,0,.28);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg,#09111d 0%,#0b1220 45%,#10192c 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    .app {
+      display: grid;
+      grid-template-columns: 290px 1fr;
+      min-height: 100vh;
+    }
+    .sidebar {
+      background: rgba(7,11,21,.95);
+      border-right: 1px solid var(--line);
+      padding: 18px 16px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    .brand {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(79,209,197,.12), rgba(139,92,246,.08));
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+      margin-bottom: 18px;
+    }
+    .brand h1 {
+      margin: 0 0 8px;
+      font-size: 1.3rem;
+      line-height: 1.2;
+    }
+    .brand p {
+      margin: 0;
+      color: var(--muted);
+      font-size: .95rem;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 14px 0 8px;
+    }
+    .stat {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 10px;
+      text-align: center;
+    }
+    .stat .value { font-size: 1.15rem; font-weight: 700; }
+    .stat .label { color: var(--muted); font-size: .8rem; }
+    .progress-wrap { margin: 12px 0 16px; }
+    .progress-bar {
+      height: 12px;
+      background: #0c1629;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      transition: width .35s ease;
+    }
+    .progress-text { color: var(--muted); font-size: .85rem; margin-top: 8px; }
+    .nav-list { display: flex; flex-direction: column; gap: 8px; }
+    .nav-btn {
+      width: 100%;
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 11px 12px;
+      text-align: left;
+      cursor: pointer;
+      transition: .18s ease;
+    }
+    .nav-btn:hover, .nav-btn.active {
+      background: linear-gradient(90deg, rgba(79,209,197,.14), rgba(139,92,246,.14));
+      border-color: var(--accent);
+      transform: translateX(3px);
+    }
+    .small-controls { display: flex; gap: 8px; margin-top: 14px; }
+    .small-controls button {
+      flex: 1;
+      padding: 10px;
+      background: var(--panel2);
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      cursor: pointer;
+    }
+    .content { padding: 24px; }
+    .hero {
+      background: linear-gradient(135deg, rgba(79,209,197,.12), rgba(139,92,246,.14));
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      margin-bottom: 22px;
+    }
+    .hero h2 { margin-top: 0; font-size: 2rem; }
+    .hero p { color: var(--muted); max-width: 950px; }
+    .hero-badges { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+    .badge {
+      background: rgba(15,26,47,.75);
+      border: 1px solid var(--line);
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: .9rem;
+    }
+    .panel {
+      display: none;
+      background: rgba(9,16,28,.65);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 22px;
+      margin-bottom: 18px;
+      box-shadow: var(--shadow);
+    }
+    .panel.active { display: block; }
+    .panel h3 { margin-top: 0; font-size: 1.75rem; }
+    .panel p, .panel li { color: var(--muted); line-height: 1.6; }
+    .grid-2 { display: grid; grid-template-columns: 1.1fr .9fr; gap: 18px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+    }
+    .card h4 { margin: 0 0 10px; font-size: 1.02rem; }
+    .diagram, .terminal-box {
+      background: #0b1528;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+    }
+    .stack, .row, .fs-tree, .permission-grid, .trouble-grid { display: flex; gap: 12px; }
+    .stack { flex-direction: column; }
+    .row { flex-wrap: wrap; align-items: stretch; }
+    .box {
+      flex: 1;
+      min-width: 140px;
+      background: linear-gradient(180deg, rgba(79,209,197,.08), rgba(255,255,255,.02));
+      border: 1px solid var(--line);
+      padding: 14px;
+      border-radius: 16px;
+      text-align: center;
+    }
+    .arrow {
+      text-align: center;
+      color: var(--accent);
+      font-size: 1.4rem;
+      padding: 4px 0;
+    }
+    .tree-node {
+      background: rgba(139,92,246,.08);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 10px 12px;
+      margin: 8px 0;
+      cursor: pointer;
+      transition: .15s ease;
+    }
+    .tree-node:hover { border-color: var(--accent); transform: translateX(4px); }
+    .tree-info {
+      margin-top: 10px;
+      padding: 14px;
+      border-radius: 14px;
+      background: rgba(79,209,197,.09);
+      border: 1px solid var(--line);
+      color: var(--text);
+      min-height: 92px;
+    }
+    code, .cmd {
+      background: rgba(0,0,0,.28);
+      border: 1px solid #26415d;
+      border-radius: 10px;
+      padding: 3px 8px;
+      color: #8ef9d6;
+      font-family: Consolas, Monaco, monospace;
+      font-size: .95rem;
+    }
+    pre {
+      margin: 0;
+      white-space: pre-wrap;
+      color: #cfe9ff;
+      font-family: Consolas, Monaco, monospace;
+      font-size: .95rem;
+      line-height: 1.5;
+    }
+    .terminal-title {
+      color: #a5c0e8;
+      margin-bottom: 10px;
+      font-size: .88rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .quiz {
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+    }
+    .question {
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--text);
+    }
+    .choices { display: grid; gap: 10px; }
+    .choice {
+      padding: 12px 14px;
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      cursor: pointer;
+      text-align: left;
+    }
+    .choice:hover { border-color: var(--accent); }
+    .choice.correct { border-color: var(--good); background: rgba(34,197,94,.12); }
+    .choice.wrong { border-color: var(--bad); background: rgba(239,68,68,.12); }
+    .explanation {
+      margin-top: 12px;
+      padding: 14px;
+      border-radius: 14px;
+      background: rgba(79,209,197,.08);
+      border: 1px solid var(--line);
+      display: none;
+    }
+    .explanation.show { display: block; }
+    .pill-list { display: flex; flex-wrap: wrap; gap: 8px; }
+    .pill {
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--line);
+      color: var(--text);
+      font-size: .9rem;
+    }
+    .perm-box {
+      flex: 1;
+      background: rgba(255,255,255,.03);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
+      min-width: 120px;
+      text-align: center;
+    }
+    .bigperm {
+      font-size: 1.35rem;
+      color: #8ef9d6;
+      font-family: Consolas, Monaco, monospace;
+      margin-bottom: 8px;
+    }
+    .svc-grid { display:grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 12px; }
+    .status {
+      display:inline-block;
+      padding:4px 8px;
+      border-radius:999px;
+      font-size:.82rem;
+      margin-top:8px;
+    }
+    .up { background: rgba(34,197,94,.14); color: #9af2b4; }
+    .down { background: rgba(239,68,68,.14); color: #ffb0b0; }
+    .warn { background: rgba(245,158,11,.14); color: #ffd391; }
+    .final-screen {
+      text-align: center;
+      padding: 24px;
+      border: 1px dashed var(--accent);
+      border-radius: 22px;
+      background: rgba(79,209,197,.08);
+    }
+    .button, .download-btn {
+      padding: 12px 16px;
+      background: linear-gradient(90deg,var(--accent),var(--accent2));
+      color: #08131f;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+    .download-btn { margin-top: 12px; }
+    .legend { color: var(--muted); font-size: .9rem; }
+    .footnote { margin-top: 14px; color: var(--muted); font-size: .85rem; }
+    @media (max-width: 1050px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar { position: relative; height: auto; }
+      .grid-2 { grid-template-columns: 1fr; }
+      .grid-3 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <h1>Linux Administration Visual Quest</h1>
+      <p>Explore Linux visually, answer questions, and build your admin instincts.</p>
+      <div class="stats">
+        <div class="stat"><div class="value" id="xpValue">0</div><div class="label">XP</div></div>
+        <div class="stat"><div class="value" id="scoreValue">0/10</div><div class="label">Challenges</div></div>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="progress-text" id="progressText">0% complete</div>
+      </div>
+    </div>
+
+    <div class="nav-list" id="navList">
+      <button class="nav-btn active" data-target="overview">Overview Map</button>
+      <button class="nav-btn" data-target="architecture">1. Linux Architecture</button>
+      <button class="nav-btn" data-target="filesystem">2. File System Structure</button>
+      <button class="nav-btn" data-target="fileops">3. File Operations</button>
+      <button class="nav-btn" data-target="viewfiles">4. View File Content</button>
+      <button class="nav-btn" data-target="users">5. Users, Root, Sudo</button>
+      <button class="nav-btn" data-target="permissions">6. Permissions & Ownership</button>
+      <button class="nav-btn" data-target="services">7. Services & Processes</button>
+      <button class="nav-btn" data-target="network">8. Network Commands</button>
+      <button class="nav-btn" data-target="logging">9. Logging & SSH</button>
+      <button class="nav-btn" data-target="troubleshooting">10. Troubleshooting</button>
+      <button class="nav-btn" data-target="finale">Final Challenge</button>
+    </div>
+
+    <div class="small-controls">
+      <button onclick="resetProgress()">Reset</button>
+      <button onclick="downloadReport()">Report</button>
+    </div>
+  </aside>
+
+  <main class="content">
+    <section class="hero">
+      <h2>Visual Linux Admin Game</h2>
+      <p>This game explains Linux administration in a visual, classroom-friendly way. Students can click through each topic, study diagrams, read short command examples, and answer mini challenges with instant explanations. It covers Linux architecture, file systems, CLI, permissions, services, networking, logging, SSH, and troubleshooting.</p>
+      <div class="hero-badges">
+        <div class="badge">Visual diagrams</div>
+        <div class="badge">Mini quizzes</div>
+        <div class="badge">Immediate feedback</div>
+        <div class="badge">Progress saving</div>
+        <div class="badge">Classroom friendly</div>
+      </div>
+    </section>
+
+    <section id="overview" class="panel active">
+      <h3>Overview Map</h3>
+      <p>Think of Linux administration as layers. You interact through the shell and terminal, but underneath that are files, permissions, services, processes, and the network. Click each module on the left to explore it.</p>
+      <div class="diagram">
+        <div class="stack">
+          <div class="box"><strong>Administrator</strong><br><span class="legend">You type commands and solve problems</span></div>
+          <div class="arrow">↓</div>
+          <div class="box"><strong>Terminal + Shell</strong><br><span class="legend">CLI and Bash interpret your commands</span></div>
+          <div class="arrow">↓</div>
+          <div class="row">
+            <div class="box"><strong>Filesystem</strong><br><span class="legend">Files, directories, config, logs</span></div>
+            <div class="box"><strong>Users & Permissions</strong><br><span class="legend">Who can access what</span></div>
+            <div class="box"><strong>Services & Processes</strong><br><span class="legend">What is running in the background</span></div>
+          </div>
+          <div class="arrow">↓</div>
+          <div class="row">
+            <div class="box"><strong>Networking</strong><br><span class="legend">IP, routes, DNS, SSH</span></div>
+            <div class="box"><strong>Logging</strong><br><span class="legend">What happened and why</span></div>
+            <div class="box"><strong>Troubleshooting</strong><br><span class="legend">Diagnose and restore service</span></div>
+          </div>
+          <div class="arrow">↓</div>
+          <div class="box"><strong>Linux Kernel</strong><br><span class="legend">Controls hardware, CPU, memory, storage, and network stack</span></div>
+        </div>
+      </div>
+      <div class="footnote">Tip: Use this game with Ubuntu or Linux Mint open in a VM so students can try commands while learning.</div>
+    </section>
+
+    <section id="architecture" class="panel">
+      <h3>1. Linux Architecture</h3>
+      <div class="grid-2">
+        <div class="card">
+          <p>Linux architecture can be visualized as a stack of layers. Each layer does a different job, but they work together whenever an administrator types a command.</p>
+          <div class="diagram">
+            <div class="stack">
+              <div class="box"><strong>User / Admin</strong><br>Decides what task to perform</div>
+              <div class="arrow">↓</div>
+              <div class="box"><strong>Applications & Utilities</strong><br><span class="cmd">ls</span> <span class="cmd">cp</span> <span class="cmd">grep</span> <span class="cmd">systemctl</span></div>
+              <div class="arrow">↓</div>
+              <div class="box"><strong>Shell</strong><br>Bash interprets commands and launches programs</div>
+              <div class="arrow">↓</div>
+              <div class="row">
+                <div class="box"><strong>Daemons</strong><br>sshd, cron, docker</div>
+                <div class="box"><strong>Package Manager</strong><br>apt, dnf</div>
+              </div>
+              <div class="arrow">↓</div>
+              <div class="box"><strong>Kernel</strong><br>CPU, memory, drivers, storage, network stack</div>
+              <div class="arrow">↓</div>
+              <div class="box"><strong>Hardware</strong><br>Disk, NIC, RAM, CPU</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <h4>Key Idea</h4>
+          <p>The shell is not the operating system itself. It is the interface that lets you talk to Linux. The kernel is the core part that actually manages hardware and system resources.</p>
+          <div class="terminal-box">
+            <div class="terminal-title">Example thought process</div>
+            <pre>You type: ls /etc
+Bash reads the command
+Linux launches the ls utility
+The kernel helps it access the disk
+The terminal shows the result</pre>
+          </div>
+          <div class="quiz" data-question="q1">
+            <div class="question">Which Linux component directly manages CPU, memory, and hardware drivers?</div>
+            <div class="choices">
+              <button class="choice" data-correct="false">Bash shell</button>
+              <button class="choice" data-correct="true">Kernel</button>
+              <button class="choice" data-correct="false">Terminal window</button>
+              <button class="choice" data-correct="false">/etc directory</button>
+            </div>
+            <div class="explanation">Correct answer: <strong>Kernel</strong>. The Linux kernel is the core that manages system resources such as the CPU, memory, hardware drivers, storage access, and networking.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="filesystem" class="panel">
+      <h3>2. File System Structure</h3>
+      <div class="grid-2">
+        <div class="card">
+          <p>Linux uses one directory hierarchy that begins at <code>/</code>. Instead of drive letters like Windows, devices and filesystems are mounted into this single tree.</p>
+          <div class="fs-tree">
+            <div style="flex:1;">
+              <div class="tree-node" onclick="showTreeInfo('/', 'The root directory is the top of the Linux filesystem. Everything begins here.')">/</div>
+              <div class="tree-node" onclick="showTreeInfo('/home', 'User home directories live here, such as /home/student01. This is where user files are commonly stored.')">/home</div>
+              <div class="tree-node" onclick="showTreeInfo('/root', 'This is the home directory of the root user. It is not the same as the root directory /.')">/root</div>
+              <div class="tree-node" onclick="showTreeInfo('/etc', 'System-wide configuration files live here, including network settings and SSH configuration.')">/etc</div>
+              <div class="tree-node" onclick="showTreeInfo('/var', 'Variable data such as logs, spools, mail, databases, and caches often live in /var.')">/var</div>
+              <div class="tree-node" onclick="showTreeInfo('/tmp', 'Temporary files are stored here. They may be cleaned up automatically by the system.')">/tmp</div>
+              <div class="tree-node" onclick="showTreeInfo('/usr', 'Programs, libraries, and many installed applications live under /usr.')">/usr</div>
+              <div class="tree-node" onclick="showTreeInfo('/dev', 'Devices appear as files here, such as /dev/sda and /dev/null.')">/dev</div>
+              <div class="tree-node" onclick="showTreeInfo('/proc', 'A virtual filesystem that exposes process and kernel information.')">/proc</div>
+              <div class="tree-node" onclick="showTreeInfo('/mnt', 'A common place for temporarily mounting filesystems.')">/mnt</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <h4>Click a directory</h4>
+          <div class="tree-info" id="treeInfo"><strong>/</strong><br>The root directory is the starting point of the Linux filesystem.</div>
+          <div class="terminal-box" style="margin-top:14px;">
+            <div class="terminal-title">Navigation examples</div>
+            <pre>pwd        # show current directory
+ls -la     # list contents, including hidden files
+cd /etc    # move into /etc
+cd ~       # go to your home directory
+cd ..      # move up one level</pre>
+          </div>
+          <div class="quiz" data-question="q2">
+            <div class="question">Why is <code>/etc</code> especially important to administrators?</div>
+            <div class="choices">
+              <button class="choice" data-correct="true">It commonly stores system configuration files</button>
+              <button class="choice" data-correct="false">It is where Linux stores RAM</button>
+              <button class="choice" data-correct="false">It holds only user pictures and documents</button>
+              <button class="choice" data-correct="false">It is the Windows-style D: drive</button>
+            </div>
+            <div class="explanation">Correct answer: <strong>It commonly stores system configuration files</strong>. Admins often edit files in <code>/etc</code> to configure services, networking, and access settings.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="fileops" class="panel">
+      <h3>3. File Operations</h3>
+      <div class="grid-2">
+        <div class="card">
+          <p>Basic file operations let administrators create files, organize folders, move content, copy backups, and remove unnecessary items. These are core daily tasks.</p>
+          <div class="grid-3">
+            <div class="card"><h4>Create</h4><p><code>touch file.txt</code><br><code>mkdir project</code></p></div>
+            <div class="card"><h4>Copy</h4><p><code>cp source.txt copy.txt</code></p></div>
+            <div class="card"><h4>Move / Rename</h4><p><code>mv old.txt new.txt</code></p></div>
+            <div class="card"><h4>Delete File</h4><p><code>rm file.txt</code></p></div>
+            <div class="card"><h4>Delete Folder</h4><p><code>rm -r folder</code></p></div>
+            <div class="card"><h4>Danger</h4><p><code>rm -rf</code> can be destructive if used carelessly.</p></div>
+          </div>
+          <div class="terminal-box" style="margin-top:14px;">
+            <div class="terminal-title">Visual workflow</div>
+            <pre>notes.txt  --cp-->  notes-backup.txt
+oldname.txt --mv--> newname.txt
+oldfolder/ --rm -r--> deleted</pre>
+          </div>
+        </div>
+        <div class="card">
+          <h4>Admin mindset</h4>
+          <p>Before running delete commands, always verify where you are with <code>pwd</code> and what exists with <code>ls</code>. Many admin mistakes happen because someone was in the wrong directory.</p>
+          <div class="quiz" data-question="q3">
+            <div class="question">Which command renames a file without creating an extra copy?</div>
+            <div class="choices">
+              <button class="choice" data-correct="false">cp old.txt new.txt</button>
+              <button class="choice" data-correct="true">mv old.txt new.txt</button>
+              <button class="choice" data-correct="false">touch new.txt</button>
+              <button class="choice" data-correct="false">rm old.txt</button>
+            </div>
+            <div class="explanation">Correct answer: <strong>mv old.txt new.txt</strong>. The <code>mv</code> command moves or renames a file. <code>cp</code> would create another copy instead.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="viewfiles" class="panel">
+      <h3>4. View File Content</h3>
+      <div class="grid-2">
+        <div class="card">
+          <p>Admins constantly inspect files: configuration files, logs, reports, and scripts. Different commands are useful depending on what you need to see.</p>
+          <div class="svc-grid">
+            <div class="card"><h4>cat</h4><p>Show an entire short file</p><p><code>cat file.txt</code></p></div>
+            <div class="card"><h4>less</h4><p>Scroll through larger files</p><p><code>less file.txt</code></p></div>
+            <div class="card"><h4>head</h4><p>See the first lines</p><p><code>head file.txt</code></p></div>
+            <div class="card"><h4>tail</h4><p>See the last lines</p><p><code>tail file.txt</code></p></div>
+            <div class="card"><h4>tail -f</h4><p>Watch log entries live</p><p><code>tail -f /var/log/syslog</code></p></div>
+            <div class="card"><h4>grep</h4><p>Search for patterns</p><p><code>grep error file.txt</code></p></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="terminal-box">
+            <div class="terminal-title">Log investigation example</div>
+            <pre>tail /var/log/syslog
+head /etc/hosts
+grep ssh /var/log/auth.log
+less /etc/ssh/sshd_config</pre>
+          </div>
+          <p style="margin-top:12px;">Use <code>head</code> when you only need the beginning, <code>tail</code> for the latest entries, and <code>grep</code> when you're looking for a specific word or error.</p>
+          <div class="quiz" data-question="q4">
+            <div class="question">Which command is best for watching new log entries appear in real time?</div>
+            <div class="choices">
+              <button class="choice" data-correct="false">cat /var/log/syslog</button>
+              <button class="choice" data-correct="true">tail -f /var/log/syslog</button>
+              <button class="choice" data-correct="false">pwd</button>
+              <button class="choice" data-correct="false">mkdir /var/log/syslog</button>
+            </div>
+            <div class="explanation">Correct answer: <strong>tail -f /var/log/syslog</strong>. The <code>-f</code> option follows a file and shows new entries as they are added.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="users" class="panel">
+      <h3>5. Users, Root, and Sudo</h3>
+      <div class="grid-2">
+        <div class="card">
+          <p>Linux uses user accounts to control who is allowed to do what. A normal user should not have unlimited control. The root account is the superuser and can bypass normal restrictions.</p>
+          <div class="diagram">
+            <div class="row">
+              <div class="box"><strong>Regular User</strong><br>Daily work, limited permissions</div>
+              <div class="box"><strong>Group Memberships</strong><br>Shared access to resources</div>
+              <div class="box"><strong>Root</strong><br>Full administrative control</div>
+            </div>
+            <div class="arrow">↓</div>
+            <div class="box"><strong>sudo</strong><br>Temporary elevation for authorized users</div>
+          </div>
+          <div class="pill-list" style="margin-top:14px;">
+            <div class="pill"><code>whoami</code> show current user</div>
+            <div class="pill"><code>id</code> show UID, GID, groups</div>
+            <div class="pill"><code>sudo useradd student01</code> create user</div>
+            <div class="pill"><code>sudo passwd student01</code> set password</div>
+          </div>
+        </div>
+        <div class="card">
+          <h4>Why sudo is preferred</h4>
+          <p>Using <code>sudo</code> is safer than casually operating as root all the time. It reduces risk, supports better administrative practices, and allows temporary elevated access when needed.</p>
+          <div class="terminal-box">
+            <div class="terminal-title">Example</div>
+            <pre>whoami
+id
+sudo apt update</pre>
+          </div>
+          <div class="quiz" data-question="q5">
+            <div class="question">What is the main purpose of <code>sudo</code>?</div>
+            <div class="choices">
+              <button class="choice" data-correct="true">To run commands with elevated privileges when authorized</button>
+              <button class="choice" data-correct="false">To rename files faster</button>
+              <button class="choice" data-correct="false">To replace the kernel</button>
+              <button class="choice" data-correct="false">To list hidden files</button>
+            </div>
+            <div class="explanation">Correct answer: <strong>To run commands with elevated privileges when authorized</strong>. <code>sudo</code> temporarily raises privileges so approved users can perform administrative tasks.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="permissions" class="panel">
+      <h3>6. Permissions and Ownership</h3>
+      <div class="grid-2">
+        <div class="card">
+          <p>Permissions answer three questions: <strong>who</strong> can access the file, <strong>what</strong> actions are allowed, and <strong>who owns it</strong>. Ownership and permissions together determine access.</p>
+          <div class="permission-grid row">
+            <div class="perm-box">
+              <div class="bigperm">-rwxr-x---</div>
+              <div><strong>Type</strong>: <code>-</code> regular file</div>
+            </div>
+            <div class="perm-box">
+              <div class="bigperm">rwx</div>
+              <div><strong>Owner</strong><br>read, write, execute</div>
+            </div>
+            <div class="perm-box">
+              <div class="bigperm">r-x</div>
+              <div><strong>Group</strong><br>read, execute</div>
+            </div>
+            <div class="perm-box">
+              <div class="bigperm">---</div>
+              <div><strong>Others</strong><br>no access</div>
+            </div>
+          </div>
+          <div class="grid-3" style="margin-top:14px;">
+            <div class="card"><h4>r = 4</h4><p>Read a file or list a directory</p></div>
+            <div class="card"><h4>w = 2</h4><p>Write or modify content</p></div>
+            <div class="card"><h4>x = 1</h4><p>Execute a file or enter a directory</p></div>
+          </div>
+          <div class="terminal-box" style="margin-top:14px;">
+            <div class="terminal-title">Ownership commands</div>
+            <pre>ls -l
+chmod 755 script.sh
+chmod u+x file
+sudo chown student01 file.txt
+sudo chgrp students file.txt</pre>
+          </div>
+        </div>
+        <div class="card">
+          <h4>Visual example</h4>
+          <p>If a script belongs to user <strong>student01</strong> but does not have execute permission, the system may refuse to run it directly. Adding execute permission solves that specific problem.</p>
+          <div class="diagram">
+            <div class="row">
+              <div class="box"><strong>Before</strong><br><code>-rw-r--r-- script.sh</code><br><span class="status down">Not executable</span></div>
+              <div class="box"><strong>Command</strong><br><code>chmod +x script.sh</code></div>
+              <div class="box"><strong>After</strong><br><code>-rwxr-xr-x script.sh</code><br><span class="status up">Executable</span></div>
+            </div>
+          </div>
+          <div class="quiz" data-question="q6">
+            <div class="question">What does <code>chmod 755 script.sh</code> do?</div>
+            <div class="choices">
+              <button class="choice" data-correct="true">Gives the owner rwx and gives group and others r-x</button>
+              <button class="choice" data-correct="false">Deletes the file and makes a copy</button>
+              <button class="choice" data-correct="false">Changes the owner to root</button>
+              <button class="choice" data-correct="false">Moves the file to /root</button>
+            </div>
+            <div class="explanation">Correct answer: <strong>Gives the owner rwx and group/others r-x</strong>. In octal permissions, 7 = 4+2+1, and 5 = 4+1.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="services" class="panel">
+      <h3>7. Services and Processes</h3>
+      <div class="grid-2">
+        <div class="card">
+          <p>Services (also called daemons) run in the background and provide ongoing functionality such as SSH access, web serving, scheduling, or container management. Processes are the running instances of programs.</p>
+          <div class="svc-grid">
+            <div class="card"><h4>sshd</h4><p>Secure remote access</p><span class="status up">service</span></div>
+            <div class="card"><h4>cron</h4><p>Scheduled jobs</p><span class="status up">service</span></div>
+            <div class="card"><h4>nginx</h4><p>Web server</p><span class="status warn">service</span></div>
+            <div class="card"><h4>docker</h4><p>Containers</p><span class="status up">service</span></div>
+          </div>
+          <div class="terminal-box" style="margin-top:14px;">
+            <div class="terminal-title">Common service & process commands</div>
+            <pre>systemctl status ssh
+sudo systemctl start ssh
+sudo systemctl stop ssh
+sudo systemctl enable ssh
+ps aux
+top
+kill PID
+kill -9 PID</pre>
+          </div>
+        </div>
+        <div class="card">
+          <h4>Start vs Enable</h4>
+          <p><strong>Start</strong> means run the service now. <strong>Enable</strong> means configure it to start automatically when the system boots under the appropriate conditions.</p>
+          <div class="diagram">
+            <div class="row">
+              <div class="box"><strong>start ssh</strong><br><span class="status up">Runs now</span></div>
+              <div class="box"><strong>enable ssh</strong><br><span class="status warn">Starts at boot</span></div>
+            </div>
+          </div>
+          <div class="quiz" data-question="q7">
+            <div class="question">Which tool is used on many modern Linux systems to manage services?</div>
+            <div class="choices">
+              <button class="choice" data-correct="false">grep</button>
+              <button class="choice" data-correct="true">systemctl</button>
+              <button class="choice" data-correct="false">chmod</button>
+              <button class="choice" data-correct="false">pwd</button>
+            </div>
+            <div class="explanation">Correct answer: <strong>systemctl</strong>. On systemd-based Linux systems, <code>systemctl</code> is commonly used to start, stop, enable, restart, and inspect services.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="network" class="panel">
+      <h3>8. Network Commands</h3>
+      <div class="grid-2">
+        <div class="card">
+          <p>Linux administrators need to verify addressing, routes, connectivity, sockets, and DNS. These commands help narrow down where the problem lives.</p>
+          <div class="svc-grid">
+            <div class="card"><h4>ip a</h4><p>Show interface addresses</p></div>
+            <div class="card"><h4>ip route</h4><p>Show routing table</p></div>
+            <div class="card"><h4>ping 8.8.8.8</h4><p>Test IP connectivity</p></div>
+            <div class="card"><h4>dig example.com</h4><p>Test DNS resolution</p></div>
+            <div class="card"><h4>nslookup example.com</h4><p>Query DNS</p></div>
+            <div class="card"><h4>ss</h4><p>View listening sockets and connections</p></div>
+          </div>
+          <div class="diagram" style="margin-top:14px;">
+            <div class="row">
+              <div class="box"><strong>Step 1</strong><br>Check IP address<br><code>ip a</code></div>
+              <div class="box"><strong>Step 2</strong><br>Check gateway<br><code>ip route</code></div>
+              <div class="box"><strong>Step 3</strong><br>Ping remote host<br><code>ping</code></div>
+              <div class="box"><strong>Step 4</strong><br>Check DNS<br><code>dig</code></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="terminal-box">
+            <div class="terminal-title">Troubleshooting logic</div>
+            <pre>ip a          # do I have an address?
+ip route      # do I have a gateway?
+ping 8.8.8.8 # can I reach the internet by IP?
+dig example.com # is DNS working?
+ss -tuln      # what services are listening?</pre>
+          </div>
+          <div class="quiz" data-question="q8">
+            <div class="question">If you can ping <code>8.8.8.8</code> but cannot open <code>example.com</code>, what is a likely issue?</div>
+            <div class="choices">
+              <button class="choice" data-correct="true">DNS resolution may be failing</button>
+              <button class="choice" data-correct="false">The CPU is physically missing</button>
+              <button class="choice" data-correct="false">chmod permissions are wrong on /home</button>
+              <button class="choice" data-correct="false">The root directory is deleted</button>
+            </div>
+            <div class="explanation">Correct answer: <strong>DNS resolution may be failing</strong>. Reaching 8.8.8.8 by IP suggests network connectivity works, while failure to reach a name points toward DNS issues.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="logging" class="panel">
+      <h3>9. Logging and SSH</h3>
+      <div class="grid-2">
+        <div class="card">
+          <p>Logs explain what happened. SSH provides secure remote command-line access. These two areas are crucial because most Linux administration is done remotely and troubleshooting often depends on finding the right log message.</p>
+          <div class="row">
+            <div class="box"><strong>Traditional Logs</strong><br><code>/var/log</code></div>
+            <div class="box"><strong>systemd Journal</strong><br><code>journalctl</code></div>
+            <div class="box"><strong>Remote Access</strong><br><code>ssh user@serverip</code></div>
+          </div>
+          <div class="terminal-box" style="margin-top:14px;">
+            <div class="terminal-title">Useful commands</div>
+            <pre>journalctl -xe
+journalctl -u ssh
+ssh user@serverip
+ssh admin@192.168.1.10
+scp file.txt user@host:/path</pre>
+          </div>
+        </div>
+        <div class="card">
+          <h4>Visual flow</h4>
+          <div class="diagram">
+            <div class="stack">
+              <div class="box"><strong>Problem happens</strong><br>SSH login fails or a service crashes</div>
+              <div class="arrow">↓</div>
+              <div class="box"><strong>Check logs</strong><br><code>journalctl -u ssh</code></div>
+              <div class="arrow">↓</div>
+              <div class="box"><strong>Connect remotely</strong><br><code>ssh admin@server</code></div>
+            </div>
+          </div>
+          <div class="quiz" data-question="q9">
+            <div class="question">What is the main reason SSH is preferred over Telnet?</div>
+            <div class="choices">
+              <button class="choice" data-correct="true">SSH provides encrypted remote access</button>
+              <button class="choice" data-correct="false">SSH automatically repairs hard drives</button>
+              <button class="choice" data-correct="false">SSH changes file ownership</button>
+              <button class="choice" data-correct="false">SSH only works on Windows</button>
+            </div>
+            <div class="explanation">Correct answer: <strong>SSH provides encrypted remote access</strong>. SSH protects credentials and administrative traffic, making it safer than older plaintext tools such as Telnet.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="troubleshooting" class="panel">
+      <h3>10. Common Troubleshooting</h3>
+      <div class="grid-2">
+        <div class="card">
+          <p>Effective troubleshooting means checking the most likely causes in a logical order rather than guessing. Match the symptom to the area you should inspect first.</p>
+          <div class="trouble-grid stack">
+            <div class="box"><strong>Permission denied</strong><br>Check <code>ls -l</code>, ownership, <code>chmod</code>, and whether <code>sudo</code> is needed.</div>
+            <div class="box"><strong>Service down</strong><br>Check <code>systemctl status</code> and <code>journalctl</code>.</div>
+            <div class="box"><strong>SSH fails</strong><br>Check service status, firewall, network path, credentials, and config.</div>
+            <div class="box"><strong>Disk full</strong><br>Check <code>df -h</code>.</div>
+            <div class="box"><strong>High CPU</strong><br>Check <code>top</code> or <code>htop</code>.</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="terminal-box">
+            <div class="terminal-title">Useful command set</div>
+            <pre>ls -l
+systemctl status ssh
+journalctl -u ssh
+df -h
+top
+ip a
+ip route</pre>
+          </div>
+          <div class="quiz" data-question="q10">
+            <div class="question">A server reports “disk full.” Which command is most directly useful first?</div>
+            <div class="choices">
+              <button class="choice" data-correct="false">chmod 755 script.sh</button>
+              <button class="choice" data-correct="true">df -h</button>
+              <button class="choice" data-correct="false">whoami</button>
+              <button class="choice" data-correct="false">groupadd students</button>
+            </div>
+            <div class="explanation">Correct answer: <strong>df -h</strong>. It shows filesystem usage in human-readable units and helps you verify which mounted filesystem is full.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="finale" class="panel">
+      <h3>Final Challenge: Think Like a Linux Administrator</h3>
+      <div class="card">
+        <p><strong>Scenario:</strong> Users report they cannot access a Linux web server. You can still SSH into the server. Based on what you learned, what should you check?</p>
+        <ol>
+          <li>Verify network information with <code>ip a</code> and <code>ip route</code>.</li>
+          <li>Check whether the web service is running with <code>systemctl status nginx</code> or the appropriate service name.</li>
+          <li>Review relevant logs with <code>journalctl -u nginx</code> or logs under <code>/var/log</code>.</li>
+          <li>Check for listening sockets with <code>ss -tuln</code>.</li>
+          <li>Check disk space with <code>df -h</code> in case the service cannot write logs or temporary files.</li>
+          <li>Inspect permissions or ownership if the service cannot access its files.</li>
+        </ol>
+        <div class="quiz" data-question="qFinal">
+          <div class="question">What is the best first mindset in Linux troubleshooting?</div>
+          <div class="choices">
+            <button class="choice" data-correct="false">Guess and reboot repeatedly</button>
+            <button class="choice" data-correct="true">Check likely causes in a logical order and use commands to gather evidence</button>
+            <button class="choice" data-correct="false">Delete logs so errors go away</button>
+            <button class="choice" data-correct="false">Always use root for every task</button>
+          </div>
+          <div class="explanation">Correct answer: <strong>Check likely causes in a logical order and gather evidence</strong>. Strong admins troubleshoot methodically instead of guessing.</div>
+        </div>
+      </div>
+      <div class="final-screen" id="finalScreen" style="display:none; margin-top:18px;">
+        <h3>Quest Complete</h3>
+        <p id="finalSummary">Great work.</p>
+        <button class="download-btn" onclick="downloadReport()">Download Progress Report</button>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+  const TOTAL_QUESTIONS = 11;
+  let xp = 0;
+  let correctCount = 0;
+  let answered = {};
+
+  const saved = JSON.parse(localStorage.getItem('linuxAdminVisualQuest') || '{}');
+  if (saved.xp) xp = saved.xp;
+  if (saved.correctCount) correctCount = saved.correctCount;
+  if (saved.answered) answered = saved.answered;
+
+  function saveProgress() {
+    localStorage.setItem('linuxAdminVisualQuest', JSON.stringify({ xp, correctCount, answered }));
+  }
+
+  function updateHud() {
+    document.getElementById('xpValue').textContent = xp;
+    document.getElementById('scoreValue').textContent = `${correctCount}/${TOTAL_QUESTIONS}`;
+    const pct = Math.round((Object.keys(answered).length / TOTAL_QUESTIONS) * 100);
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressText').textContent = `${pct}% complete`;
+
+    if (Object.keys(answered).length === TOTAL_QUESTIONS) {
+      const finalScreen = document.getElementById('finalScreen');
+      finalScreen.style.display = 'block';
+      document.getElementById('finalSummary').innerHTML = `You finished all ${TOTAL_QUESTIONS} challenges with <strong>${correctCount}</strong> correct answers and <strong>${xp} XP</strong>.`;
+    }
+  }
+
+  function restoreAnsweredUI() {
+    document.querySelectorAll('.quiz').forEach(quiz => {
+      const qid = quiz.dataset.question;
+      if (!answered[qid]) return;
+      const userCorrect = answered[qid].correct;
+      const choices = quiz.querySelectorAll('.choice');
+      choices.forEach(choice => {
+        choice.disabled = true;
+        if (choice.dataset.correct === 'true') choice.classList.add('correct');
+      });
+      if (!userCorrect) {
+        const selectedIndex = answered[qid].selectedIndex;
+        if (choices[selectedIndex] && choices[selectedIndex].dataset.correct !== 'true') {
+          choices[selectedIndex].classList.add('wrong');
+        }
+      }
+      const ex = quiz.querySelector('.explanation');
+      ex.classList.add('show');
+    });
+  }
+
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.target).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+
+  document.querySelectorAll('.quiz').forEach(quiz => {
+    const qid = quiz.dataset.question;
+    const choices = quiz.querySelectorAll('.choice');
+    const explanation = quiz.querySelector('.explanation');
+    choices.forEach((choice, index) => {
+      choice.addEventListener('click', () => {
+        if (answered[qid]) return;
+        const correct = choice.dataset.correct === 'true';
+        answered[qid] = { correct, selectedIndex: index };
+        choices.forEach(c => {
+          c.disabled = true;
+          if (c.dataset.correct === 'true') c.classList.add('correct');
+        });
+        if (!correct) choice.classList.add('wrong');
+        if (correct) {
+          xp += 10;
+          correctCount += 1;
+        } else {
+          xp += 3;
+        }
+        explanation.classList.add('show');
+        saveProgress();
+        updateHud();
+      });
+    });
+  });
+
+  function showTreeInfo(title, text) {
+    document.getElementById('treeInfo').innerHTML = `<strong>${title}</strong><br>${text}`;
+  }
+
+  function resetProgress() {
+    if (!confirm('Reset all progress for this game?')) return;
+    localStorage.removeItem('linuxAdminVisualQuest');
+    location.reload();
+  }
+
+  function downloadReport() {
+    const report = `Linux Administration Visual Quest Report\n\n` +
+      `Date: ${new Date().toLocaleString()}\n` +
+      `XP: ${xp}\n` +
+      `Correct Answers: ${correctCount}/${TOTAL_QUESTIONS}\n` +
+      `Completed Challenges: ${Object.keys(answered).length}/${TOTAL_QUESTIONS}\n\n` +
+      `Topics Covered:\n` +
+      `1. Linux Architecture\n2. File System Structure\n3. File Operations\n4. View File Content\n5. Users, Root, Sudo\n6. Permissions and Ownership\n7. Services and Processes\n8. Network Commands\n9. Logging and SSH\n10. Common Troubleshooting\n11. Final Challenge\n`;
+    const blob = new Blob([report], { type: 'text/plain' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'Linux_Admin_Visual_Quest_Report.txt';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  }
+
+  updateHud();
+  restoreAnsweredUI();
+</script>
+</body>
+</html>
