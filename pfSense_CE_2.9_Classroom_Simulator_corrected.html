@@ -1,0 +1,635 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>pfSense CE 2.9.0 Classroom Simulator</title>
+<style>
+:root{
+  --nav:#263238; --nav2:#37474f; --red:#d54b45; --red2:#b83d38;
+  --bg:#eef1f4; --panel:#fff; --line:#ccd3d8; --text:#263238;
+  --muted:#68757e; --green:#2f9e44; --yellow:#e0a800; --blue:#2b78b8;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+.topbar{height:58px;background:var(--nav);color:#fff;display:flex;align-items:center;padding:0 18px;gap:18px;position:sticky;top:0;z-index:50}
+.brand{font-size:25px;font-weight:700;letter-spacing:-1px}
+.brand span{color:#ef665f}
+.version{font-size:12px;color:#b9c4ca}
+.mainnav{display:flex;gap:2px;flex:1;height:100%;align-items:stretch}
+.navitem{padding:0 14px;display:flex;align-items:center;cursor:pointer;font-size:14px;position:relative}
+.navitem:hover,.navitem.active{background:var(--nav2)}
+.navitem .menu{display:none;position:absolute;top:58px;left:0;min-width:225px;background:#fff;color:#222;border:1px solid #aaa;box-shadow:0 5px 18px #0003}
+.navitem:hover .menu{display:block}
+.menu div{padding:9px 12px;border-bottom:1px solid #eee;white-space:nowrap}
+.menu div:hover{background:#f1f4f6}
+.user{font-size:13px;color:#dbe3e7}
+.wrap{max-width:1700px;margin:auto;padding:14px}
+.alert{background:#fff6d8;border:1px solid #e7cc75;padding:10px 12px;border-radius:3px;margin-bottom:12px}
+.breadcrumb{color:#68757e;font-size:12px;margin-bottom:7px}
+.pagehead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+h1{font-size:23px;font-weight:500;margin:0}
+.btn{border:1px solid #999;background:#fff;color:#222;border-radius:3px;padding:7px 11px;cursor:pointer;font-size:13px}
+.btn:hover{background:#f1f1f1}.btn.red{background:var(--red);border-color:var(--red2);color:#fff}.btn.blue{background:#337ab7;border-color:#2e6da4;color:#fff}.btn.green{background:#449d44;border-color:#398439;color:#fff}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}
+.col6{grid-column:span 6}.col4{grid-column:span 4}.col8{grid-column:span 8}.col12{grid-column:span 12}
+.widget,.panel{background:var(--panel);border:1px solid #c9d0d5;border-radius:3px;box-shadow:0 1px 2px #0001}
+.widgethead,.panelhead{background:#f5f5f5;border-bottom:1px solid #d5dadd;padding:9px 11px;font-weight:700;font-size:14px;display:flex;justify-content:space-between}
+.widgetbody,.panelbody{padding:11px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{border:1px solid #d9dee2;padding:7px 8px;text-align:left}
+th{background:#f1f3f5;font-weight:700}
+.ok{color:var(--green);font-weight:700}.bad{color:#c0392b;font-weight:700}.warn{color:#b8860b;font-weight:700}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}.dot.green{background:#3baa54}.dot.red{background:#d9534f}.dot.yellow{background:#e0a800}
+.progress{height:15px;background:#e4e7e9;border-radius:3px;overflow:hidden}.progress div{height:100%;background:#5cb85c}
+.tabs{display:flex;border-bottom:1px solid #bbb;margin-bottom:12px;gap:2px}
+.tab{padding:8px 12px;border:1px solid #bbb;border-bottom:0;background:#eee;cursor:pointer;border-radius:3px 3px 0 0}
+.tab.active{background:#fff;font-weight:700}
+.formgrid{display:grid;grid-template-columns:260px 1fr;gap:0;border:1px solid #d5dadd;border-bottom:0}
+.formgrid>div{padding:9px;border-bottom:1px solid #d5dadd}
+.formgrid>div:nth-child(odd){background:#f5f5f5;font-weight:700}
+input,select,textarea{width:100%;padding:7px;border:1px solid #aeb6bc;border-radius:3px;background:#fff}
+input[type=checkbox]{width:auto}
+.help{font-size:11px;color:#66757e;margin-top:4px}
+.rule-pass{border-left:5px solid #3c9b47}.rule-block{border-left:5px solid #c94d48}.rule-row{background:#fff}
+.rule-actions button{padding:3px 6px;margin-right:3px}
+.statuscards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.statuscard{border:1px solid #d5dadd;background:#fff;padding:11px}
+.console{background:#15191c;color:#d5efda;font-family:Consolas,monospace;padding:12px;min-height:145px;white-space:pre-wrap;border-radius:2px}
+.coach{position:fixed;right:16px;bottom:16px;width:340px;background:#263238;color:#fff;border:1px solid #607d8b;border-radius:5px;box-shadow:0 8px 30px #0005;z-index:80}
+.coach h3{margin:0;background:#37474f;padding:10px 12px;font-size:15px}
+.coachbody{padding:10px 12px;font-size:13px;max-height:380px;overflow:auto}
+.coachstep{padding:7px 8px;border-left:3px solid #78909c;background:#ffffff0d;margin:6px 0}
+.coachstep.done{border-color:#5cb85c}.coachstep.current{border-color:#ef665f}
+.coachbuttons{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.coachbuttons button{font-size:11px;padding:6px 8px}
+.hidden{display:none!important}
+footer{text-align:center;color:#7a8790;font-size:12px;padding:30px 10px}
+@media(max-width:900px){
+  .mainnav{overflow:auto}.navitem{padding:0 8px}.col6,.col4,.col8{grid-column:span 12}
+  .formgrid{grid-template-columns:1fr}.formgrid>div:nth-child(odd){border-bottom:0}
+  .coach{width:calc(100% - 20px);right:10px}.version{display:none}
+}
+</style>
+
+<style>
+.clean-main{max-width:1700px;margin:auto;padding:18px}
+.campaign-nav,#camp{display:none!important}
+.campaign{display:block!important}
+</style>
+
+
+<style>
+html,body{margin:0!important}
+.wrap{max-width:none!important}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div><div class="brand">pf<span>Sense</span></div><div class="version">Community Edition 2.9.0 • Classroom Simulation</div></div>
+  <div class="mainnav">
+    <div class="navitem" onclick="showPage('dashboard')">System<div class="menu"><div>Advanced</div><div>General Setup</div><div>Package Manager</div><div>Routing</div><div>User Manager</div></div></div>
+    <div class="navitem" onclick="showPage('interfaces')">Interfaces<div class="menu"><div>Assignments</div><div>WAN</div><div>LAN</div><div>VLANs</div><div>Interface Groups</div></div></div>
+    <div class="navitem" onclick="showPage('firewall')">Firewall<div class="menu"><div>Aliases</div><div>NAT</div><div>Rules</div><div>Schedules</div><div>Traffic Shaper</div></div></div>
+    <div class="navitem" onclick="showPage('services')">Services<div class="menu"><div>DHCP Server</div><div>DHCP Relay</div><div>DNS Resolver</div><div>NTP</div><div>UPnP & NAT-PMP</div></div></div>
+    <div class="navitem" onclick="showPage('status')">Status<div class="menu"><div>Dashboard</div><div>DHCP Leases</div><div>Gateways</div><div>Interfaces</div><div>Services</div><div>System Logs</div><div>Traffic Graph</div></div></div>
+    <div class="navitem" onclick="showPage('diagnostics')">Diagnostics<div class="menu"><div>ARP Table</div><div>DNS Lookup</div><div>Packet Capture</div><div>Ping</div><div>States</div><div>Tables</div><div>Traceroute</div></div></div>
+  </div>
+  <div class="user">admin@firewall</div>
+</div>
+
+<div class="wrap">
+
+<section id="dashboard" class="page">
+<div class="breadcrumb">Status / Dashboard</div>
+<div class="pagehead"><h1>Dashboard</h1><button class="btn">+ Widgets</button></div>
+<div class="alert">This is a classroom simulation of pfSense CE. Changes here do not affect a real firewall.</div>
+<div class="grid">
+  <div class="widget col6"><div class="widgethead">System Information <span>▾</span></div><div class="widgetbody">
+    <table>
+      <tr><td>Name</td><td>firewall.networklab.local</td></tr>
+      <tr><td>System</td><td>pfSense CE 2.9.0 (simulated)</td></tr>
+      <tr><td>Platform</td><td>amd64 / FreeBSD 16.0-CURRENT</td></tr>
+      <tr><td>BIOS</td><td>UEFI</td></tr>
+      <tr><td>Uptime</td><td id="uptime">01:17:42</td></tr>
+      <tr><td>DNS Servers</td><td>10.10.20.10 / 1.1.1.1</td></tr>
+      <tr><td>CPU Usage</td><td><div class="progress"><div style="width:13%"></div></div>13%</td></tr>
+      <tr><td>Memory Usage</td><td><div class="progress"><div style="width:28%"></div></div>28%</td></tr>
+    </table>
+  </div></div>
+
+  <div class="widget col6"><div class="widgethead">Interfaces <span>▾</span></div><div class="widgetbody">
+    <table id="dashInterfaces">
+      <tr><th>Interface</th><th>IP Address</th><th>Status</th></tr>
+      <tr><td>WAN</td><td>198.51.100.25/24</td><td><span class="dot green"></span>up 1 Gbps</td></tr>
+      <tr><td>LAN</td><td>172.16.16.1/24</td><td><span class="dot green"></span>up 1 Gbps</td></tr>
+    </table>
+  </div></div>
+
+  <div class="widget col6"><div class="widgethead">Gateways <span>▾</span></div><div class="widgetbody">
+    <table><tr><th>Name</th><th>Gateway</th><th>RTT</th><th>Loss</th><th>Status</th></tr>
+    <tr><td>WAN_DHCP</td><td>198.51.100.1</td><td>8.3 ms</td><td>0.0%</td><td class="ok">Online</td></tr></table>
+  </div></div>
+
+  <div class="widget col6"><div class="widgethead">Services Status <span>▾</span></div><div class="widgetbody">
+    <table><tr><th>Service</th><th>Description</th><th>Status</th><th>Controls</th></tr>
+    <tr><td>dhcpd</td><td>DHCPv4 Server</td><td id="dashDhcp" class="bad">Stopped</td><td>▶ ↻ ■</td></tr>
+    <tr><td>unbound</td><td>DNS Resolver</td><td class="ok">Running</td><td>↻ ■</td></tr>
+    <tr><td>ntpd</td><td>NTP daemon</td><td class="ok">Running</td><td>↻ ■</td></tr></table>
+  </div></div>
+</div>
+</section>
+
+
+<section id="interfaces" class="page hidden">
+<div class="breadcrumb">Interfaces / Assignments / VLANs</div>
+<div class="pagehead"><h1>VLANs</h1><button class="btn red" onclick="applyInterfaces()">Apply Changes</button></div>
+<div class="tabs"><div class="tab">Interface Assignments</div><div class="tab active">VLANs</div><div class="tab">Interface Groups</div><div class="tab">Wireless</div></div>
+
+<div class="panel"><div class="panelhead">Add VLAN</div><div class="panelbody">
+<div class="formgrid">
+<div>Parent Interface</div><div><select id="newVlanParent"><option>igb0</option><option>igb1</option></select></div>
+<div>VLAN Tag</div><div><input id="newVlanTag" placeholder="10" onkeydown="if(event.key===\'Enter\'){event.preventDefault();addVlan()}"></div>
+<div>Description</div><div><input id="newVlanDesc" placeholder="ADMIN" onkeydown="if(event.key===\'Enter\'){event.preventDefault();addVlan()}"></div>
+<div>IPv4 Address</div><div><input id="newVlanIp" placeholder="10.10.10.1" onkeydown="if(event.key===\'Enter\'){event.preventDefault();addVlan()}"></div>
+<div>Subnet</div><div><select id="newVlanPrefix"><option>/24</option></select></div>
+</div>
+<div style="margin-top:10px">
+<button class="btn blue" onclick="addVlan()">Add VLAN</button>
+<button class="btn" onclick="verifyVlans()">Verify VLANs</button>
+</div>
+<div id="ifaceMsg" style="margin-top:8px"></div>
+</div></div>
+
+<div class="panel"><div class="panelhead">Configured VLANs</div><div class="panelbody">
+<table>
+<tr><th>Tag</th><th>Description</th><th>Parent</th><th>IPv4 Address</th><th>Subnet</th><th>Action</th></tr>
+<tbody id="vlanRows"><tr><td colspan="6">No VLANs configured.</td></tr></tbody>
+</table>
+</div></div>
+</section>
+
+
+
+<section id="firewall" class="page hidden">
+<div class="breadcrumb">Firewall / Rules / USERS</div>
+<div class="pagehead"><h1>Firewall Rules</h1><button class="btn red" onclick="applyRules()">Apply Changes</button></div>
+<div class="tabs"><div class="tab">Floating</div><div class="tab">WAN</div><div class="tab">LAN</div><div class="tab active">USERS</div><div class="tab">SERVERS</div><div class="tab">IDRAC</div><div class="tab">WIFI</div></div>
+
+<div class="panel"><div class="panelhead">Add Rule to USERS Interface</div><div class="panelbody">
+<div class="formgrid">
+<div>Action</div><div><select id="ruleAction"><option>Pass</option><option>Block</option></select></div>
+<div>Protocol</div><div><select id="ruleProtocol"><option>IPv4 TCP/UDP</option><option>IPv4 TCP</option><option>IPv4 *</option></select></div>
+<div>Source</div><div><select id="ruleSource"><option>USERS net</option></select></div>
+<div>Destination</div><div><input id="ruleDestination" placeholder="10.10.20.10 or * or IDRAC net" onkeydown="if(event.key===\'Enter\'){event.preventDefault();addFirewallRule()}"></div>
+<div>Destination Port</div><div><input id="rulePort" placeholder="53 or 80,443 or *" onkeydown="if(event.key===\'Enter\'){event.preventDefault();addFirewallRule()}"></div>
+<div>Description</div><div><input id="ruleDescription" placeholder="Allow internal DNS" onkeydown="if(event.key===\'Enter\'){event.preventDefault();addFirewallRule()}"></div>
+</div>
+<div style="margin-top:10px">
+<button class="btn blue" onclick="addFirewallRule()">Add Rule</button>
+<button class="btn" onclick="verifyRules()">Verify Rules</button>
+</div>
+<div id="ruleMsg" style="margin-top:8px"></div>
+</div></div>
+
+<div class="panel"><div class="panelhead">USERS Rules — Evaluated Top to Bottom</div><div class="panelbody">
+<table>
+<tr><th>#</th><th>Action</th><th>Protocol</th><th>Source</th><th>Destination</th><th>Port</th><th>Description</th><th>Action</th></tr>
+<tbody id="firewallRuleRows"><tr><td colspan="8">No rules configured.</td></tr></tbody>
+</table>
+<p class="help">Required policy: allow DNS to the internal DNS server, allow HTTP/HTTPS to any destination, and block USERS from the iDRAC network.</p>
+</div></div>
+
+<div class="panel"><div class="panelhead">Rule Verification</div><div class="panelbody">
+<table>
+<tr><th>Required Rule</th><th>Status</th></tr>
+<tr><td>Allow USERS → 10.10.20.10 TCP/UDP 53</td><td id="verifyDnsRule" class="bad">Not verified</td></tr>
+<tr><td>Allow USERS → any TCP 80,443</td><td id="verifyWebRule" class="bad">Not verified</td></tr>
+<tr><td>Block USERS → IDRAC net IPv4 *</td><td id="verifyIdracRule" class="bad">Not verified</td></tr>
+</table>
+</div></div>
+</section>
+
+
+<section id="services" class="page hidden">
+<div class="breadcrumb">Services / DHCP Server / USERS</div>
+<div class="pagehead"><h1>DHCP Server</h1><button class="btn red" onclick="saveDhcp()">Save</button></div>
+<div class="tabs"><div class="tab">ADMIN</div><div class="tab">SERVERS</div><div class="tab active">USERS</div><div class="tab">IDRAC</div><div class="tab">WIFI</div></div>
+<div class="panel"><div class="panelhead">DHCP Server on USERS</div><div class="panelbody">
+<div class="formgrid">
+<div>Enable</div><div><label><input id="dhcpEnable" type="checkbox"> Enable DHCP server on USERS interface</label></div>
+<div>Subnet</div><div>10.10.21.0</div>
+<div>Subnet Mask</div><div>255.255.255.0</div>
+<div>Available Range</div><div>10.10.21.1 - 10.10.21.254</div>
+<div>Range</div><div><div style="display:flex;gap:8px"><input id="dhcpStart" placeholder="10.10.21.50"><input id="dhcpEnd" placeholder="10.10.21.220"></div><div class="help">Addresses handed out dynamically to clients.</div></div>
+<div>Gateway</div><div><input id="dhcpGateway" placeholder="10.10.21.1"></div>
+<div>DNS servers</div><div><input id="dhcpDns" placeholder="10.10.20.10"><div class="help">Use the internal DNS server for domain clients.</div></div>
+<div>Domain name</div><div><input id="dhcpDomain" value="networklab.local"></div>
+<div>Default lease time</div><div><input value="7200"><div class="help">Seconds</div></div>
+<div>Maximum lease time</div><div><input value="86400"></div>
+</div>
+<div id="dhcpMsg" style="margin-top:10px"></div>
+</div></div>
+</section>
+
+<section id="status" class="page hidden">
+<div class="breadcrumb">Status / Interfaces</div>
+<div class="pagehead"><h1>Status</h1><button class="btn" onclick="refreshStatus()">Refresh</button></div>
+<div class="tabs"><div class="tab active" onclick="statusTab('interfacesStatus')">Interfaces</div><div class="tab" onclick="statusTab('servicesStatus')">Services</div><div class="tab" onclick="statusTab('leasesStatus')">DHCP Leases</div><div class="tab" onclick="statusTab('logsStatus')">System Logs</div></div>
+
+<div id="interfacesStatus" class="statuspane">
+<div class="statuscards" id="statusInterfaces"></div>
+</div>
+
+<div id="servicesStatus" class="statuspane hidden">
+<div class="panel"><div class="panelhead">Services</div><div class="panelbody">
+<table><tr><th>Service</th><th>Description</th><th>Status</th><th>Controls</th></tr>
+<tr><td>dhcpd</td><td>DHCPv4 Server</td><td id="svcDhcp" class="bad">Stopped</td><td><button class="btn" onclick="toggleDhcpService()">▶ / ■</button></td></tr>
+<tr><td>unbound</td><td>DNS Resolver</td><td class="ok">Running</td><td><button class="btn">↻</button></td></tr>
+<tr><td>ntpd</td><td>NTP daemon</td><td class="ok">Running</td><td><button class="btn">↻</button></td></tr>
+</table></div></div>
+</div>
+
+<div id="leasesStatus" class="statuspane hidden">
+<div class="panel"><div class="panelhead">DHCP Leases</div><div class="panelbody">
+<table><tr><th>IP Address</th><th>MAC Address</th><th>Hostname</th><th>Start</th><th>End</th><th>Status</th></tr>
+<tbody id="leaseRows"><tr><td colspan="6">No active leases.</td></tr></tbody></table>
+<button class="btn blue" style="margin-top:10px" onclick="simulateLease()">Simulate Client DHCP Request</button>
+</div></div>
+</div>
+
+<div id="logsStatus" class="statuspane hidden">
+<div class="panel"><div class="panelhead">System Logs / Firewall</div><div class="panelbody"><div class="console" id="logConsole">Oct 01 07:35:01 filterlog: firewall started
+Oct 01 07:35:02 unbound: service started
+Oct 01 07:35:02 ntpd: synchronized
+</div></div></div>
+</div>
+</section>
+
+<section id="diagnostics" class="page hidden">
+<div class="breadcrumb">Diagnostics / Ping</div>
+<div class="pagehead"><h1>Diagnostics</h1></div>
+<div class="tabs"><div class="tab active">Ping</div><div class="tab">Traceroute</div><div class="tab">DNS Lookup</div><div class="tab">ARP Table</div><div class="tab">States</div><div class="tab">Tables</div><div class="tab">Packet Capture</div></div>
+<div class="panel"><div class="panelhead">Ping</div><div class="panelbody">
+<div class="formgrid">
+<div>Hostname</div><div><input id="pingHost" value="10.10.21.51" onkeydown="if(event.key==='Enter'){event.preventDefault();runPing();}"></div>
+<div>IP Protocol</div><div><select><option>IPv4</option><option>IPv6</option></select></div>
+<div>Source Address</div><div><select><option>Default</option><option>USERS</option><option>SERVERS</option><option>WIFI</option></select></div>
+<div>Count</div><div><select><option>3</option><option>5</option><option>10</option></select></div>
+</div>
+<button class="btn blue" style="margin-top:10px" onclick="runPing()">Ping</button>
+<div class="console" id="pingOutput" style="margin-top:10px">Ready.</div>
+</div></div>
+</section>
+
+</div>
+
+<div class="coach">
+<h3>Student Guide • pfSense CE</h3>
+<div class="coachbody">
+<div id="coachText">Start on the Dashboard. Review system, interface, gateway, and service status before making changes.</div>
+<div id="coachSteps"></div>
+<div class="coachbuttons">
+<button class="btn" onclick="nextHint()">Next Hint</button>
+<button class="btn" onclick="showExact()">Show Exact Values</button>
+<button class="btn green" onclick="verifyLab()">Verify Full Lab</button>
+<button class="btn" onclick="resetLab()">Reset</button>
+</div>
+<div id="coachResult" style="margin-top:8px"></div>
+</div>
+</div>
+
+
+
+<script>
+const VLAN_DATA=[
+ {tag:10,name:"ADMIN",ip:"10.10.10.1"},
+ {tag:20,name:"SERVERS",ip:"10.10.20.1"},
+ {tag:21,name:"USERS",ip:"10.10.21.1"},
+ {tag:22,name:"IDRAC",ip:"10.10.22.1"},
+ {tag:23,name:"WIFI",ip:"10.10.23.1"},
+ {tag:99,name:"NETMGMT",ip:"10.10.99.1"}
+];
+let state={vlans:false,vlanVerified:false,dhcp:false,rules:false,rulesVerified:false,applied:false,dhcpService:false,lease:false};
+let configuredVlans=[];
+let firewallRules=[];
+let hint=0;
+
+const coachByPage={
+ dashboard:["Review the Dashboard widgets.","Check interface link status.","Check gateway status.","Look at Services Status before configuring anything."],
+ interfaces:[
+   "Add VLAN 10 on igb1 with description ADMIN and IP 10.10.10.1/24.",
+   "Add VLAN 20 on igb1 with description SERVERS and IP 10.10.20.1/24.",
+   "Add VLAN 21 on igb1 with description USERS and IP 10.10.21.1/24.",
+   "Add VLAN 22 on igb1 with description IDRAC and IP 10.10.22.1/24.",
+   "Add VLAN 23 on igb1 with description WIFI and IP 10.10.23.1/24.",
+   "Add VLAN 99 on igb1 with description NETMGMT and IP 10.10.99.1/24.",
+   "Click Verify VLANs, then Apply Changes."
+ ],
+ firewall:[
+   "Add a Pass rule: USERS net → 10.10.20.10 using IPv4 TCP/UDP, destination port 53.",
+   "Add a Pass rule: USERS net → * using IPv4 TCP, destination ports 80,443.",
+   "Add a Block rule: USERS net → IDRAC net using IPv4 *, destination port *.",
+   "Click Verify Rules, then Apply Changes."
+ ],
+ services:["Enable DHCP on USERS.","Use pool 10.10.21.50 through 10.10.21.220.","Gateway 10.10.21.1.","DNS 10.10.20.10.","Domain networklab.local.","Save."],
+ status:["Review assigned interfaces.","Check Services Status.","Open DHCP Leases and simulate a client request.","Use logs for troubleshooting."],
+ diagnostics:["Ping a simulated user client.","If VLANs, rules, and DHCP are configured, the ping should succeed."]
+};
+
+function showPage(id){
+ document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));
+ document.getElementById(id).classList.remove('hidden');
+ document.querySelectorAll('.navitem').forEach(n=>n.classList.remove('active'));
+ updateCoach(id);
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+function updateCoach(id){
+ const steps=coachByPage[id]||[];
+ document.getElementById('coachText').textContent="Guided help for "+id.charAt(0).toUpperCase()+id.slice(1)+".";
+ document.getElementById('coachSteps').innerHTML=steps.map((s,i)=>`<div class="coachstep ${i===0?'current':''}">${i+1}. ${s}</div>`).join('');
+ hint=0;
+}
+function nextHint(){
+ const page=[...document.querySelectorAll('.page')].find(p=>!p.classList.contains('hidden')).id;
+ const arr=coachByPage[page]||[];
+ if(!arr.length)return;
+ hint=(hint+1)%arr.length;
+ document.querySelectorAll('.coachstep').forEach((e,i)=>{e.classList.toggle('current',i===hint);e.classList.toggle('done',i<hint)});
+}
+function showExact(){
+ const page=[...document.querySelectorAll('.page')].find(p=>!p.classList.contains('hidden')).id;
+ const exact={
+  interfaces:"Add these VLANs on parent igb1:
+VLAN 10 ADMIN — 10.10.10.1/24
+VLAN 20 SERVERS — 10.10.20.1/24
+VLAN 21 USERS — 10.10.21.1/24
+VLAN 22 IDRAC — 10.10.22.1/24
+VLAN 23 WIFI — 10.10.23.1/24
+VLAN 99 NETMGMT — 10.10.99.1/24",
+  firewall:"Rule 1: Pass | IPv4 TCP/UDP | USERS net | 10.10.20.10 | 53 | Allow internal DNS
+Rule 2: Pass | IPv4 TCP | USERS net | * | 80,443 | Allow Web
+Rule 3: Block | IPv4 * | USERS net | IDRAC net | * | Block users to iDRAC",
+  services:"10.10.21.50–10.10.21.220, GW 10.10.21.1, DNS 10.10.20.10, domain networklab.local.",
+  status:"DHCP service should be Running and the test client should receive 10.10.21.51.",
+  diagnostics:"Ping target 10.10.21.51 after VLANs, firewall rules, and DHCP are active."
+ };
+ document.getElementById('coachResult').innerHTML='<div class="alert" style="white-space:pre-wrap">'+(exact[page]||"Review the widgets and current state.")+'</div>';
+}
+
+
+function renderVlanRows(){
+ const body=document.getElementById('vlanRows');
+ if(!configuredVlans.length){
+   body.innerHTML='<tr><td colspan="6">No VLANs configured.</td></tr>';
+   return;
+ }
+ body.innerHTML=configuredVlans.map((v,i)=>`<tr>
+ <td>${v.tag}</td><td>${v.name}</td><td>${v.parent}</td><td>${v.ip}</td><td>/24</td>
+ <td><button class="btn" onclick="removeVlan(${i})">Delete</button></td></tr>`).join('');
+}
+function addVlan(){
+ const parent=document.getElementById('newVlanParent').value;
+ const tag=parseInt(document.getElementById('newVlanTag').value.trim(),10);
+ const name=document.getElementById('newVlanDesc').value.trim().toUpperCase();
+ const ip=document.getElementById('newVlanIp').value.trim();
+ if(!tag||!name||!ip){
+   document.getElementById('ifaceMsg').innerHTML='<span class="bad">Enter parent, VLAN tag, description, and IPv4 address.</span>';
+   return;
+ }
+ if(configuredVlans.some(v=>v.tag===tag)){
+   document.getElementById('ifaceMsg').innerHTML='<span class="bad">That VLAN tag already exists.</span>';
+   return;
+ }
+ configuredVlans.push({parent,tag,name,ip});
+ state.vlans=false; state.vlanVerified=false; state.applied=false;
+ renderVlanRows();
+ document.getElementById('newVlanTag').value='';
+ document.getElementById('newVlanDesc').value='';
+ document.getElementById('newVlanIp').value='';
+ document.getElementById('ifaceMsg').innerHTML='<span class="ok">VLAN added. Continue until all six VLANs are present.</span>';
+}
+function removeVlan(i){
+ configuredVlans.splice(i,1);
+ state.vlans=false;state.vlanVerified=false;state.applied=false;
+ renderVlanRows();
+}
+function normalizeVlanName(name){
+  // Make comparison forgiving without changing the required VLAN tag or IP.
+  // Lowercase, remove punctuation, and collapse extra spaces first.
+  const n = String(name || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ");
+
+  const aliases = {
+    "admin": "ADMIN",
+    "administrator": "ADMIN",
+    "administration": "ADMIN",
+    "admin vlan": "ADMIN",
+
+    "server": "SERVERS",
+    "servers": "SERVERS",
+    "server vlan": "SERVERS",
+    "servers vlan": "SERVERS",
+
+    "user": "USERS",
+    "users": "USERS",
+    "client": "USERS",
+    "clients": "USERS",
+    "user vlan": "USERS",
+    "users vlan": "USERS",
+
+    "idrac": "IDRAC",
+    "i drac": "IDRAC",
+    "idrac vlan": "IDRAC",
+    "server management": "IDRAC",
+    "management controller": "IDRAC",
+
+    "wifi": "WIFI",
+    "wi fi": "WIFI",
+    "wireless": "WIFI",
+    "wireless vlan": "WIFI",
+    "wifi vlan": "WIFI",
+
+    "netmgmt": "NETMGMT",
+    "net mgmt": "NETMGMT",
+    "network management": "NETMGMT",
+    "network mgmt": "NETMGMT",
+    "management": "NETMGMT",
+    "management vlan": "NETMGMT"
+  };
+
+  return aliases[n] || n.toUpperCase();
+}
+
+function verifyVlans(){
+  const ok = VLAN_DATA.every(req =>
+    configuredVlans.some(v =>
+      v.parent === "igb1" &&
+      v.tag === req.tag &&
+      normalizeVlanName(v.name) === normalizeVlanName(req.name) &&
+      v.ip === req.ip
+    )
+  ) && configuredVlans.length === VLAN_DATA.length;
+
+  state.vlans = ok;
+  state.vlanVerified = ok;
+
+  document.getElementById('ifaceMsg').innerHTML = ok
+    ? '<span class="ok">All required VLANs verified. Click Apply Changes.</span>'
+    : '<span class="bad">VLAN verification failed. Check VLAN tag, description, parent igb1, and gateway IP for all six VLANs.</span>';
+}
+function applyInterfaces(){
+ if(state.vlanVerified){
+   state.applied=true;
+   document.getElementById('ifaceMsg').innerHTML='<span class="ok">VLAN interfaces applied successfully.</span>';
+   refreshInterfaces();
+ }else{
+   document.getElementById('ifaceMsg').innerHTML='<span class="bad">Verify all VLANs before applying changes.</span>';
+ }
+}
+function refreshInterfaces(){
+ const t=document.getElementById('dashInterfaces');
+ t.innerHTML='<tr><th>Interface</th><th>IP Address</th><th>Status</th></tr>'+
+ '<tr><td>WAN</td><td>198.51.100.25/24</td><td><span class="dot green"></span>up 1 Gbps</td></tr>'+
+ '<tr><td>LAN</td><td>172.16.16.1/24</td><td><span class="dot green"></span>up 1 Gbps</td></tr>'+
+ (state.applied?configuredVlans.sort((a,b)=>a.tag-b.tag).map(v=>`<tr><td>${v.name}</td><td>${v.ip}/24</td><td><span class="dot green"></span>up 1 Gbps</td></tr>`).join(''):'');
+ refreshStatus();
+}
+function renderFirewallRules(){
+ const body=document.getElementById('firewallRuleRows');
+ if(!firewallRules.length){
+   body.innerHTML='<tr><td colspan="8">No rules configured.</td></tr>';
+   return;
+ }
+ body.innerHTML=firewallRules.map((r,i)=>`<tr class="rule-row ${r.action==="Pass"?"rule-pass":"rule-block"}">
+ <td>${i+1}</td><td>${r.action}</td><td>${r.protocol}</td><td>${r.source}</td>
+ <td>${r.destination}</td><td>${r.port}</td><td>${r.description}</td>
+ <td><button class="btn" onclick="removeFirewallRule(${i})">Delete</button></td></tr>`).join('');
+}
+function addFirewallRule(){
+ const rule={
+   action:document.getElementById('ruleAction').value,
+   protocol:document.getElementById('ruleProtocol').value,
+   source:document.getElementById('ruleSource').value,
+   destination:document.getElementById('ruleDestination').value.trim(),
+   port:document.getElementById('rulePort').value.trim(),
+   description:document.getElementById('ruleDescription').value.trim()
+ };
+ if(!rule.destination||!rule.port||!rule.description){
+   document.getElementById('ruleMsg').innerHTML='<span class="bad">Complete destination, port, and description.</span>';
+   return;
+ }
+ firewallRules.push(rule);
+ state.rules=false;state.rulesVerified=false;
+ renderFirewallRules();
+ document.getElementById('ruleDestination').value='';
+ document.getElementById('rulePort').value='';
+ document.getElementById('ruleDescription').value='';
+ document.getElementById('ruleMsg').innerHTML='<span class="ok">Rule added. Continue until all required rules are present.</span>';
+}
+function removeFirewallRule(i){
+ firewallRules.splice(i,1);
+ state.rules=false;state.rulesVerified=false;
+ renderFirewallRules();
+ verifyRuleIndicators(false,false,false);
+}
+function verifyRuleIndicators(dns,web,idrac){
+ const vals=[['verifyDnsRule',dns],['verifyWebRule',web],['verifyIdracRule',idrac]];
+ vals.forEach(([id,ok])=>{
+   const e=document.getElementById(id);
+   e.textContent=ok?'Verified':'Not verified';
+   e.className=ok?'ok':'bad';
+ });
+}
+function verifyRules(){
+ const dns=firewallRules.some(r=>
+   r.action==="Pass" && r.protocol==="IPv4 TCP/UDP" && r.source==="USERS net" &&
+   r.destination==="10.10.20.10" && r.port==="53"
+ );
+ const web=firewallRules.some(r=>
+   r.action==="Pass" && r.protocol==="IPv4 TCP" && r.source==="USERS net" &&
+   r.destination==="*" && (r.port==="80,443" || r.port==="80, 443")
+ );
+ const idrac=firewallRules.some(r=>
+   r.action==="Block" && r.protocol==="IPv4 *" && r.source==="USERS net" &&
+   r.destination.toUpperCase()==="IDRAC NET" && r.port==="*"
+ );
+ verifyRuleIndicators(dns,web,idrac);
+ state.rulesVerified=dns&&web&&idrac;
+ document.getElementById('ruleMsg').innerHTML=state.rulesVerified
+   ?'<span class="ok">All required firewall rules verified. Click Apply Changes.</span>'
+   :'<span class="bad">Rule verification failed. Compare each rule to the Student Guide.</span>';
+}
+function applyRules(){
+ if(state.rulesVerified){
+   state.rules=true;
+   document.getElementById('ruleMsg').innerHTML='<span class="ok">Firewall rules applied successfully.</span>';
+ }else{
+   state.rules=false;
+   document.getElementById('ruleMsg').innerHTML='<span class="bad">Verify all required rules before applying.</span>';
+ }
+}
+
+function saveDhcp(){
+ state.dhcp=document.getElementById('dhcpEnable').checked &&
+ document.getElementById('dhcpStart').value.trim()==="10.10.21.50" &&
+ document.getElementById('dhcpEnd').value.trim()==="10.10.21.220" &&
+ document.getElementById('dhcpGateway').value.trim()==="10.10.21.1" &&
+ document.getElementById('dhcpDns').value.trim()==="10.10.20.10" &&
+ document.getElementById('dhcpDomain').value.trim()==="networklab.local";
+ state.dhcpService=state.dhcp;
+ document.getElementById('dhcpMsg').innerHTML=state.dhcp?'<span class="ok">DHCP configuration saved. Service is running.</span>':'<span class="bad">Check DHCP scope, gateway, DNS, and domain.</span>';
+ updateServices();
+}
+function updateServices(){
+ for(const id of ['dashDhcp','svcDhcp']){
+  const e=document.getElementById(id);
+  if(e){e.textContent=state.dhcpService?'Running':'Stopped';e.className=state.dhcpService?'ok':'bad'}
+ }
+}
+function toggleDhcpService(){state.dhcpService=!state.dhcpService;updateServices()}
+function statusTab(id){
+ document.querySelectorAll('.statuspane').forEach(x=>x.classList.add('hidden'));
+ document.getElementById(id).classList.remove('hidden');
+}
+function refreshStatus(){
+ const host=document.getElementById('statusInterfaces'); if(!host)return;
+ const base=[{n:"WAN",dev:"igb0",ip:"198.51.100.25/24",up:true},{n:"LAN",dev:"igb1",ip:"172.16.16.1/24",up:true}];
+ const more=state.applied?configuredVlans.slice().sort((a,b)=>a.tag-b.tag).map(v=>({n:v.name,dev:"igb1."+v.tag,ip:v.ip+"/24",up:true})):[];
+ host.innerHTML=[...base,...more].map(x=>`<div class="statuscard"><b>${x.n} (${x.dev})</b><p><span class="dot green"></span><span class="ok">up</span></p><p>${x.ip}</p><p>Media: 1000baseT full-duplex</p><p>In/Out: 128 KB / 94 KB</p></div>`).join('');
+}
+function simulateLease(){
+ if(state.dhcpService&&state.dhcp){
+   state.lease=true;
+   document.getElementById('leaseRows').innerHTML='<tr><td>10.10.21.51</td><td>00:11:22:33:44:55</td><td>CLIENT01</td><td>07:42:12</td><td>09:42:12</td><td class="ok">active</td></tr>';
+   document.getElementById('logConsole').textContent+='\\nOct 01 07:42:12 dhcpd: DHCPDISCOVER from 00:11:22:33:44:55\\nOct 01 07:42:12 dhcpd: DHCPOFFER on 10.10.21.51\\nOct 01 07:42:13 dhcpd: DHCPACK on 10.10.21.51 to CLIENT01';
+ }else alert("DHCP service is not configured/running.");
+}
+function runPing(){
+ const host=document.getElementById('pingHost').value.trim();
+ const out=document.getElementById('pingOutput');
+ if(host==="10.10.21.51"&&state.applied&&state.rules&&state.dhcpService&&state.lease){
+  out.textContent="PING 10.10.21.51 (10.10.21.51): 56 data bytes\\n64 bytes from 10.10.21.51: icmp_seq=0 ttl=128 time=0.792 ms\\n64 bytes from 10.10.21.51: icmp_seq=1 ttl=128 time=0.611 ms\\n64 bytes from 10.10.21.51: icmp_seq=2 ttl=128 time=0.584 ms\\n\\n--- 10.10.21.51 ping statistics ---\\n3 packets transmitted, 3 packets received, 0.0% packet loss";
+ }else out.textContent="PING "+host+"\\nRequest timeout / host unreachable. Check interfaces, DHCP, and client lease.";
+}
+function verifyLab(){
+ const ok=state.vlanVerified&&state.applied&&state.dhcp&&state.rulesVerified&&state.rules&&state.dhcpService;
+ document.getElementById('coachResult').innerHTML=ok?'<span class="ok">Full pfSense lab verified. VLANs are created and applied, firewall rules are verified and applied, and DHCP is configured.</span>':'<span class="bad">Not complete yet. Create and verify all VLANs, verify/apply the firewall rules, and configure DHCP.</span>';
+}
+function resetLab(){
+ if(!confirm("Reset the pfSense simulator?"))return;
+ state={vlans:false,vlanVerified:false,dhcp:false,rules:false,rulesVerified:false,applied:false,dhcpService:false,lease:false};configuredVlans=[];firewallRules=[];
+ location.reload();
+}
+function tick(){
+ const e=document.getElementById('uptime');if(!e)return;
+ const parts=e.textContent.split(':').map(Number);let s=parts[0]*3600+parts[1]*60+parts[2]+1;
+ e.textContent=String(Math.floor(s/3600)).padStart(2,'0')+':'+String(Math.floor(s%3600/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+}
+renderVlanRows();renderFirewallRules();refreshStatus();updateCoach('dashboard');setInterval(tick,1000);
+</script>
+</body>
+</html>
